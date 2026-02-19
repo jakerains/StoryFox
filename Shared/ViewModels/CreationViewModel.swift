@@ -39,6 +39,7 @@ final class CreationViewModel {
     // MARK: - Generators
     let storyGenerator = StoryGenerator()
     let remoteStoryGenerator = RemoteStoryGenerator()
+    let mlxStoryGenerator = MLXStoryGenerator()
     let illustrationGenerator = IllustrationGenerator()
 
     private var generationTask: Task<Void, Never>?
@@ -49,14 +50,41 @@ final class CreationViewModel {
     }
 
     var isAvailable: Bool {
-        remoteStoryGenerator.isConfigured || storyGenerator.isAvailable
+        let settings = ModelSelectionStore.load()
+        switch settings.textProvider {
+        case .appleFoundation:
+            return remoteStoryGenerator.isConfigured || storyGenerator.isAvailable
+        case .mlxSwift:
+            return true
+        case .openRouter:
+            return CloudCredentialStore.isAuthenticated(for: .openRouter)
+        case .togetherAI:
+            return CloudCredentialStore.isAuthenticated(for: .togetherAI)
+        case .huggingFace:
+            return CloudCredentialStore.isAuthenticated(for: .huggingFace)
+        }
     }
 
     var unavailabilityReason: String? {
-        if remoteStoryGenerator.isConfigured || storyGenerator.isAvailable {
+        let settings = ModelSelectionStore.load()
+        switch settings.textProvider {
+        case .appleFoundation:
+            if remoteStoryGenerator.isConfigured || storyGenerator.isAvailable {
+                return nil
+            }
+            return storyGenerator.unavailabilityReason
+        case .mlxSwift:
             return nil
+        case .openRouter:
+            return CloudCredentialStore.isAuthenticated(for: .openRouter)
+                ? nil : "OpenRouter API key not configured. Add it in Settings."
+        case .togetherAI:
+            return CloudCredentialStore.isAuthenticated(for: .togetherAI)
+                ? nil : "Together AI API key not configured. Add it in Settings."
+        case .huggingFace:
+            return CloudCredentialStore.isAuthenticated(for: .huggingFace)
+                ? nil : "Hugging Face not authenticated. Log in via Settings."
         }
-        return storyGenerator.unavailabilityReason
     }
 
     // MARK: - Generation
@@ -96,7 +124,8 @@ final class CreationViewModel {
                 try await illustrationGenerator.generateIllustrations(
                     for: book.pages,
                     coverPrompt: coverPrompt,
-                    style: selectedStyle
+                    style: selectedStyle,
+                    format: selectedFormat
                 ) { [weak self] index, image in
                     guard let self else { return }
                     self.generatedImages[index] = image
@@ -146,6 +175,81 @@ final class CreationViewModel {
     }
 
     private func generateStoryWithRouting(
+        concept: String,
+        pageCount: Int
+    ) async throws -> StoryBook {
+        let settings = ModelSelectionStore.load()
+        switch settings.textProvider {
+        case .appleFoundation:
+            return try await generateFoundationRoutedStory(
+                concept: concept,
+                pageCount: pageCount
+            )
+
+        case .mlxSwift:
+            phase = .generatingText(partialText: "Using MLX model for story drafting...")
+            do {
+                return try await mlxStoryGenerator.generateStory(
+                    concept: concept,
+                    pageCount: pageCount,
+                    onProgress: { [weak self] partialText in
+                        guard let self else { return }
+                        self.phase = .generatingText(partialText: partialText)
+                    }
+                )
+            } catch {
+                if settings.enableFoundationFallback {
+                    phase = .generatingText(partialText: "MLX model unavailable, switching to Apple Foundation path...")
+                    return try await generateFoundationRoutedStory(
+                        concept: concept,
+                        pageCount: pageCount
+                    )
+                } else {
+                    throw error
+                }
+            }
+
+        case .openRouter, .togetherAI, .huggingFace:
+            return try await generateCloudStory(
+                concept: concept,
+                pageCount: pageCount,
+                provider: settings.textProvider.cloudProvider!,
+                enableFallback: settings.enableFoundationFallback
+            )
+        }
+    }
+
+    private func generateCloudStory(
+        concept: String,
+        pageCount: Int,
+        provider: CloudProvider,
+        enableFallback: Bool
+    ) async throws -> StoryBook {
+        let generator = CloudTextGenerator(cloudProvider: provider)
+        phase = .generatingText(partialText: "Using \(provider.displayName) for story drafting...")
+        do {
+            return try await generator.generateStory(
+                concept: concept,
+                pageCount: pageCount,
+                onProgress: { [weak self] partialText in
+                    guard let self else { return }
+                    self.phase = .generatingText(partialText: partialText)
+                }
+            )
+        } catch {
+            if enableFallback {
+                phase = .generatingText(partialText: "\(provider.displayName) unavailable, switching to Apple Foundation path...")
+                return try await generateFoundationRoutedStory(
+                    concept: concept,
+                    pageCount: pageCount
+                )
+            } else {
+                throw error
+            }
+        }
+    }
+
+    private func generateFoundationRoutedStory(
         concept: String,
         pageCount: Int
     ) async throws -> StoryBook {

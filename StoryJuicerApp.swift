@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+#if os(macOS)
+import AppKit
+#endif
 
 @main
 struct StoryJuicerApp: App {
@@ -9,6 +12,10 @@ struct StoryJuicerApp: App {
         }
         .defaultSize(width: 1080, height: 760)
         .modelContainer(for: StoredStorybook.self)
+
+        Settings {
+            MacModelSettingsView()
+        }
     }
 }
 
@@ -133,14 +140,14 @@ struct MainView: View {
 
     private var sidebarHeader: some View {
         HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
-            Image(systemName: "book.closed.fill")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(Color.sjCoral)
+            sidebarBrandIcon
                 .frame(width: 32, height: 32)
-                .sjGlassCard(
-                    tint: .sjCoral.opacity(StoryJuicerGlassTokens.Tint.standard),
-                    cornerRadius: 999
-                )
+                .clipShape(.rect(cornerRadius: 9, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.3), lineWidth: 1)
+                }
+                .shadow(color: Color.black.opacity(0.14), radius: 6, y: 3)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text("StoryJuicer")
@@ -153,6 +160,32 @@ struct MainView: View {
 
             Spacer()
         }
+    }
+
+    @ViewBuilder
+    private var sidebarBrandIcon: some View {
+#if os(macOS)
+        if let appIcon = NSImage(named: NSImage.applicationIconName) {
+            Image(nsImage: appIcon)
+                .resizable()
+                .scaledToFill()
+        } else {
+            fallbackSidebarSymbol
+        }
+#else
+        fallbackSidebarSymbol
+#endif
+    }
+
+    private var fallbackSidebarSymbol: some View {
+        Image(systemName: "book.closed.fill")
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(Color.sjCoral)
+            .frame(width: 32, height: 32)
+            .sjGlassCard(
+                tint: .sjCoral.opacity(StoryJuicerGlassTokens.Tint.standard),
+                cornerRadius: 999
+            )
     }
 
     private func savedBookRow(_ book: StoredStorybook, isSelected: Bool) -> some View {

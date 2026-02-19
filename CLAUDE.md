@@ -12,33 +12,87 @@ xcodegen generate
 
 # Build from command line
 xcodebuild -project StoryJuicer.xcodeproj -scheme StoryJuicer -destination 'platform=macOS' build
+
+# Build and run (uses scripts/build.sh + scripts/run.sh)
+make run
+
+# Build a signed, notarized DMG for distribution
+make dmg
 ```
 
 **Important:** XcodeGen overwrites `Resources/StoryJuicer.entitlements` on each run. If the entitlements file has custom sandbox permissions, back it up before regenerating and restore after.
 
-There are no tests, no linter, and no package dependencies. The project uses only Apple platform frameworks.
+There are no tests, no linter, and no package dependencies beyond Apple platform frameworks and the HuggingFace Swift SDK.
 
 ## What This App Does
 
-StoryJuicer generates illustrated children's storybooks entirely on-device using Apple AI. The user enters a story concept, picks page count/format/style, and the app produces a complete storybook with text and illustrations — no API keys, no cloud, no external dependencies.
+StoryJuicer generates illustrated children's storybooks using a combination of on-device and cloud AI. The user enters a story concept, picks page count/format/style, and the app produces a complete storybook with text and illustrations.
 
-- **Text generation:** FoundationModels framework (on-device ~3B LLM) with `@Generable` structs for typed output
-- **Image generation:** ImagePlayground `ImageCreator` API (on-device diffusion model)
-- **Target:** macOS 26 (Tahoe) on Apple Silicon with Apple Intelligence enabled
+**Text generation providers:**
+- Apple FoundationModels (on-device ~3B LLM) with `@Generable` structs
+- MLX Swift (local open-weight models via Hugging Face)
+- Hugging Face Inference API (cloud)
+- *(OpenRouter and Together AI exist in code but are hidden from UI)*
+
+**Image generation providers:**
+- ImagePlayground `ImageCreator` API (on-device diffusion)
+- Hugging Face Inference API (cloud, e.g. FLUX.1-schnell)
+- *(Diffusers local, OpenRouter, Together AI exist in code but are hidden from UI)*
+
+**Target:** macOS 26 (Tahoe) on Apple Silicon with Apple Intelligence enabled
 
 ## Architecture
 
 ```
-StoryJuicerApp.swift          ← App entry + MainView (NavigationSplitView routing)
-Shared/                       ← All cross-platform code (~70% of codebase)
-  Models/                     ← StoryBook (@Generable), BookFormat, IllustrationStyle, StoredStorybook (@Model)
-  Generation/                 ← StoryGenerator (LLM), IllustrationGenerator (ImageCreator), PDFRendering protocol
-  ViewModels/                 ← CreationViewModel (drives creation flow), BookReaderViewModel (reader + regeneration)
-  Views/Components/           ← Reusable UI: Color+Theme, PageThumbnail, PageOverviewGrid, SqueezeButton, etc.
-  Utilities/                  ← GenerationConfig, PlatformImage typealias
-macOS/                        ← Platform-specific views and PDF renderer
-  Views/                      ← MacCreationView, MacGenerationProgressView, MacBookReaderView, MacExportView
-  PDFRenderer+macOS.swift     ← Core Graphics PDF rendering at 300 DPI
+StoryJuicerApp.swift              ← App entry + MainView (NavigationSplitView routing)
+Shared/
+  Models/                         ← StoryBook (@Generable), BookFormat, IllustrationStyle, StoredStorybook (@Model)
+  Generation/
+    StoryGenerator.swift          ← On-device FoundationModels text generation
+    MLXStoryGenerator.swift       ← Local MLX Swift text generation
+    CloudTextGenerator.swift      ← Cloud text generation (HF, OpenRouter, Together AI)
+    CloudImageGenerator.swift     ← Cloud image generation (HF native inference path)
+    IllustrationGenerator.swift   ← On-device ImagePlayground image generation
+    ImagePlaygroundImageGenerator  ← ImagePlayground wrapper implementing StoryImageGenerating
+    ImageGenerationRouter.swift   ← Routes to correct image generator based on provider settings
+    OpenAICompatibleClient.swift  ← Generic HTTP client for OpenAI-compatible APIs
+    CloudProviderTypes.swift      ← CloudProvider enum, URLs, defaults, error types
+    GenerationProviderTypes.swift ← StoryTextProvider, StoryImageProvider enums, ModelSelectionSettings
+    StoryTextGenerating.swift     ← Protocol for text generators
+    StoryImageGenerating.swift    ← Protocol for image generators
+    StoryDecoding.swift           ← JSON response parsing helpers
+    StoryPromptTemplates.swift    ← Prompt templates for story generation
+    StoryProviderAvailability.swift ← Runtime availability checks
+    PDFRendering.swift            ← Protocol for PDF export
+    RemoteStoryGenerator.swift    ← Unified remote text generation entry point
+    DiffusersImageGenerator.swift ← Local Diffusers image generation (hidden)
+  ViewModels/
+    CreationViewModel.swift       ← Drives creation flow
+    BookReaderViewModel.swift     ← Reader + page regeneration
+  Views/Components/               ← Color+Theme, SqueezeButton, FormatPreviewCard, StylePickerItem,
+                                    PageThumbnail, ErrorBanner, UnavailableOverlay, SettingsPanelStyle,
+                                    StoryJuicerTypography
+  Utilities/
+    ModelSelectionStore.swift     ← Persists ModelSelectionSettings to JSON file
+    CloudCredentialStore.swift    ← Keychain storage for API keys + OAuth tokens
+    HFTokenStore.swift           ← Keychain storage for Hugging Face tokens
+    HuggingFaceOAuth.swift       ← OAuth device flow for Hugging Face login
+    CloudModelListCache.swift    ← Caches available model lists from cloud providers
+    GenerationDiagnosticsLogger  ← Structured logging for generation pipeline
+    ContentSafetyPolicy.swift    ← Content safety guardrails
+    GenerationOptions+Defaults   ← Default generation config values
+    DiffusersRuntimeManager.swift ← Local Diffusers model management (hidden)
+    PlatformImage.swift          ← Cross-platform image typealias
+macOS/
+  Views/
+    MacCreationView.swift        ← Story concept input, format/style pickers
+    MacGenerationProgressView    ← Streaming text, image progress grid
+    MacBookReaderView.swift      ← Page-by-page reader with overview grid
+    MacExportView.swift          ← PDF/image export
+    MacModelSettingsView.swift   ← Model & provider settings panel
+    CloudProviderSettingsSection ← Per-provider settings card (auth, model pickers, test buttons)
+    CloudProviderLoginButton     ← OAuth login button for cloud providers
+  PDFRenderer+macOS.swift        ← Core Graphics PDF rendering at 300 DPI
 ```
 
 ### Navigation Flow
@@ -54,8 +108,8 @@ macOS/                        ← Platform-specific views and PDF renderer
 Sequential: text must complete before images begin (LLM generates the image prompts).
 
 1. `CreationViewModel.squeezeStory()` kicks off the pipeline
-2. `StoryGenerator` streams a `StoryBook` struct via `LanguageModelSession.streamResponse()`
-3. `IllustrationGenerator` generates images concurrently (capped at `GenerationConfig.maxConcurrentImages`)
+2. Text generator (routed by `StoryTextProvider`) streams a `StoryBook` struct
+3. Image generator (routed by `StoryImageProvider`) generates images concurrently (capped at `GenerationConfig.maxConcurrentImages`)
 4. On completion, a `BookReaderViewModel` is created and route switches to `.reading`
 5. Book is persisted to SwiftData via `StoredStorybook`
 
@@ -66,6 +120,38 @@ Sequential: text must complete before images begin (LLM generates the image prom
 - **`GenerationPhase`** is `Equatable` (stores errors as `String`, not `Error`) so SwiftUI `.onChange` works
 - **`@Bindable`** in child views (not `@ObservedObject`) since we use `@Observable`
 - **Images stored as `[Int: CGImage]`** where key 0 = cover, keys 1...N = story pages by `pageNumber`
+- **Dual-path cloud architecture:** HuggingFace uses native inference endpoints; OpenRouter/Together AI share `OpenAICompatibleClient`
+
+## Cloud Provider Architecture
+
+### Authentication
+- `CloudCredentialStore.bearerToken(for:)` checks for an API key first, then falls back to an OAuth access token
+- HuggingFace supports both direct API tokens and OAuth device flow login (`HuggingFaceOAuth`)
+- Tokens are stored in macOS Keychain via `HFTokenStore` and `CloudCredentialStore`
+
+### HuggingFace API Paths (IMPORTANT)
+
+**Text (works via OpenAI-compatible layer):**
+- Endpoint: `https://router.huggingface.co/v1/chat/completions`
+- Uses standard OpenAI chat completion format
+- Both `InferenceClient` SDK and `OpenAICompatibleClient` work
+
+**Images (MUST use native HF Inference endpoint):**
+- Working endpoint: `POST https://router.huggingface.co/hf-inference/models/{model_id}`
+- Request body: `{"inputs": "prompt text", "parameters": {"width": 1024, "height": 1024}}`
+- Response: raw image bytes (JPEG) — decode with `CGImageSourceCreateWithData`
+- **DO NOT use** the HF Swift SDK's `textToImage()` — it posts to `/v1/images/generations` which returns 404 on `router.huggingface.co`. This is a known SDK bug.
+- **DO NOT use** `api-inference.huggingface.co` — it returns 410 (deprecated)
+
+### Hidden Providers
+OpenRouter and Together AI are fully implemented in code but **hidden from the UI** in `MacModelSettingsView.swift` via `.filter { $0 != .openRouter && $0 != .togetherAI }` on the provider pickers. The "More Providers" section in settings is commented out. To re-enable, remove those filters and uncomment the section.
+
+### Settings Test Buttons
+`CloudProviderSettingsSection` has three test buttons per provider:
+- **Test Connection** — fetches model list to verify API key
+- **Test Text Model** — sends a real prompt and shows a response snippet
+- **Test Image Model** — sends a real prompt and shows image dimensions
+Error messages use `.textSelection(.enabled)` so users can copy them.
 
 ## Apple Framework API Notes
 
@@ -81,9 +167,43 @@ Sequential: text must complete before images begin (LLM generates the image prom
 - Each image takes ~15-30 seconds on-device
 - Three styles: `.illustration`, `.animation`, `.sketch` — mapped via `IllustrationStyle.playgroundStyle`
 
+## Distribution
+
+### DMG Build (`make dmg`)
+Produces a signed, notarized DMG at `dist/StoryJuicer.dmg`. Pipeline:
+1. `xcodegen generate` — regenerate project
+2. `xcodebuild archive` — Release archive with Developer ID signing
+3. `xcodebuild -exportArchive` — export signed `.app`
+4. `xcrun notarytool submit` — notarize with Apple
+5. `xcrun stapler staple` — staple notarization ticket
+6. `hdiutil create` — package into DMG, notarize + staple the DMG itself
+
+**Signing identity:** `Developer ID Application: Jacob RAINS (47347VQHQV)`
+**Notarization profile:** `StoryJuicer-Notarize` (stored in Keychain via `xcrun notarytool store-credentials`)
+
+### Makefile Targets
+- `make help` — list all targets
+- `make doctor` — check toolchain readiness
+- `make build` / `make run` — Debug build
+- `make build-release` / `make run-release` — Release build
+- `make dmg` — full distribution pipeline
+- `make clean` — clean Xcode build artifacts
+- `make purge-image-cache` — remove local Diffusers model cache
+
 ## Theme Colors
 
 All custom colors are defined as `Color.sj*` extensions in `Color+Theme.swift` ("Warm Library at Dusk" palette). Primary accent is `sjCoral` (terracotta). Use these consistently — don't introduce new color literals.
+
+## UI Components
+
+Glass-morphism design system defined in `SettingsPanelStyle.swift`:
+- `SettingsPanelCard` — frosted glass card container
+- `SettingsSectionHeader` — title + subtitle + icon header
+- `SettingsControlRow` — label + control layout
+- `.settingsFieldChrome()` modifier — consistent field styling
+- `.glass` / `.glassProminent` button styles
+- `StoryJuicerGlassTokens` — spacing, radius, tint constants
+- `StoryJuicerTypography` — font presets for settings UI
 
 ## Model Names
 

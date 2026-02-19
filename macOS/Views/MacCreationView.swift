@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 struct MacCreationView: View {
     @Bindable var viewModel: CreationViewModel
@@ -71,21 +74,13 @@ struct MacCreationView: View {
 
     private var headerSection: some View {
         HStack(alignment: .top, spacing: StoryJuicerGlassTokens.Spacing.large) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.sjCoral.opacity(0.9), Color.sjGold.opacity(0.9)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-
-                Image(systemName: "book.fill")
-                    .font(.title.weight(.bold))
-                    .foregroundStyle(.white)
-            }
+            heroBrandIcon
             .frame(width: 66, height: 66)
+            .clipShape(.rect(cornerRadius: 18, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.35), lineWidth: 1)
+            }
             .shadow(color: Color.black.opacity(0.16), radius: 10, y: 5)
             .scaleEffect(animateHero ? 1 : 0.94)
 
@@ -113,6 +108,38 @@ struct MacCreationView: View {
         .overlay {
             RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.hero)
                 .strokeBorder(Color.sjBorder.opacity(0.65), lineWidth: 1)
+        }
+    }
+
+    @ViewBuilder
+    private var heroBrandIcon: some View {
+#if os(macOS)
+        if let appIcon = NSImage(named: NSImage.applicationIconName) {
+            Image(nsImage: appIcon)
+                .resizable()
+                .scaledToFill()
+        } else {
+            fallbackHeroSymbol
+        }
+#else
+        fallbackHeroSymbol
+#endif
+    }
+
+    private var fallbackHeroSymbol: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.sjCoral.opacity(0.9), Color.sjGold.opacity(0.9)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            Image(systemName: "book.fill")
+                .font(.title.weight(.bold))
+                .foregroundStyle(.white)
         }
     }
 
@@ -152,53 +179,66 @@ struct MacCreationView: View {
     }
 
     private var settingsSection: some View {
-        VStack(spacing: StoryJuicerGlassTokens.Spacing.large) {
+        SettingsPanelCard(tint: .sjGlassWeak.opacity(0.68)) {
+            SettingsSectionHeader(
+                title: "Book Setup",
+                subtitle: "Tune page count, layout, and illustration style before generating.",
+                systemImage: "wand.and.stars"
+            )
+
             pageCountRow
-
-            Divider()
-                .overlay(Color.sjBorder.opacity(0.65))
-
+            panelDivider
             formatPickerSection
-
-            Divider()
-                .overlay(Color.sjBorder.opacity(0.65))
-
+            panelDivider
             stylePickerSection
-        }
-        .padding(StoryJuicerGlassTokens.Spacing.large)
-        .sjGlassCard(
-            tint: .sjGlassWeak.opacity(0.65),
-            cornerRadius: StoryJuicerGlassTokens.Radius.hero
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.hero)
-                .strokeBorder(Color.sjBorder.opacity(0.65), lineWidth: 1)
         }
     }
 
+    private var panelDivider: some View {
+        Rectangle()
+            .fill(
+                LinearGradient(
+                    colors: [Color.sjBorder.opacity(0.2), Color.sjBorder.opacity(0.85), Color.sjBorder.opacity(0.2)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .frame(height: 1)
+    }
+
     private var pageCountRow: some View {
-        HStack {
-            Label("Pages", systemImage: "doc.on.doc")
-                .font(StoryJuicerTypography.uiTitle)
-                .foregroundStyle(Color.sjGlassInk)
-
-            Spacer()
-
+        SettingsControlRow(
+            title: "Page Count",
+            description: "Choose an even value from \(GenerationConfig.minPages) to \(GenerationConfig.maxPages)."
+        ) {
             Stepper(
-                "\(viewModel.pageCount) pages",
                 value: $viewModel.pageCount,
                 in: GenerationConfig.minPages...GenerationConfig.maxPages,
                 step: 2
-            )
-            .frame(width: 190)
+            ) {
+                Text("\(viewModel.pageCount) pages")
+                    .font(StoryJuicerTypography.settingsControl)
+                    .foregroundStyle(Color.sjText)
+            }
+            .frame(width: 210)
+            .padding(.horizontal, StoryJuicerGlassTokens.Spacing.small)
+            .padding(.vertical, StoryJuicerGlassTokens.Spacing.xSmall + 2)
+            .background(Color.sjReadableCard.opacity(0.85), in: .rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
+            .overlay {
+                RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
+                    .strokeBorder(Color.sjBorder.opacity(0.8), lineWidth: 1)
+            }
+            .tint(.sjCoral)
         }
     }
 
     private var formatPickerSection: some View {
-        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
-            Label("Book Format", systemImage: "rectangle.portrait.on.rectangle.portrait")
-                .font(StoryJuicerTypography.uiTitle)
-                .foregroundStyle(Color.sjGlassInk)
+        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.medium) {
+            SettingsSectionHeader(
+                title: "Book Format",
+                subtitle: "Pick page proportions for reading and PDF export.",
+                systemImage: "rectangle.portrait.on.rectangle.portrait"
+            )
 
             GlassEffectContainer(spacing: StoryJuicerGlassTokens.Spacing.small) {
                 LazyVGrid(
@@ -225,15 +265,18 @@ struct MacCreationView: View {
     }
 
     private var stylePickerSection: some View {
-        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
-            Label("Illustration Style", systemImage: "paintbrush.fill")
-                .font(StoryJuicerTypography.uiTitle)
-                .foregroundStyle(Color.sjGlassInk)
+        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.medium) {
+            SettingsSectionHeader(
+                title: "Illustration Style",
+                subtitle: "Choose the visual treatment for every generated page.",
+                systemImage: "paintbrush.fill"
+            )
 
-            if !supportsImagePlayground {
-                Label("Image Playground is not available on this device.", systemImage: "exclamationmark.triangle")
-                    .font(StoryJuicerTypography.uiMetaStrong)
-                    .foregroundStyle(Color.sjCoral)
+            if !supportsImagePlayground && ModelSelectionStore.load().imageProvider == .imagePlayground {
+                warningCallout(
+                    "Image Playground is not available on this device.",
+                    systemImage: "exclamationmark.triangle"
+                )
             }
 
             GlassEffectContainer(spacing: StoryJuicerGlassTokens.Spacing.medium) {
@@ -254,6 +297,25 @@ struct MacCreationView: View {
                     }
                 }
             }
+        }
+    }
+
+    private func warningCallout(_ message: String, systemImage: String) -> some View {
+        HStack(alignment: .top, spacing: StoryJuicerGlassTokens.Spacing.small) {
+            Image(systemName: systemImage)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.sjCoral)
+
+            Text(message)
+                .font(StoryJuicerTypography.settingsMeta)
+                .foregroundStyle(Color.sjSecondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(StoryJuicerGlassTokens.Spacing.small)
+        .background(Color.sjCoral.opacity(0.12), in: .rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
+        .overlay {
+            RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
+                .strokeBorder(Color.sjCoral.opacity(0.38), lineWidth: 1)
         }
     }
 }

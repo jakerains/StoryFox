@@ -14,4 +14,11 @@ enum StoryJuicerTypography {
     static let uiMeta = Font.system(.callout, design: .rounded)
     static let uiMetaStrong = Font.system(.callout, design: .rounded).weight(.semibold)
     static let uiFootnoteStrong = Font.system(.footnote, design: .rounded).weight(.semibold)
+
+    // Settings hierarchy for polished readability in dense control panels
+    static let settingsHero = Font.system(size: 30, weight: .semibold, design: .serif)
+    static let settingsSectionTitle = Font.system(size: 19, weight: .semibold, design: .rounded)
+    static let settingsBody = Font.system(size: 15, weight: .regular, design: .rounded)
+    static let settingsControl = Font.system(size: 15, weight: .medium, design: .rounded)
+    static let settingsMeta = Font.system(size: 13, weight: .regular, design: .rounded)
 }

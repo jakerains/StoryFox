@@ -58,6 +58,10 @@ struct MacGenerationProgressView: View {
         }
     }
 
+    private var currentSettings: ModelSelectionSettings {
+        ModelSelectionStore.load()
+    }
+
     @ViewBuilder
     private var phaseIndicator: some View {
         switch viewModel.phase {
@@ -67,11 +71,15 @@ struct MacGenerationProgressView: View {
                     .scaleEffect(1.15)
                     .tint(Color.sjCoral)
 
-                Text("Writing your story")
-                    .font(StoryJuicerTypography.uiTitle)
-                    .foregroundStyle(Color.sjGlassInk)
+                HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                    Text("Writing your story")
+                        .font(StoryJuicerTypography.uiTitle)
+                        .foregroundStyle(Color.sjGlassInk)
 
-                Text("The on-device model is composing each page and scene prompt.")
+                    providerBadge(currentSettings.textProvider.displayName)
+                }
+
+                Text(textProviderDescription)
                     .font(StoryJuicerTypography.uiBody)
                     .foregroundStyle(Color.sjSecondaryText)
             }
@@ -82,17 +90,55 @@ struct MacGenerationProgressView: View {
                     .tint(Color.sjCoral)
                     .frame(maxWidth: 360)
 
-                Text("Painting illustrations")
-                    .font(StoryJuicerTypography.uiTitle)
-                    .foregroundStyle(Color.sjGlassInk)
+                HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                    Text("Painting illustrations")
+                        .font(StoryJuicerTypography.uiTitle)
+                        .foregroundStyle(Color.sjGlassInk)
+
+                    providerBadge(currentSettings.imageProvider.displayName)
+                }
 
                 Text("Illustrating page \(completed) of \(total)")
                     .font(StoryJuicerTypography.uiBody)
                     .foregroundStyle(Color.sjSecondaryText)
+
+                if let status = viewModel.illustrationGenerator.lastStatusMessage,
+                   !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text(status)
+                        .font(StoryJuicerTypography.uiMeta)
+                        .foregroundStyle(Color.sjSecondaryText)
+                }
             }
 
         default:
             EmptyView()
+        }
+    }
+
+    private func providerBadge(_ name: String) -> some View {
+        Text(name)
+            .font(.system(size: 10, weight: .semibold, design: .rounded))
+            .foregroundStyle(Color.sjCoral)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Color.sjCoral.opacity(0.12), in: Capsule())
+            .overlay {
+                Capsule().strokeBorder(Color.sjCoral.opacity(0.3), lineWidth: 1)
+            }
+    }
+
+    private var textProviderDescription: String {
+        switch currentSettings.textProvider {
+        case .appleFoundation:
+            return "On-device Apple Foundation model is composing each page."
+        case .mlxSwift:
+            return "Local MLX model is composing each page."
+        case .openRouter:
+            return "OpenRouter cloud model is composing each page."
+        case .togetherAI:
+            return "Together AI cloud model is composing each page."
+        case .huggingFace:
+            return "Hugging Face cloud model is composing each page."
         }
     }
 
@@ -116,20 +162,41 @@ struct MacGenerationProgressView: View {
     }
 
     private func textStreamingView(_ text: String) -> some View {
-        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
+        let displayText = userFacingStreamingText(from: text)
+
+        return VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
             if let book = viewModel.storyBook {
                 Text(book.title)
                     .font(.system(.title2, design: .rounded).weight(.bold))
                     .foregroundStyle(Color.sjGlassInk)
             }
 
-            Text(text.isEmpty ? "Generating draft pages..." : text)
+            Text(displayText)
                 .font(.system(.title2, design: .serif))
-                .foregroundStyle(text.isEmpty ? Color.sjSecondaryText : Color.sjText)
+                .foregroundStyle(displayText == "Generating draft pages..." ? Color.sjSecondaryText : Color.sjText)
                 .lineSpacing(7)
-                .animation(StoryJuicerMotion.standard, value: text)
+                .animation(StoryJuicerMotion.standard, value: displayText)
                 .textSelection(.enabled)
         }
+    }
+
+    private func userFacingStreamingText(from text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return "Generating draft pages..."
+        }
+        guard !looksLikeRawModelJSON(trimmed) else {
+            return "Generating draft pages..."
+        }
+        return text
+    }
+
+    private func looksLikeRawModelJSON(_ text: String) -> Bool {
+        if text.first == "{" || text.first == "[" {
+            return true
+        }
+        let jsonMarkers = ["\"title\"", "\"authorLine\"", "\"moral\"", "\"pages\"", "\"imagePrompt\""]
+        return jsonMarkers.contains(where: { text.contains($0) })
     }
 
     private var imageProgressGrid: some View {

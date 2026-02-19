@@ -17,6 +17,7 @@ final class BookReaderViewModel {
     var regeneratingPages: Set<Int> = []
     var regenerationErrors: [Int: String] = [:]
     var lastRegenerationError: String?
+    private var pageRetryCount: [Int: Int] = [:]
 
     /// The UUID of the corresponding StoredStorybook, if persisted.
     var storedBookID: UUID?
@@ -108,15 +109,24 @@ final class BookReaderViewModel {
             return
         }
 
+        // Each retry skips further into the variant list so we don't replay
+        // the same prompts that already failed for this page.
+        let retries = pageRetryCount[index, default: 0]
+        let startVariant = min(retries + 1, 5)
+        pageRetryCount[index] = retries + 1
+
         regeneratingPages.insert(index)
         regenerationErrors[index] = nil
         lastRegenerationError = nil
         do {
             let image = try await illustrationGenerator.generateSingleImage(
                 prompt: prompt,
-                style: illustrationStyle
+                style: illustrationStyle,
+                format: format,
+                startingVariantIndex: startVariant
             )
             images[index] = image
+            pageRetryCount[index] = 0
             onImageRegenerated?(index, image)
         } catch {
             let message = IllustrationGenerator.userFacingErrorMessage(for: error)

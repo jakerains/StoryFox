@@ -29,7 +29,10 @@ struct ContentSafetyPolicy: Sendable {
         (#"\b(weapon|gun|knife|sword)\b"#, "toy prop"),
         (#"\b(kill|killing|murder|stab|stabbing|fight|battle|war)\b"#, "playful challenge"),
         (#"\b(blood|gore|dismember)\b"#, "colorful confetti"),
-        (#"\b(demon|devil|zombie|horror)\b"#, "friendly fantasy creature")
+        (#"\b(demon|devil|zombie|horror|ghost|haunted)\b"#, "friendly fantasy creature"),
+        (#"\b(explosion|explode|fireball|burning|destroy|destruction)\b"#, "festive sparkles"),
+        (#"\b(dead|death|dying)\b"#, "sleepy"),
+        (#"\b(police chase|chase scene|car crash)\b"#, "adventure walk")
     ]
 
     static func validateConcept(_ rawConcept: String) -> ContentSafetyCheckResult {
@@ -54,11 +57,8 @@ struct ContentSafetyPolicy: Sendable {
     static func safeCoverPrompt(title: String, concept: String) -> String {
         let safeTitle = sanitizeConcept(title)
         let safeConcept = sanitizeConcept(concept)
-        return """
-            Children's book cover illustration for "\(safeTitle)". \
-            Theme: \(safeConcept). \
-            Warm, whimsical, colorful, friendly characters, family-friendly tone, no violence, no scary imagery, no text in image.
-            """
+        // Short descriptive phrase — no instructions for the diffusion model.
+        return "\(safeTitle) book cover, \(safeConcept), warm whimsical colors, friendly characters"
     }
 
     static func safeIllustrationPrompt(_ prompt: String) -> String {
@@ -72,20 +72,21 @@ struct ContentSafetyPolicy: Sendable {
             )
         }
 
-        if sanitized.count > 360 {
-            sanitized = String(sanitized.prefix(360))
+        // Keep prompts short and purely descriptive for Image Playground.
+        // The style parameter already handles art style — instructional
+        // wrappers like "Create one cheerful illustration of..." confuse
+        // the diffusion model and can trigger content filters.
+        if sanitized.count > 180 {
+            sanitized = String(sanitized.prefix(180))
         }
 
-        return """
-            \(sanitized). \
-            Children's book illustration style, gentle, cheerful, family-friendly, no text, no violence, no scary imagery.
-            """
+        return sanitized
     }
 
     static func sanitizeConcept(_ text: String) -> String {
         let normalized = normalizeWhitespace(text)
         let cleaned = normalized.replacingOccurrences(
-            of: #"[<>`]"#,
+            of: #"[<>`\"']"#,
             with: "",
             options: .regularExpression
         )

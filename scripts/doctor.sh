@@ -19,6 +19,8 @@ check_command() {
 check_command xcodebuild
 check_command xcodegen
 check_command swift
+check_command xcrun
+check_command python3
 
 if command -v xcodebuild >/dev/null 2>&1; then
     xcode_version="$(xcodebuild -version | sed -n '1s/^Xcode //p')"
@@ -33,7 +35,18 @@ if command -v xcodebuild >/dev/null 2>&1; then
     fi
 fi
 
+if command -v xcrun >/dev/null 2>&1; then
+    if xcrun -f metal >/dev/null 2>&1; then
+        printf '[OK] Metal toolchain is available (required by MLX Swift)\n'
+    else
+        printf '[FAIL] Metal toolchain is missing. Install it with:\n'
+        printf '       xcodebuild -downloadComponent MetalToolchain\n'
+        issues=$((issues + 1))
+    fi
+fi
+
 printf '[INFO] StoryJuicer is an Xcode app target. Use make build/make run (not swift run).\n'
+printf '[INFO] Image generation currently uses Apple Image Playground for the stable path.\n'
 
 if [[ -f StoryJuicer.xcodeproj/project.pbxproj ]]; then
     printf '[OK] StoryJuicer.xcodeproj exists\n'

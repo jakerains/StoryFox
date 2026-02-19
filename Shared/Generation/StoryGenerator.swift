@@ -63,7 +63,7 @@ final class StoryGenerator {
     func generateStory(
         concept: String,
         pageCount: Int,
-        onProgress: @MainActor @Sendable (String) -> Void = { _ in }
+        onProgress: @escaping @MainActor @Sendable (String) -> Void = { _ in }
     ) async throws -> StoryBook {
         state = .generating(partialText: "")
         onProgress("")
@@ -101,7 +101,7 @@ final class StoryGenerator {
     private func attemptGeneration(
         concept: String,
         pageCount: Int,
-        onProgress: @MainActor @Sendable (String) -> Void
+        onProgress: @escaping @MainActor @Sendable (String) -> Void
     ) async throws -> StoryBook {
         let session = LanguageModelSession(
             instructions: Self.systemInstructions

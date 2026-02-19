@@ -1,0 +1,22 @@
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+xcuserdata/
+DerivedData/
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# Build artifacts
+build/
+dist/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Firecrawl
+.firecrawl/
+
+# Claude Code
+.claude/*.local.md
+.claude/*.local.json
