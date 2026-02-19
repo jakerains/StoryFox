@@ -148,13 +148,21 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
         )
     ]
 
+    static var defaultDiffusersAlias: String {
+#if os(macOS)
+        DiffusersRuntimeManager.defaultAlias
+#else
+        "default"
+#endif
+    }
+
     static let `default` = ModelSelectionSettings(
         textProvider: .appleFoundation,
         imageProvider: .imagePlayground,
         mlxModelID: defaultMLXModelID,
         diffusersModelID: defaultDiffusersModelID,
         hfTokenKeychainRef: HFTokenStore.defaultAlias,
-        diffusersRuntimeAlias: DiffusersRuntimeManager.defaultAlias,
+        diffusersRuntimeAlias: defaultDiffusersAlias,
         enableFoundationFallback: true,
         enableImageFallback: true,
         openRouterTextModelID: CloudProvider.openRouter.defaultTextModelID,
@@ -172,7 +180,7 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
 
     var resolvedDiffusersRuntimeAlias: String {
         let alias = diffusersRuntimeAlias.trimmingCharacters(in: .whitespacesAndNewlines)
-        return alias.isEmpty ? DiffusersRuntimeManager.defaultAlias : alias
+        return alias.isEmpty ? Self.defaultDiffusersAlias : alias
     }
 
     // MARK: - Backward-Compatible Codable

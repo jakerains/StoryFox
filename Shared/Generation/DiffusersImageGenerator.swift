@@ -2,6 +2,8 @@ import CoreGraphics
 import Foundation
 import ImageIO
 
+#if os(macOS)
+
 struct DiffusersImageGenerator: StoryImageGenerating {
     let provider: StoryImageProvider = .diffusers
     private let runtimeManager: DiffusersRuntimeManager
@@ -94,4 +96,6 @@ struct DiffusersImageGenerator: StoryImageGenerating {
         }
     }
 }
+
+#endif // os(macOS)
 

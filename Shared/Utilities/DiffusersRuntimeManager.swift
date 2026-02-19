@@ -1,5 +1,7 @@
 import Foundation
 
+#if os(macOS)
+
 enum DiffusersWorkerMode: String, Sendable {
     case healthCheck = "health"
     case prewarm = "prewarm"
@@ -574,3 +576,5 @@ actor DiffusersRuntimeManager {
         }.value
     }
 }
+
+#endif // os(macOS)

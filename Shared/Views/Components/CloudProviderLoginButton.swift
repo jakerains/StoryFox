@@ -1,16 +1,16 @@
-import AppKit
 import SwiftUI
 
 /// Helper button that opens the provider's token settings page in the browser.
 /// Shown in the HuggingFace settings section to help users get their API token.
 struct CloudProviderTokenHelper: View {
     let provider: CloudProvider
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         HStack(spacing: StoryJuicerGlassTokens.Spacing.medium) {
             if let url = provider.tokenSettingsURL {
                 Button {
-                    NSWorkspace.shared.open(url)
+                    openURL(url)
                 } label: {
                     Label("Get \(provider.displayName) Token", systemImage: "arrow.up.right.square")
                 }

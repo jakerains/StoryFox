@@ -10,12 +10,16 @@ struct StoryJuicerApp: App {
         WindowGroup {
             MainView()
         }
+#if os(macOS)
         .defaultSize(width: 1080, height: 760)
+#endif
         .modelContainer(for: StoredStorybook.self)
 
+#if os(macOS)
         Settings {
             MacModelSettingsView()
         }
+#endif
     }
 }
 
@@ -34,8 +38,12 @@ struct MainView: View {
     @State private var viewModel = CreationViewModel()
     @State private var route: AppRoute = .creation
     @State private var readerViewModel: BookReaderViewModel?
-    @State private var pdfRenderer = MacPDFRenderer()
+    @State private var pdfRenderer = StoryPDFRenderer()
     @State private var selectedSavedBookID: UUID?
+#if os(iOS)
+    @State private var showingSettings = false
+    @Environment(\.scenePhase) private var scenePhase
+#endif
 
     var body: some View {
         NavigationSplitView {
@@ -45,6 +53,7 @@ struct MainView: View {
                 .background(detailBackground)
         }
         .navigationSplitViewStyle(.balanced)
+#if os(macOS)
         .frame(minWidth: 860, minHeight: 580)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
             try? modelContext.save()
@@ -55,6 +64,20 @@ struct MainView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             consumePendingShortcutRequest()
         }
+#endif
+#if os(iOS)
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background || newPhase == .inactive {
+                try? modelContext.save()
+            }
+            if newPhase == .active {
+                consumePendingShortcutRequest()
+            }
+        }
+        .sheet(isPresented: $showingSettings) {
+            IOSModelSettingsView()
+        }
+#endif
         .onAppear {
             consumePendingShortcutRequest()
         }
@@ -149,16 +172,22 @@ struct MainView: View {
                 }
                 .shadow(color: Color.black.opacity(0.14), radius: 6, y: 3)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text("StoryJuicer")
-                    .font(StoryJuicerTypography.uiTitle)
-                    .foregroundStyle(Color.sjGlassInk)
-                Text("Editorial Warm Glass")
-                    .font(StoryJuicerTypography.uiMeta)
-                    .foregroundStyle(Color.sjSecondaryText)
-            }
+            Text("StoryJuicer")
+                .font(StoryJuicerTypography.uiTitle)
+                .foregroundStyle(Color.sjGlassInk)
 
             Spacer()
+
+#if os(iOS)
+            Button {
+                showingSettings = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.title3)
+                    .foregroundStyle(Color.sjCoral)
+            }
+            .buttonStyle(.plain)
+#endif
         }
     }
 
@@ -173,7 +202,13 @@ struct MainView: View {
             fallbackSidebarSymbol
         }
 #else
-        fallbackSidebarSymbol
+        if let uiImage = UIImage(named: "AppIcon") {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+        } else {
+            fallbackSidebarSymbol
+        }
 #endif
     }
 
@@ -252,40 +287,78 @@ struct MainView: View {
     private var detailView: some View {
         switch route {
         case .creation:
-            MacCreationView(viewModel: viewModel)
+            creationView
                 .onChange(of: viewModel.phase) { _, newPhase in
                     handlePhaseChange(newPhase)
                 }
 
         case .generating:
-            MacGenerationProgressView(viewModel: viewModel) {
-                viewModel.cancel()
-                route = .creation
-            }
-            .onChange(of: viewModel.phase) { _, newPhase in
-                handlePhaseChange(newPhase)
-            }
+            generatingView
+                .onChange(of: viewModel.phase) { _, newPhase in
+                    handlePhaseChange(newPhase)
+                }
 
         case .reading:
             if let readerVM = readerViewModel {
-                MacBookReaderView(
-                    viewModel: readerVM,
-                    onExportPDF: {
-                        MacExportView.exportPDF(
-                            storybook: readerVM.storyBook,
-                            images: readerVM.images,
-                            format: readerVM.format,
-                            renderer: pdfRenderer
-                        )
-                    },
-                    onBackToHome: {
-                        viewModel.reset()
-                        readerViewModel = nil
-                        route = .creation
-                    }
-                )
+                readerView(readerVM)
             }
         }
+    }
+
+    @ViewBuilder
+    private var creationView: some View {
+#if os(macOS)
+        MacCreationView(viewModel: viewModel)
+#else
+        IOSCreationView(viewModel: viewModel)
+#endif
+    }
+
+    @ViewBuilder
+    private var generatingView: some View {
+#if os(macOS)
+        MacGenerationProgressView(viewModel: viewModel) {
+            viewModel.cancel()
+            route = .creation
+        }
+#else
+        IOSGenerationProgressView(viewModel: viewModel) {
+            viewModel.cancel()
+            route = .creation
+        }
+#endif
+    }
+
+    @ViewBuilder
+    private func readerView(_ readerVM: BookReaderViewModel) -> some View {
+#if os(macOS)
+        MacBookReaderView(
+            viewModel: readerVM,
+            onExportPDF: {
+                MacExportView.exportPDF(
+                    storybook: readerVM.storyBook,
+                    images: readerVM.images,
+                    format: readerVM.format,
+                    renderer: pdfRenderer
+                )
+            },
+            onBackToHome: {
+                viewModel.reset()
+                readerViewModel = nil
+                route = .creation
+            }
+        )
+#else
+        IOSBookReaderView(
+            viewModel: readerVM,
+            pdfRenderer: pdfRenderer,
+            onBackToHome: {
+                viewModel.reset()
+                readerViewModel = nil
+                route = .creation
+            }
+        )
+#endif
     }
 
     // MARK: - Actions

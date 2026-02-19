@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help doctor purge-image-cache generate build build-release run run-release clean app-path dmg
+.PHONY: help doctor purge-image-cache generate build build-release run run-release clean app-path dmg build-ios run-ios
 
 help:
 	@echo "StoryJuicer commands:"
@@ -13,6 +13,8 @@ help:
 	@echo "  make build-release Build Release app"
 	@echo "  make run-release   Build and open Release app"
 	@echo "  make dmg           Build, sign, notarize, and package a distributable DMG"
+	@echo "  make build-ios     Build iOS Simulator Debug app"
+	@echo "  make run-ios       Build and launch in iOS Simulator"
 	@echo "  make clean         Clean Xcode build artifacts"
 	@echo "  make app-path      Print built Debug .app bundle path"
 	@echo ""
@@ -52,6 +54,34 @@ app-path:
 			/TARGET_BUILD_DIR = / { target=$$2 } \
 			/WRAPPER_NAME = / { wrapper=$$2 } \
 			END { if (target != "" && wrapper != "") print target "/" wrapper }'
+
+# ── iOS Targets ─────────────────────────────────────────────────────
+
+IOS_SCHEME := StoryJuicer-iOS
+IOS_SIM_DEST := platform=iOS Simulator,name=iPhone 16 Pro,OS=26.0
+
+build-ios: generate
+	xcodebuild build \
+		-project StoryJuicer.xcodeproj \
+		-scheme $(IOS_SCHEME) \
+		-destination '$(IOS_SIM_DEST)' \
+		-configuration Debug
+
+run-ios: build-ios
+	@echo "──── Launching in iOS Simulator ────"
+	@xcrun simctl boot "iPhone 16 Pro" 2>/dev/null || true
+	@open -a Simulator
+	@APP_PATH=$$(xcodebuild \
+		-project StoryJuicer.xcodeproj \
+		-scheme $(IOS_SCHEME) \
+		-configuration Debug \
+		-destination '$(IOS_SIM_DEST)' \
+		-showBuildSettings 2>/dev/null | awk -F' = ' '\
+			/TARGET_BUILD_DIR = / { target=$$2 } \
+			/WRAPPER_NAME = / { wrapper=$$2 } \
+			END { if (target != "" && wrapper != "") print target "/" wrapper }') && \
+	xcrun simctl install booted "$$APP_PATH" && \
+	xcrun simctl launch booted com.jakerains.StoryJuicer
 
 # ── Distributable DMG ────────────────────────────────────────────────
 # Signs with Developer ID, notarizes with Apple, staples the ticket,
@@ -117,18 +147,12 @@ dmg:
 	@echo ""
 	@echo "──── 7/7  Creating DMG with drag-to-Applications ────"
 	@rm -f "$(DMG_DIR)/$(APP_NAME).dmg"
-	create-dmg \
-		--volname "$(APP_NAME)" \
-		--volicon "Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" \
-		--window-pos 200 120 \
-		--window-size 660 400 \
-		--icon-size 128 \
-		--icon "$(APP_NAME).app" 160 190 \
-		--app-drop-link 500 190 \
-		--hide-extension "$(APP_NAME).app" \
-		--no-internet-enable \
-		"$(DMG_DIR)/$(APP_NAME).dmg" \
-		"$(DMG_DIR)/export/$(APP_NAME).app"
+	@rm -rf /tmp/storyjuicer_dmg_staging
+	@mkdir -p /tmp/storyjuicer_dmg_staging
+	@cp -R "$(DMG_DIR)/export/$(APP_NAME).app" /tmp/storyjuicer_dmg_staging/
+	@ln -s /Applications /tmp/storyjuicer_dmg_staging/Applications
+	hdiutil create -volname "$(APP_NAME)" -srcfolder /tmp/storyjuicer_dmg_staging -ov -format UDZO "$(DMG_DIR)/$(APP_NAME).dmg"
+	@rm -rf /tmp/storyjuicer_dmg_staging
 	xcrun notarytool submit "$(DMG_DIR)/$(APP_NAME).dmg" \
 		--keychain-profile "$(NOTARY_PROFILE)" \
 		--wait

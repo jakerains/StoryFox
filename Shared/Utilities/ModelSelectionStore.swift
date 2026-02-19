@@ -52,7 +52,7 @@ enum ModelSelectionStore {
             updated.diffusersModelID = ModelSelectionSettings.defaultDiffusersModelID
         }
         if updated.diffusersRuntimeAlias.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            updated.diffusersRuntimeAlias = DiffusersRuntimeManager.defaultAlias
+            updated.diffusersRuntimeAlias = ModelSelectionSettings.defaultDiffusersAlias
         }
         return updated
     }
@@ -85,7 +85,7 @@ enum ModelSelectionStore {
             mlxModelID: legacy.mlxModelID,
             diffusersModelID: ModelSelectionSettings.defaultDiffusersModelID,
             hfTokenKeychainRef: legacy.hfTokenKeychainRef,
-            diffusersRuntimeAlias: DiffusersRuntimeManager.defaultAlias,
+            diffusersRuntimeAlias: ModelSelectionSettings.defaultDiffusersAlias,
             enableFoundationFallback: legacy.enableFoundationFallback,
             enableImageFallback: true
         )

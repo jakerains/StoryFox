@@ -45,7 +45,11 @@ final class StoryGenerator {
         case .unavailable(let reason):
             switch reason {
             case .deviceNotEligible:
+#if os(macOS)
                 return "This Mac doesn't support Apple Intelligence. An Apple Silicon Mac is required."
+#else
+                return "This device doesn't support Apple Intelligence. A compatible iPhone or iPad is required."
+#endif
             case .appleIntelligenceNotEnabled:
                 return "Apple Intelligence is not enabled. Please enable it in System Settings."
             case .modelNotReady:
