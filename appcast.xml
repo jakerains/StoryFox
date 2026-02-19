@@ -12,7 +12,7 @@
             <sparkle:version>3</sparkle:version>
             <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/jakerains/StoryJuicer/releases/download/v1.0.3/StoryJuicer.dmg" length="27630249" type="application/octet-stream" sparkle:edSignature="j5NordbGc3N+KGKIpiGMCrCyjDiJemvKQPBkee/VlrOibvY1rXaqWDxZMo+TZscTB4HpcN8BB6HMNgqzjXh5Ag=="/>
+            <enclosure url="https://github.com/jakerains/StoryJuicer/releases/download/v1.1.0/StoryJuicer.dmg" length="27648029" type="application/octet-stream" sparkle:edSignature="lndqS1IGMIu22Rvn0Xp9krS3yhgUhoHz8Oqj/AEzyV8Qn0e6nHpH1icuOKH0m5WNAeJDsDwylc1x/uen79x/Cw=="/>
         </item>
         <item>
             <title>1.0.1</title>
