@@ -18,22 +18,24 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://storyjuicer.com"),
   title: "StoryJuicer — AI-Powered Illustrated Children's Storybooks",
   description:
     "Type a story idea, pick a style, and get a fully illustrated children's book with text, cover art, and 300 DPI print-ready PDF export — all on your device.",
   openGraph: {
-    title: "StoryJuicer",
+    title: "StoryJuicer — AI-Powered Illustrated Storybooks",
     description:
-      "AI-powered illustrated children's storybooks — on your device.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+      "Type a story idea, pick a style, and get a fully illustrated children's book — all on your Mac. Free to use, no account required.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "StoryJuicer — AI-powered illustrated children's storybooks" }],
     type: "website",
+    siteName: "StoryJuicer",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StoryJuicer",
+    title: "StoryJuicer — AI-Powered Illustrated Storybooks",
     description:
-      "AI-powered illustrated children's storybooks — on your device.",
-    images: ["/og-image.png"],
+      "Type a story idea, pick a style, and get a fully illustrated children's book — all on your Mac. Free to use, no account required.",
+    images: [{ url: "/og-image.png", alt: "StoryJuicer — AI-powered illustrated children's storybooks" }],
   },
   icons: {
     icon: [
