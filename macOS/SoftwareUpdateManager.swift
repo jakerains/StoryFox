@@ -42,6 +42,11 @@ final class SoftwareUpdateManager {
         }
 
         canCheckForUpdates = updaterController.updater.canCheckForUpdates
+
+        // Default to checking automatically so users don't miss updates
+        if !updaterController.updater.automaticallyChecksForUpdates {
+            updaterController.updater.automaticallyChecksForUpdates = true
+        }
     }
 
     // MARK: - Actions
