@@ -236,7 +236,37 @@ struct StoryPDFRenderer: PDFRendering {
         let moralFrame = CTFramesetterCreateFrame(moralFramesetter, CFRangeMake(0, 0), moralPath, nil)
         CTFrameDraw(moralFrame, context)
 
+        drawStamp(context: context, pageSize: pageSize)
+
         context.endPDFPage()
+    }
+
+    private func drawStamp(context: CGContext, pageSize: CGSize) {
+        guard let stampImage = loadStampImage() else { return }
+        let stampSize: CGFloat = 80
+        let stampRect = CGRect(
+            x: (pageSize.width - stampSize) / 2,
+            y: pageSize.height * 0.12,
+            width: stampSize,
+            height: stampSize
+        )
+        context.saveGState()
+        context.setAlpha(0.7)
+        context.draw(stampImage, in: stampRect)
+        context.restoreGState()
+    }
+
+    private func loadStampImage() -> CGImage? {
+        #if os(macOS)
+        guard let nsImage = NSImage(named: "StoryJuicerStamp"),
+              let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return nil
+        }
+        return cgImage
+        #else
+        guard let uiImage = UIImage(named: "StoryJuicerStamp") else { return nil }
+        return uiImage.cgImage
+        #endif
     }
 
     // MARK: - Drawing Helpers

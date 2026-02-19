@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02935B307E289688A250D1AE /* PageEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE4743A72F454E4A84C55C7 /* PageEditSheet.swift */; };
 		030FB849DAEB09307A6B1D59 /* Hub in Frameworks */ = {isa = PBXBuildFile; productRef = C52BB850C95829BC1F9593FF /* Hub */; };
 		036CD056C578AD624A0D567D /* StoryJuicerGlassTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0465CDDABA6910466B3F2646 /* StoryJuicerGlassTokens.swift */; };
 		03B7FCDDA981DB284AF52442 /* StoryPromptTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F0E8FEF92E7D35D917733B /* StoryPromptTemplates.swift */; };
@@ -112,6 +113,7 @@
 		C28048FC1DF5E2748A2558B1 /* StoryTextGenerating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB224AE6213447F16CCCBA8 /* StoryTextGenerating.swift */; };
 		C39428C86CE360CD5CF7BFF0 /* MacGenerationProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127CED7EEDEEF7A928F41BA6 /* MacGenerationProgressView.swift */; };
 		C4B5DCF66CBB4D814CAB784E /* DiffusersRuntimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2BCBE6947A2A8722A408DF /* DiffusersRuntimeManager.swift */; };
+		C4CA8F875B6DCD84BA48DE9C /* PageEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE4743A72F454E4A84C55C7 /* PageEditSheet.swift */; };
 		C669423423058C68E9E8144B /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FFCE7F21A4B3E62A012235B /* Color+Theme.swift */; };
 		C6986622884F78159C3E4A81 /* CloudModelListCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A871C4631951986354971CD5 /* CloudModelListCache.swift */; };
 		C8C617A75FE6031FC5946A5D /* SqueezeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337E19A50437FAAE88D08E4C /* SqueezeButton.swift */; };
@@ -198,6 +200,7 @@
 		8ECF2D7D80B77CA03E4D3A0F /* CloudCredentialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudCredentialStore.swift; sourceTree = "<group>"; };
 		90F2379A8DBB93D6FB293FA0 /* HuggingFaceOAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceOAuth.swift; sourceTree = "<group>"; };
 		936FDCA097D737885BC90C26 /* GenerationDiagnosticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationDiagnosticsLogger.swift; sourceTree = "<group>"; };
+		9BE4743A72F454E4A84C55C7 /* PageEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageEditSheet.swift; sourceTree = "<group>"; };
 		9E2DA4A704ACD20890A75E01 /* ShortcutStoryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutStoryRequest.swift; sourceTree = "<group>"; };
 		A04654598FF9E9B2E26FD112 /* MacCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCreationView.swift; sourceTree = "<group>"; };
 		A486E72F9D92D19EB35450DA /* StoryEPUBRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryEPUBRenderer.swift; sourceTree = "<group>"; };
@@ -423,6 +426,7 @@
 				3FFCE7F21A4B3E62A012235B /* Color+Theme.swift */,
 				74822B6ECC14197B6E7B20A7 /* ErrorBanner.swift */,
 				70A26FB75E213C902755B4D9 /* FormatPreviewCard.swift */,
+				9BE4743A72F454E4A84C55C7 /* PageEditSheet.swift */,
 				AB5A8997F389AB790F6A8352 /* PageOverviewGrid.swift */,
 				321E816D7962582FA44C8895 /* PageThumbnail.swift */,
 				3A08484E7B5C9E4017487BA1 /* SettingsPanelStyle.swift */,
@@ -497,6 +501,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					2E227541CCE11E8B502F44A6 = {
+						DevelopmentTeam = 47347VQHQV;
+					};
+				};
 			};
 			buildConfigurationList = E6B96B163395F8A0DFE00968 /* Build configuration list for PBXProject "StoryJuicer" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -587,6 +596,7 @@
 				142EC4EC1A41227994C18EFD /* OpenAICompatibleClient.swift in Sources */,
 				9F1268ACE356B6D6C6998CE0 /* PDFRenderer+macOS.swift in Sources */,
 				F89BA71C370BB1518A980B21 /* PDFRendering.swift in Sources */,
+				C4CA8F875B6DCD84BA48DE9C /* PageEditSheet.swift in Sources */,
 				7846D866FB000F011BE370E1 /* PageOverviewGrid.swift in Sources */,
 				9AE40FEE29EADEEA0F895C74 /* PageThumbnail.swift in Sources */,
 				6EF47E20FFD7F1A7FA087A8D /* PlatformImage.swift in Sources */,
@@ -657,6 +667,7 @@
 				7C620596B2E4788C32EDE87F /* ModelSelectionStore.swift in Sources */,
 				228BD1BA1C7A36DBC8E739BF /* OpenAICompatibleClient.swift in Sources */,
 				1A6BF09C36340F254BD0BA25 /* PDFRendering.swift in Sources */,
+				02935B307E289688A250D1AE /* PageEditSheet.swift in Sources */,
 				F0BCB44A95397C325B6474AA /* PageOverviewGrid.swift in Sources */,
 				F93E5796C96AEE40AFB4A926 /* PageThumbnail.swift in Sources */,
 				BDC8E25A6488250808652BA6 /* PlatformImage.swift in Sources */,
@@ -696,6 +707,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Resources/StoryJuicer-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47347VQHQV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict> <key>CFBundleURLName</key><string>com.jakerains.StoryJuicer.oauth</string> <key>CFBundleURLSchemes</key><array><string>storyjuicer</string></array> </dict></array>";
@@ -785,6 +797,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Resources/StoryJuicer-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47347VQHQV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict> <key>CFBundleURLName</key><string>com.jakerains.StoryJuicer.oauth</string> <key>CFBundleURLSchemes</key><array><string>storyjuicer</string></array> </dict></array>";

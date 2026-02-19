@@ -46,6 +46,7 @@ struct SqueezeButton: View {
                 radius: StoryJuicerGlassTokens.Shadow.radius,
                 y: StoryJuicerGlassTokens.Shadow.y
             )
+            .contentShape(Capsule())
             .scaleEffect(isEnabled ? 1 : 0.985)
             .animation(StoryJuicerMotion.fast, value: isEnabled)
         }

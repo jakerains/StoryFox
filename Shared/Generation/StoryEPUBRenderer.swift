@@ -45,6 +45,16 @@ struct StoryEPUBRenderer: EPUBRendering {
             }
         }
 
+        // 4b. Stamp image for end page (PNG to preserve transparency)
+        let hasStamp: Bool
+        if let stampImage = loadStampImage(), let stampPNG = cgImageToPNGData(stampImage) {
+            zip.addStored(path: "OEBPS/images/stamp.png", data: stampPNG)
+            imageManifestEntries.append((id: "img-stamp", href: "images/stamp.png"))
+            hasStamp = true
+        } else {
+            hasStamp = false
+        }
+
         // 5. XHTML pages
         let coverXHTML = coverPage(storybook: storybook, hasCoverImage: images[0] != nil,
                                    vw: vw, vh: vh)
@@ -56,7 +66,7 @@ struct StoryEPUBRenderer: EPUBRendering {
             zip.addDeflated(path: "OEBPS/page-\(page.pageNumber).xhtml", data: Data(xhtml.utf8))
         }
 
-        let endXHTML = endPage(storybook: storybook, vw: vw, vh: vh)
+        let endXHTML = endPage(storybook: storybook, hasStamp: hasStamp, vw: vw, vh: vh)
         zip.addDeflated(path: "OEBPS/end.xhtml", data: Data(endXHTML.utf8))
 
         // 6. Navigation document
@@ -166,6 +176,11 @@ struct StoryEPUBRenderer: EPUBRendering {
             margin-top: 16px;
             max-width: 80%;
         }
+        .stamp {
+            width: 80px; height: 80px;
+            opacity: 0.7;
+            margin-top: 24px;
+        }
         """
     }
 
@@ -207,13 +222,18 @@ struct StoryEPUBRenderer: EPUBRendering {
 
     // MARK: - End Page
 
-    private func endPage(storybook: StoryBook, vw: Int, vh: Int) -> String {
+    private func endPage(storybook: StoryBook, hasStamp: Bool, vw: Int, vh: Int) -> String {
+        let stampHTML = hasStamp
+            ? "<img class=\"stamp\" src=\"images/stamp.png\" alt=\"StoryJuicer stamp\"/>"
+            : ""
+
         return xhtmlDocument(title: "The End", vw: vw, vh: vh, body: """
             <div class="page end-page">
                 <div class="end-ornament">\u{2014}  \u{25C6}  \u{2014}</div>
                 <div class="end-title">The End</div>
                 <div class="end-ornament">\u{2014}  \u{25C6}  \u{2014}</div>
                 <div class="end-moral">\(xmlEscape(storybook.moral))</div>
+                \(stampHTML)
             </div>
             """)
     }
@@ -265,7 +285,8 @@ struct StoryEPUBRenderer: EPUBRendering {
         manifestItems += "        <item id=\"end\" href=\"end.xhtml\" media-type=\"application/xhtml+xml\"/>\n"
 
         for entry in imageEntries {
-            manifestItems += "        <item id=\"\(entry.id)\" href=\"\(entry.href)\" media-type=\"image/jpeg\"/>\n"
+            let mediaType = entry.href.hasSuffix(".png") ? "image/png" : "image/jpeg"
+            manifestItems += "        <item id=\"\(entry.id)\" href=\"\(entry.href)\" media-type=\"\(mediaType)\"/>\n"
         }
 
         // Spine
@@ -323,6 +344,19 @@ struct StoryEPUBRenderer: EPUBRendering {
             .replacingOccurrences(of: ">", with: "&gt;")
             .replacingOccurrences(of: "\"", with: "&quot;")
             .replacingOccurrences(of: "'", with: "&#39;")
+    }
+
+    private func loadStampImage() -> CGImage? {
+        #if os(macOS)
+        guard let nsImage = NSImage(named: "StoryJuicerStamp"),
+              let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return nil
+        }
+        return cgImage
+        #else
+        guard let uiImage = UIImage(named: "StoryJuicerStamp") else { return nil }
+        return uiImage.cgImage
+        #endif
     }
 
     private func iso8601Now() -> String {

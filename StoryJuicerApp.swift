@@ -404,6 +404,10 @@ struct MainView: View {
                     guard let readerVM else { return }
                     persistRegeneratedImage(index: index, image: cgImage, bookID: readerVM.storedBookID)
                 }
+                readerVM.onTextEdited = { [weak readerVM] updatedBook in
+                    guard let readerVM else { return }
+                    persistEditedText(book: updatedBook, bookID: readerVM.storedBookID)
+                }
                 readerViewModel = readerVM
                 route = .reading
                 saveBook(book)
@@ -442,6 +446,10 @@ struct MainView: View {
             guard let readerVM else { return }
             persistRegeneratedImage(index: index, image: cgImage, bookID: readerVM.storedBookID)
         }
+        readerVM.onTextEdited = { [weak readerVM] updatedBook in
+            guard let readerVM else { return }
+            persistEditedText(book: updatedBook, bookID: readerVM.storedBookID)
+        }
         readerViewModel = readerVM
         route = .reading
     }
@@ -456,6 +464,24 @@ struct MainView: View {
             stored.coverImageData = pngData
         } else if let storedPage = stored.pages.first(where: { $0.pageNumber == index }) {
             storedPage.imageData = pngData
+        }
+
+        try? modelContext.save()
+    }
+
+    private func persistEditedText(book: StoryBook, bookID: UUID?) {
+        guard let bookID,
+              let stored = savedBooks.first(where: { $0.id == bookID }) else { return }
+
+        stored.title = book.title
+        stored.authorLine = book.authorLine
+        stored.moral = book.moral
+
+        for page in book.pages {
+            if let storedPage = stored.pages.first(where: { $0.pageNumber == page.pageNumber }) {
+                storedPage.text = page.text
+                storedPage.imagePrompt = page.imagePrompt
+            }
         }
 
         try? modelContext.save()

@@ -3,6 +3,7 @@ import SwiftUI
 struct IOSBookReaderView: View {
     private enum ReaderSheet: String, Identifiable {
         case pageOverview
+        case pageEdit
 
         var id: String { rawValue }
     }
@@ -47,6 +48,13 @@ struct IOSBookReaderView: View {
                     activeSheet = .pageOverview
                 } label: {
                     Label("Page Overview", systemImage: "square.grid.2x2")
+                }
+                .sjGlassToolbarItem(prominent: false)
+
+                Button {
+                    activeSheet = .pageEdit
+                } label: {
+                    Label("Edit Page", systemImage: "pencil.circle")
                 }
                 .sjGlassToolbarItem(prominent: false)
 
@@ -98,6 +106,10 @@ struct IOSBookReaderView: View {
             switch sheet {
             case .pageOverview:
                 PageOverviewGrid(viewModel: viewModel) {
+                    activeSheet = nil
+                }
+            case .pageEdit:
+                PageEditSheet(viewModel: viewModel) {
                     activeSheet = nil
                 }
             }
@@ -264,6 +276,8 @@ struct IOSBookReaderView: View {
                 .italic()
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, textPadding)
+
+            storyJuicerStamp
         }
         .padding(StoryJuicerGlassTokens.Spacing.xLarge)
         .sjGlassCard(
@@ -272,6 +286,16 @@ struct IOSBookReaderView: View {
         )
         .frame(maxWidth: 780, maxHeight: .infinity)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var storyJuicerStamp: some View {
+        Image("StoryJuicerStamp")
+            .resizable()
+            .renderingMode(.original)
+            .scaledToFit()
+            .frame(width: 90, height: 90)
+            .opacity(0.7)
+            .padding(.top, StoryJuicerGlassTokens.Spacing.medium)
     }
 
     private var navigationOverlay: some View {

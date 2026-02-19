@@ -27,7 +27,7 @@ struct StoryDTO: Decodable {
             .enumerated()
             .map { offset, page -> StoryPage in
                 let pageNumber = offset + 1
-                let safeText = page.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                let safeText = StoryTextCleanup.clean(page.text)
                 let safePrompt = page.imagePrompt.trimmingCharacters(in: .whitespacesAndNewlines)
                 let fallbackPrompt = ContentSafetyPolicy.safeIllustrationPrompt(
                     "A gentle scene inspired by \(fallbackConcept)"
@@ -40,12 +40,56 @@ struct StoryDTO: Decodable {
                 )
             }
 
+        let cleanTitle = StoryTextCleanup.clean(title)
+        let cleanAuthor = StoryTextCleanup.clean(authorLine)
+        let cleanMoral = StoryTextCleanup.clean(moral)
+
         return StoryBook(
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "StoryJuicer Book" : title,
-            authorLine: authorLine.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Written by StoryJuicer" : authorLine,
-            moral: moral.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Kindness and curiosity guide every adventure." : moral,
+            title: cleanTitle.isEmpty ? "StoryJuicer Book" : cleanTitle,
+            authorLine: cleanAuthor.isEmpty ? "Written by StoryJuicer" : cleanAuthor,
+            moral: cleanMoral.isEmpty ? "Kindness and curiosity guide every adventure." : cleanMoral,
             pages: orderedPages
         )
+    }
+}
+
+/// Strips markdown formatting artifacts that cloud and MLX models often
+/// embed in JSON string values (bold, italic, headings, etc.) and
+/// normalizes whitespace so story text renders cleanly in the reader, PDF,
+/// and EPUB exports.
+enum StoryTextCleanup {
+    static func clean(_ text: String) -> String {
+        var s = text
+
+        // Strip markdown bold/italic wrappers: ***bold italic***, **bold**, *italic*, __bold__, _italic_
+        // Process longest patterns first so we don't leave orphaned markers.
+        s = s.replacingOccurrences(of: "\\*{3}(.+?)\\*{3}", with: "$1", options: .regularExpression)
+        s = s.replacingOccurrences(of: "\\*{2}(.+?)\\*{2}", with: "$1", options: .regularExpression)
+        s = s.replacingOccurrences(of: "(?<=\\s|^)\\*(?=\\S)(.+?)(?<=\\S)\\*(?=\\s|$|[.,!?])", with: "$1", options: .regularExpression)
+        s = s.replacingOccurrences(of: "__(.+?)__", with: "$1", options: .regularExpression)
+        s = s.replacingOccurrences(of: "(?<=\\s|^)_(?=\\S)(.+?)(?<=\\S)_(?=\\s|$|[.,!?])", with: "$1", options: .regularExpression)
+
+        // Strip markdown heading prefixes (# Title, ## Subtitle, etc.)
+        s = s.replacingOccurrences(of: "(?m)^#{1,6}\\s+", with: "", options: .regularExpression)
+
+        // Normalize smart/curly quotes to straight quotes
+        s = s.replacingOccurrences(of: "\u{201C}", with: "\"") // left double
+        s = s.replacingOccurrences(of: "\u{201D}", with: "\"") // right double
+        s = s.replacingOccurrences(of: "\u{2018}", with: "'")  // left single
+        s = s.replacingOccurrences(of: "\u{2019}", with: "'")  // right single
+
+        // Strip wrapping quotes that some models put around the entire value
+        if s.hasPrefix("\"") && s.hasSuffix("\"") && s.count > 2 {
+            s = String(s.dropFirst().dropLast())
+        }
+
+        // Collapse multiple whitespace/newlines into a single space
+        s = s.replacingOccurrences(of: "\\s{2,}", with: " ", options: .regularExpression)
+
+        // Final trim
+        s = s.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return s
     }
 }
 

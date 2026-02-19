@@ -4,7 +4,7 @@ import CoreGraphics
 @Observable
 @MainActor
 final class BookReaderViewModel {
-    let storyBook: StoryBook
+    var storyBook: StoryBook
     var images: [Int: CGImage]
     let format: BookFormat
     let illustrationStyle: IllustrationStyle
@@ -12,6 +12,9 @@ final class BookReaderViewModel {
 
     /// Called after a single image is regenerated, passing (imageIndex, newImage).
     var onImageRegenerated: ((Int, CGImage) -> Void)?
+
+    /// Called after story text is edited, passing the updated StoryBook.
+    var onTextEdited: ((StoryBook) -> Void)?
 
     private(set) var currentPage: Int = 0
     var regeneratingPages: Set<Int> = []
@@ -92,7 +95,92 @@ final class BookReaderViewModel {
         currentPage = page
     }
 
-    // MARK: - Regeneration
+    // MARK: - Text Editing
+
+    func updateAuthorLine(_ newAuthor: String) {
+        storyBook = StoryBook(
+            title: storyBook.title,
+            authorLine: newAuthor,
+            moral: storyBook.moral,
+            pages: storyBook.pages
+        )
+        onTextEdited?(storyBook)
+    }
+
+    func updateMoral(_ newMoral: String) {
+        storyBook = StoryBook(
+            title: storyBook.title,
+            authorLine: storyBook.authorLine,
+            moral: newMoral,
+            pages: storyBook.pages
+        )
+        onTextEdited?(storyBook)
+    }
+
+    func updatePageText(pageNumber: Int, newText: String) {
+        let updatedPages = storyBook.pages.map { page in
+            if page.pageNumber == pageNumber {
+                return StoryPage(
+                    pageNumber: page.pageNumber,
+                    text: newText,
+                    imagePrompt: page.imagePrompt
+                )
+            }
+            return page
+        }
+        storyBook = StoryBook(
+            title: storyBook.title,
+            authorLine: storyBook.authorLine,
+            moral: storyBook.moral,
+            pages: updatedPages
+        )
+        onTextEdited?(storyBook)
+    }
+
+    /// Regenerate an image with an optional custom prompt override.
+    func regenerateImage(index: Int, customPrompt: String? = nil) async {
+        guard !regeneratingPages.contains(index) else { return }
+
+        let prompt: String
+        if let custom = customPrompt, !custom.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            prompt = ContentSafetyPolicy.safeIllustrationPrompt(custom)
+        } else if index == 0 {
+            prompt = ContentSafetyPolicy.safeCoverPrompt(
+                title: storyBook.title,
+                concept: storyBook.moral
+            )
+        } else if let page = storyBook.pages.first(where: { $0.pageNumber == index }) {
+            prompt = page.imagePrompt
+        } else {
+            return
+        }
+
+        let retries = pageRetryCount[index, default: 0]
+        let startVariant = min(retries + 1, 5)
+        pageRetryCount[index] = retries + 1
+
+        regeneratingPages.insert(index)
+        regenerationErrors[index] = nil
+        lastRegenerationError = nil
+        do {
+            let image = try await illustrationGenerator.generateSingleImage(
+                prompt: prompt,
+                style: illustrationStyle,
+                format: format,
+                startingVariantIndex: startVariant
+            )
+            images[index] = image
+            pageRetryCount[index] = 0
+            onImageRegenerated?(index, image)
+        } catch {
+            let message = IllustrationGenerator.userFacingErrorMessage(for: error)
+            regenerationErrors[index] = message
+            lastRegenerationError = message
+        }
+        regeneratingPages.remove(index)
+    }
+
+    // MARK: - Regeneration (legacy)
 
     func regeneratePage(index: Int) async {
         guard !regeneratingPages.contains(index) else { return }
