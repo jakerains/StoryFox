@@ -1,43 +1,98 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { fadeUpVariants, staggerContainer } from "@/lib/motion";
 import { GlassCard } from "./GlassCard";
 
 const requirements = [
-  { icon: "💻", label: "macOS 26 (Tahoe) or iOS 26" },
-  { icon: "🧠", label: "Apple Silicon (M1 or later)" },
-  { icon: "✨", label: "Apple Intelligence enabled" },
+  {
+    icon: "🖥",
+    title: "macOS 26",
+    subtitle: "Tahoe",
+    description: "Requires the latest macOS with built-in AI capabilities.",
+    color: "var(--sj-coral)",
+  },
+  {
+    icon: "⚡",
+    title: "Apple Silicon",
+    subtitle: "M1 or later",
+    description: "Optimized for the Neural Engine in every Apple Silicon chip.",
+    color: "var(--sj-gold)",
+  },
+  {
+    icon: "✨",
+    title: "Apple Intelligence",
+    subtitle: "Enabled",
+    description: "Powers the built-in text and image generation engine.",
+    color: "var(--sj-lavender)",
+  },
 ];
 
 export function Requirements() {
   return (
     <section id="requirements" className="relative py-20 sm:py-28">
-      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 text-center">
+      {/* Ambient glow */}
+      <div className="glow-amber pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2" />
+
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="mb-14 text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeUpVariants}
+        >
           <h2 className="section-title mb-4 font-serif font-bold text-sj-text">
-            System Requirements
+            What You Need
           </h2>
-        </div>
+          <p className="mx-auto max-w-md text-lg text-sj-secondary">
+            Here&apos;s what you need to get started.
+          </p>
+        </motion.div>
 
-        <GlassCard className="p-8">
-          <div className="flex flex-col items-center gap-4">
-            {requirements.map((req) => (
-              <div
-                key={req.label}
-                className="flex items-center gap-3 rounded-full border border-sj-border/40 bg-[var(--sj-card)]/60 px-5 py-2.5"
-              >
-                <span className="text-xl">{req.icon}</span>
-                <span className="font-sans text-sm font-medium text-sj-text">
-                  {req.label}
+        <motion.div
+          className="grid grid-cols-1 gap-5 sm:grid-cols-3"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          {requirements.map((req) => (
+            <motion.div key={req.title} variants={fadeUpVariants}>
+              <GlassCard className="flex h-full flex-col items-center p-7 text-center" hover>
+                {/* Colored icon ring */}
+                <div
+                  className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${req.color} 14%, transparent)`,
+                    boxShadow: `0 0 0 1px color-mix(in srgb, ${req.color} 20%, transparent)`,
+                  }}
+                >
+                  {req.icon}
+                </div>
+
+                {/* Title + subtitle */}
+                <h3 className="font-serif text-lg font-bold text-sj-text">
+                  {req.title}
+                </h3>
+                <span
+                  className="mb-3 mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${req.color} 10%, transparent)`,
+                    color: req.color,
+                  }}
+                >
+                  {req.subtitle}
                 </span>
-              </div>
-            ))}
 
-            <div className="mt-4 h-px w-32 bg-gradient-to-r from-transparent via-sj-border to-transparent" />
-
-            <p className="text-center font-sans text-sm text-sj-muted">
-              Cloud features are optional. Use Hugging Face for access to larger
-              models.
-            </p>
-          </div>
-        </GlassCard>
+                {/* Description */}
+                <p className="text-sm leading-relaxed text-sj-secondary">
+                  {req.description}
+                </p>
+              </GlassCard>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

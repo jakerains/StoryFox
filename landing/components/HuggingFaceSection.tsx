@@ -9,7 +9,7 @@ const upgradeSteps = [
     number: "1",
     title: "Create a free account",
     description:
-      "Sign up at huggingface.co — it's completely free, no credit card needed.",
+      "Sign up at huggingface.co — takes less than a minute.",
   },
   {
     number: "2",
@@ -42,7 +42,7 @@ const benefits = [
     icon: "💰",
     title: "Completely Free",
     description:
-      "Hugging Face's free tier includes generous inference limits. No credit card, no subscriptions, no hidden costs.",
+      "Hugging Face's free tier includes generous inference limits — no subscriptions, no hidden costs.",
   },
   {
     icon: "🔐",
@@ -160,7 +160,7 @@ export function HuggingFaceSection() {
                   Create a Free Account
                 </a>
                 <p className="text-xs text-sj-muted">
-                  No credit card required. Takes less than a minute.
+                  Completely free — no credit card required.
                 </p>
               </div>
             </GlassCard>

@@ -89,11 +89,14 @@ macOS/
     MacGenerationProgressView    ← Streaming text, image progress grid
     MacBookReaderView.swift      ← Page-by-page reader with overview grid
     MacExportView.swift          ← PDF/image export
-    MacModelSettingsView.swift   ← Model & provider settings panel
-    CloudProviderSettingsSection ← Per-provider settings card (auth, model pickers, test buttons)
-    CloudProviderLoginButton     ← OAuth login button for cloud providers
+    MacModelSettingsView.swift   ← Model & provider settings panel (On-Device → Cloud → Local Models)
   SoftwareUpdateManager.swift    ← Sparkle auto-update wrapper (@Observable)
   PDFRenderer+macOS.swift        ← Core Graphics PDF rendering at 300 DPI
+landing/                          ← Next.js 15 landing page (Vercel)
+  app/                           ← layout.tsx, page.tsx, globals.css
+  components/                    ← Hero, Features, HuggingFaceSection, StylesShowcase, etc.
+  lib/                           ← motion.ts (animation variants), utils.ts
+  public/images/                 ← AI-generated illustration style samples
 ```
 
 ### Navigation Flow
@@ -249,6 +252,47 @@ Glass-morphism design system defined in `SettingsPanelStyle.swift`:
 - `.glass` / `.glassProminent` button styles
 - `StoryJuicerGlassTokens` — spacing, radius, tint constants
 - `StoryJuicerTypography` — font presets for settings UI
+
+## Settings Layout Order
+
+Settings sections are ordered for a consumer-friendly flow:
+
+1. **On-Device** — Foundation Models (built-in, works immediately)
+2. **Cloud Providers** — HuggingFace callout banner + `CloudProviderSettingsSection` (free upgrade path)
+3. **Local Models** — MLX Swift (power-user feature, requires downloading model weights)
+
+The HuggingFace sign-in button uses a custom badge-style view matching the [official HF badge](https://huggingface.co/datasets/huggingface/badges#sign-in-with-hugging-face) — yellow (#FFD21E) background with 🤗 emoji. The actual OAuth button code is in `CloudProviderSettingsSection.swift` in the `oauthRow` computed property.
+
+## Landing Page
+
+**Location:** `landing/` subdirectory (Next.js 15 + Tailwind CSS v4 + Framer Motion)
+
+```bash
+# Dev server
+cd landing && npm run dev
+
+# Deploy to Vercel (manual, not git-connected)
+cd landing && vercel --prod
+```
+
+**Design system mirrors the native app:**
+- CSS variables in `globals.css` map 1:1 to `Color+Theme.swift` tokens (light/dark)
+- `GlassCard.tsx` replicates `SettingsPanelCard` from SwiftUI
+- Typography: Playfair Display (serif headlines) + Nunito (rounded sans body)
+- Animation variants in `lib/motion.ts` match `StoryJuicerMotion` timing
+
+**Key sections:**
+- Hero with fanned storybook illustration showcase (3 AI-generated samples)
+- How It Works (4-step flow), Features (8-card grid)
+- HuggingFace upgrade section (explains free cloud AI, links to huggingface.co/join)
+- Illustration Styles showcase, Book Formats, Requirements, Footer
+
+**Important notes:**
+- Copy is consumer-focused — no developer jargon, no "shared codebase", no "Sparkle framework"
+- GitHub link is in the footer only, not prominent
+- Download button is OS-aware (macOS → DMG, other → GitHub)
+- Vercel root directory must be set to `landing` in project settings
+- Generated illustration samples are in `landing/public/images/`
 
 ## Model Names
 

@@ -20,47 +20,32 @@ const features = [
     color: "var(--sj-gold)",
   },
   {
-    icon: "🎨",
-    title: "3 Illustration Styles",
-    description:
-      "Classic painterly illustration, Pixar-style animation, or hand-drawn pencil sketch.",
-    color: "var(--sj-coral)",
-  },
-  {
-    icon: "📐",
-    title: "4 Book Formats",
-    description:
-      'Standard square, landscape, portrait, or small square — up to 11" × 8.5".',
-    color: "var(--sj-lavender)",
-  },
-  {
     icon: "🛡️",
     title: "Safe for Kids",
     description:
       "Built-in safety guardrails ensure every story is age-appropriate for ages 3–8. Peace of mind for parents.",
-    color: "var(--sj-mint)",
-  },
-  {
-    icon: "🤗",
-    title: "Hugging Face Cloud",
-    description:
-      "Connect a free Hugging Face account to unlock more powerful AI models for even better stories and illustrations.",
-    color: "var(--sj-gold)",
-    link: "#huggingface",
-  },
-  {
-    icon: "📱",
-    title: "Mac & iPhone",
-    description:
-      "Available on both macOS and iOS. Make storybooks on your Mac at home or on the go with your iPhone.",
     color: "var(--sj-coral)",
+  },
+  {
+    icon: "📖",
+    title: "Choose Your Length",
+    description:
+      "Create anything from a quick 3-page bedtime story to a full 20-page adventure. You pick the page count.",
+    color: "var(--sj-lavender)",
+  },
+  {
+    icon: "🔄",
+    title: "Redo Any Page",
+    description:
+      "Not happy with a page? Regenerate just the text or illustration individually — no need to start over.",
+    color: "var(--sj-sky)",
   },
   {
     icon: "📚",
     title: "Save Your Library",
     description:
       "All your storybooks are saved automatically. Come back anytime to re-read, export, or share them.",
-    color: "var(--sj-sky)",
+    color: "var(--sj-gold)",
   },
 ];
 
@@ -88,14 +73,14 @@ export function Features() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {features.map((feature) => {
-            const content = (
+          {features.map((feature) => (
+            <motion.div key={feature.title} variants={scaleInVariants}>
               <GlassCard className="flex h-full flex-col p-6" hover>
                 <div
                   className="mb-4 flex h-11 w-11 items-center justify-center rounded-full text-2xl"
@@ -113,30 +98,9 @@ export function Features() {
                 <p className="text-sm leading-relaxed text-sj-secondary">
                   {feature.description}
                 </p>
-
-                {"link" in feature && (
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-sj-coral">
-                    Learn more
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
-                )}
               </GlassCard>
-            );
-
-            return (
-              <motion.div key={feature.title} variants={scaleInVariants}>
-                {"link" in feature ? (
-                  <a href={(feature as { link: string }).link} className="block h-full">
-                    {content}
-                  </a>
-                ) : (
-                  content
-                )}
-              </motion.div>
-            );
-          })}
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </section>

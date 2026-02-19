@@ -6,6 +6,7 @@ import { HuggingFaceSection } from "@/components/HuggingFaceSection";
 import { StylesShowcase } from "@/components/StylesShowcase";
 import { BookFormats } from "@/components/BookFormats";
 import { Requirements } from "@/components/Requirements";
+import { SafetyDisclaimer } from "@/components/SafetyDisclaimer";
 import { Footer } from "@/components/Footer";
 
 export default function Page() {
@@ -19,7 +20,7 @@ export default function Page() {
             "@type": "SoftwareApplication",
             name: "StoryJuicer",
             applicationCategory: "UtilitiesApplication",
-            operatingSystem: "macOS 26, iOS 26",
+            operatingSystem: "macOS 26",
             offers: {
               "@type": "Offer",
               price: "0",
@@ -28,7 +29,7 @@ export default function Page() {
             description:
               "AI-powered illustrated children's storybooks — on your device. Generate complete storybooks with text, illustrations, and print-ready PDF export.",
             author: { "@type": "Person", name: "Jake Rains" },
-            softwareVersion: "1.0.2",
+            softwareVersion: "1.0.3",
             downloadUrl:
               "https://github.com/jakerains/StoryJuicer/releases/latest/download/StoryJuicer.dmg",
           }),
@@ -43,6 +44,7 @@ export default function Page() {
         <StylesShowcase />
         <BookFormats />
         <Requirements />
+        <SafetyDisclaimer />
       </main>
       <Footer />
     </>

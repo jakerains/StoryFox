@@ -35,7 +35,14 @@ export const metadata: Metadata = {
       "AI-powered illustrated children's storybooks — on your device.",
     images: ["/og-image.png"],
   },
-  icons: { icon: "/favicon.ico", apple: "/app-icon.png" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

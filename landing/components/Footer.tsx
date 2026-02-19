@@ -25,9 +25,14 @@ export function Footer() {
                 StoryJuicer
               </span>
             </div>
-            <p className="text-sm text-sj-muted">
+            <a
+              href="https://jakerains.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-sj-muted transition-colors hover:text-sj-coral"
+            >
               Made with love by Jake Rains
-            </p>
+            </a>
           </div>
 
           {/* Links */}
@@ -43,7 +48,7 @@ export function Footer() {
               </a>
               <span className="text-sj-border">·</span>
               <span className="rounded-full bg-sj-gold/10 px-2.5 py-0.5 text-xs font-medium text-sj-gold">
-                v1.0.2
+                v1.0.3
               </span>
             </div>
           </div>
