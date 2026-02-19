@@ -34,6 +34,9 @@ struct MacModelSettingsView: View {
                 header
                 providerSection
 
+                sectionLabel("Story", systemImage: "book")
+                audienceModeSection
+
                 sectionLabel("On-Device", systemImage: "desktopcomputer")
                 foundationModelSection
 
@@ -129,6 +132,50 @@ struct MacModelSettingsView: View {
     }
 
     // MARK: - Provider Pickers
+
+    private var audienceModeSection: some View {
+        SettingsPanelCard {
+            SettingsSectionHeader(
+                title: "Audience",
+                subtitle: "Choose who the story is for — this adjusts language, tone, and complexity.",
+                systemImage: "person.2"
+            )
+
+            HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                ForEach(AudienceMode.allCases) { mode in
+                    let isSelected = settings.audienceMode == mode
+                    Button {
+                        withAnimation(StoryJuicerMotion.standard) {
+                            settings.audienceMode = mode
+                        }
+                    } label: {
+                        HStack(spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
+                            Image(systemName: mode.iconName)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(isSelected ? Color.sjCoral : .sjSecondaryText)
+
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(mode.displayName)
+                                    .font(StoryJuicerTypography.settingsControl)
+                                    .foregroundStyle(isSelected ? Color.sjGlassInk : .sjSecondaryText)
+
+                                Text(mode.subtitle)
+                                    .font(StoryJuicerTypography.settingsMeta)
+                                    .foregroundStyle(Color.sjSecondaryText)
+                                    .lineLimit(1)
+                            }
+                        }
+                        .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
+                        .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
+                        .sjGlassChip(selected: isSelected, interactive: true)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(mode.displayName) audience mode")
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
+        }
+    }
 
     private var providerSection: some View {
         SettingsPanelCard {

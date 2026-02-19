@@ -30,6 +30,7 @@ final class CreationViewModel {
     var pageCount: Int = GenerationConfig.defaultPages
     var selectedFormat: BookFormat = .standard
     var selectedStyle: IllustrationStyle = .illustration
+    var isEnrichedConcept: Bool = false
 
     // MARK: - Generation State
     private(set) var phase: GenerationPhase = .idle
@@ -92,7 +93,9 @@ final class CreationViewModel {
     func squeezeStory() {
         guard canGenerate else { return }
 
-        let conceptCheck = ContentSafetyPolicy.validateConcept(storyConcept)
+        // Enriched concepts from Q&A are longer — use a higher sanitization limit
+        let maxLength = isEnrichedConcept ? 1500 : 220
+        let conceptCheck = ContentSafetyPolicy.validateConcept(storyConcept, maxLength: maxLength)
         guard case .allowed(let safeConcept) = conceptCheck else {
             if case .blocked(let reason) = conceptCheck {
                 phase = .failed(reason)

@@ -1,19 +1,22 @@
 import SwiftUI
 
 struct SqueezeButton: View {
+    var title: String = "Squeeze a Story"
+    var subtitle: String = "Generate text + illustrations"
+    var icon: String = "wand.and.stars"
     let isEnabled: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
-                Image(systemName: "wand.and.stars")
+                Image(systemName: icon)
                     .font(.title3.weight(.semibold))
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Squeeze a Story")
+                    Text(title)
                         .font(StoryJuicerTypography.uiTitle)
-                    Text("Generate text + illustrations")
+                    Text(subtitle)
                         .font(StoryJuicerTypography.uiMeta)
                         .foregroundStyle(Color.sjSecondaryText)
                 }

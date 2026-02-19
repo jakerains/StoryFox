@@ -6,6 +6,8 @@ struct IOSCreationView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     @State private var animateHero = false
+    @State private var creationMode: CreationMode = .quick
+    @State private var qaViewModel = StoryQAViewModel()
 
     private var horizontalPadding: CGFloat {
         sizeClass == .compact
@@ -31,12 +33,43 @@ struct IOSCreationView: View {
                     }
 
                     conceptSection
+
+                    // Q&A flow when guided mode is active and running
+                    if creationMode == .guided && qaViewModel.phase != .idle {
+                        StoryQAFlowView(
+                            viewModel: qaViewModel,
+                            onComplete: { enrichedConcept in
+                                viewModel.storyConcept = enrichedConcept
+                                viewModel.isEnrichedConcept = true
+                                viewModel.squeezeStory()
+                            },
+                            onCancel: {
+                                qaViewModel.cancel()
+                                withAnimation(StoryJuicerMotion.standard) {
+                                    creationMode = .quick
+                                }
+                            }
+                        )
+                    }
+
                     settingsSection
 
-                    SqueezeButton(isEnabled: viewModel.canGenerate) {
-                        viewModel.squeezeStory()
+                    if creationMode == .quick {
+                        SqueezeButton(isEnabled: viewModel.canGenerate) {
+                            viewModel.squeezeStory()
+                        }
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.small)
+                    } else if qaViewModel.phase == .idle {
+                        SqueezeButton(
+                            title: "Explore Your Story",
+                            subtitle: "AI will ask questions to enrich your concept",
+                            icon: "sparkle.magnifyingglass",
+                            isEnabled: viewModel.canGenerate
+                        ) {
+                            qaViewModel.startQA(concept: viewModel.storyConcept)
+                        }
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.small)
                     }
-                    .padding(.top, StoryJuicerGlassTokens.Spacing.small)
                 }
                 .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, StoryJuicerGlassTokens.Spacing.xLarge)
@@ -170,6 +203,9 @@ struct IOSCreationView: View {
                             .allowsHitTesting(false)
                     }
                 }
+                .disabled(qaViewModel.phase != .idle && creationMode == .guided)
+
+            CreationModeToggle(selection: $creationMode)
         }
         .padding(StoryJuicerGlassTokens.Spacing.large)
         .sjGlassCard(

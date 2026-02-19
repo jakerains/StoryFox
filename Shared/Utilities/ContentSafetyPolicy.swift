@@ -35,7 +35,7 @@ struct ContentSafetyPolicy: Sendable {
         (#"\b(police chase|chase scene|car crash)\b"#, "adventure walk")
     ]
 
-    static func validateConcept(_ rawConcept: String) -> ContentSafetyCheckResult {
+    static func validateConcept(_ rawConcept: String, maxLength: Int = 220) -> ContentSafetyCheckResult {
         let normalized = normalizeWhitespace(rawConcept)
 
         guard !normalized.isEmpty else {
@@ -51,7 +51,7 @@ struct ContentSafetyPolicy: Sendable {
             }
         }
 
-        return .allowed(sanitizedConcept: sanitizeConcept(normalized))
+        return .allowed(sanitizedConcept: sanitizeConcept(normalized, maxLength: maxLength))
     }
 
     static func safeCoverPrompt(title: String, concept: String) -> String {
@@ -83,15 +83,15 @@ struct ContentSafetyPolicy: Sendable {
         return sanitized
     }
 
-    static func sanitizeConcept(_ text: String) -> String {
+    static func sanitizeConcept(_ text: String, maxLength: Int = 220) -> String {
         let normalized = normalizeWhitespace(text)
         let cleaned = normalized.replacingOccurrences(
             of: #"[<>`\"']"#,
             with: "",
             options: .regularExpression
         )
-        if cleaned.count > 220 {
-            return String(cleaned.prefix(220))
+        if cleaned.count > maxLength {
+            return String(cleaned.prefix(maxLength))
         }
         return cleaned
     }

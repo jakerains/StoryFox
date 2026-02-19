@@ -195,7 +195,7 @@ The script handles everything: version bump → `make dmg` → appcast generatio
 2. **Update `landing/lib/changelog.ts`** — add or update the entry for the new version with a description of what changed (tagged as `added`, `fixed`, `changed`, or `removed`)
 3. **Update `softwareVersion`** in `landing/app/page.tsx` structured data to match the new version
 4. **Build and release the new version** — run `./scripts/release.sh <version>` to build the DMG, generate the appcast, create the GitHub release, and push. **Bumping the version in `project.yml` alone does NOT make it available to users.** The appcast only updates when a new DMG is built and `generate_appcast` runs against it. Without this step, Sparkle will say "no update available."
-5. **Deploy the landing page** — run `cd landing && vercel --prod` if the changelog or landing page content changed
+5. **Landing page deploys automatically** — Vercel is git-connected, so pushing to main triggers a deploy. No manual `vercel --prod` needed.
 
 **Why step 4 matters:** Sparkle compares the installed app's version against `appcast.xml` on GitHub. If you bump `project.yml` but don't rebuild the DMG and regenerate the appcast, the appcast still advertises the old version and users see "no update." The release script handles everything atomically.
 
@@ -283,8 +283,8 @@ The HuggingFace sign-in button uses a custom badge-style view matching the [offi
 # Dev server
 cd landing && npm run dev
 
-# Deploy to Vercel (manual, not git-connected)
-cd landing && vercel --prod
+# Deploy to Vercel (git-connected — auto-deploys on push to main)
+# No manual deploy needed
 ```
 
 **Design system mirrors the native app:**

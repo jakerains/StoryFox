@@ -12,6 +12,33 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.0",
+    date: "2026-02-19",
+    title: "Guided Story Creation, Audience Mode, About Panel",
+    changes: [
+      {
+        type: "added",
+        description:
+          "Guided creation mode — AI asks follow-up questions across 3 rounds (characters, plot, tone) with A/B/C suggestions to enrich your story concept before generation",
+      },
+      {
+        type: "added",
+        description:
+          "Kid / Adult audience toggle in Settings — adjusts Q&A question tone and story generation language level",
+      },
+      {
+        type: "added",
+        description:
+          "Custom About panel with 'Made with love by Jake Rains' credit linking to jakerains.com",
+      },
+      {
+        type: "changed",
+        description:
+          "Creation view now features a Quick/Guided mode toggle below the story concept input",
+      },
+    ],
+  },
+  {
     version: "1.1.1",
     date: "2026-02-19",
     title: "Edit & Regenerate, StoryJuicer Stamp, Text Cleanup",

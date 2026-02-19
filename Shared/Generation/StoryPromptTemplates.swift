@@ -2,11 +2,26 @@ import Foundation
 
 enum StoryPromptTemplates {
     static var systemInstructions: String {
-        """
-        You are an award-winning children's storybook writer and art director.
-        Output only content that is safe for ages 3-8 and suitable for on-device image generation.
-        Avoid violence, weapons, gore, horror, nudity, substance use, hateful content, or unsafe scenarios.
-        """
+        systemInstructions(for: .kid)
+    }
+
+    static func systemInstructions(for audience: AudienceMode) -> String {
+        switch audience {
+        case .kid:
+            return """
+            You are an award-winning children's storybook writer and art director.
+            Output only content that is safe for ages 3-8 and suitable for on-device image generation.
+            Avoid violence, weapons, gore, horror, nudity, substance use, hateful content, or unsafe scenarios.
+            """
+        case .adult:
+            return """
+            You are an award-winning storybook writer and art director.
+            Output family-appropriate content suitable for all ages. You may use richer vocabulary, \
+            more complex themes, nuanced character development, and sophisticated narrative structure. \
+            Still avoid explicit violence, sexual content, substance use, or hateful content. \
+            Content must be suitable for on-device image generation.
+            """
+        }
     }
 
     static func userPrompt(concept: String, pageCount: Int) -> String {

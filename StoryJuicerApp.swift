@@ -24,6 +24,11 @@ struct StoryJuicerApp: App {
             MacModelSettingsView(updateManager: updateManager)
         }
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About StoryJuicer") {
+                    NSApplication.shared.orderFrontStandardAboutPanel(options: aboutPanelOptions)
+                }
+            }
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates...") {
                     updateManager.checkForUpdates()
@@ -33,6 +38,70 @@ struct StoryJuicerApp: App {
         }
 #endif
     }
+
+#if os(macOS)
+    private var aboutPanelOptions: [NSApplication.AboutPanelOptionKey: Any] {
+        let credits = NSMutableAttributedString()
+
+        let bodyFont = NSFont.systemFont(ofSize: 11, weight: .regular)
+        let bodyColor = NSColor.secondaryLabelColor
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        paragraphStyle.paragraphSpacing = 4
+
+        // Line 1: "Made with [heart]"
+        let madeWith = NSAttributedString(
+            string: "Made with \u{2764}\u{FE0F}\n",
+            attributes: [
+                .font: bodyFont,
+                .foregroundColor: bodyColor,
+                .paragraphStyle: paragraphStyle
+            ]
+        )
+        credits.append(madeWith)
+
+        // Line 2: "by"
+        let byLine = NSAttributedString(
+            string: "by\n",
+            attributes: [
+                .font: bodyFont,
+                .foregroundColor: bodyColor,
+                .paragraphStyle: paragraphStyle
+            ]
+        )
+        credits.append(byLine)
+
+        // Line 3: "Jake Rains" as a clickable link
+        let linkFont = NSFont.systemFont(ofSize: 11, weight: .medium)
+        let jakeRains = NSAttributedString(
+            string: "Jake Rains",
+            attributes: [
+                .font: linkFont,
+                .foregroundColor: NSColor.linkColor,
+                .link: URL(string: "https://jakerains.com")!,
+                .paragraphStyle: paragraphStyle
+            ]
+        )
+        credits.append(jakeRains)
+
+        var options: [NSApplication.AboutPanelOptionKey: Any] = [
+            .credits: credits
+        ]
+
+        // Larger app icon in the About panel
+        if let appIcon = NSImage(named: NSImage.applicationIconName) {
+            let size = NSSize(width: 200, height: 200)
+            let resized = NSImage(size: size)
+            resized.lockFocus()
+            appIcon.draw(in: NSRect(origin: .zero, size: size),
+                         from: .zero, operation: .copy, fraction: 1.0)
+            resized.unlockFocus()
+            options[.applicationIcon] = resized
+        }
+
+        return options
+    }
+#endif
 }
 
 // MARK: - Navigation

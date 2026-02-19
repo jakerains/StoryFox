@@ -105,6 +105,7 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
     var diffusersRuntimeAlias: String
     var enableFoundationFallback: Bool
     var enableImageFallback: Bool
+    var audienceMode: AudienceMode
 
     // Cloud provider model IDs
     var openRouterTextModelID: String
@@ -192,6 +193,7 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
         case openRouterTextModelID, openRouterImageModelID
         case togetherTextModelID, togetherImageModelID
         case huggingFaceTextModelID, huggingFaceImageModelID
+        case audienceMode
     }
 
     init(
@@ -203,6 +205,7 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
         diffusersRuntimeAlias: String,
         enableFoundationFallback: Bool,
         enableImageFallback: Bool,
+        audienceMode: AudienceMode = .kid,
         openRouterTextModelID: String = CloudProvider.openRouter.defaultTextModelID,
         openRouterImageModelID: String = CloudProvider.openRouter.defaultImageModelID,
         togetherTextModelID: String = CloudProvider.togetherAI.defaultTextModelID,
@@ -218,6 +221,7 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
         self.diffusersRuntimeAlias = diffusersRuntimeAlias
         self.enableFoundationFallback = enableFoundationFallback
         self.enableImageFallback = enableImageFallback
+        self.audienceMode = audienceMode
         self.openRouterTextModelID = openRouterTextModelID
         self.openRouterImageModelID = openRouterImageModelID
         self.togetherTextModelID = togetherTextModelID
@@ -236,6 +240,8 @@ struct ModelSelectionSettings: Codable, Sendable, Equatable {
         diffusersRuntimeAlias = try container.decode(String.self, forKey: .diffusersRuntimeAlias)
         enableFoundationFallback = try container.decode(Bool.self, forKey: .enableFoundationFallback)
         enableImageFallback = try container.decode(Bool.self, forKey: .enableImageFallback)
+
+        audienceMode = try container.decodeIfPresent(AudienceMode.self, forKey: .audienceMode) ?? .kid
 
         // Cloud model IDs — use defaults for backward compatibility with v2 settings
         openRouterTextModelID = try container.decodeIfPresent(String.self, forKey: .openRouterTextModelID)
