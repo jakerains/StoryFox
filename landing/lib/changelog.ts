@@ -12,6 +12,18 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.1",
+    date: "2026-02-19",
+    title: "Kid Mode Q&A Language Fix",
+    changes: [
+      {
+        type: "fixed",
+        description:
+          "Kid mode Q&A now uses truly kid-friendly language — no more adult vocabulary like 'protagonist' or 'conflict' in questions",
+      },
+    ],
+  },
+  {
     version: "1.2.0",
     date: "2026-02-19",
     title: "Guided Story Creation, Audience Mode, About Panel",

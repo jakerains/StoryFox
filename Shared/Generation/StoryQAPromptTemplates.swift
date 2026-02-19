@@ -8,10 +8,14 @@ enum StoryQAPromptTemplates {
         switch audience {
         case .kid:
             return """
-            You are a friendly, enthusiastic story helper talking to a child! \
-            Use simple, fun language. Keep questions short and exciting. \
-            Make your suggested answers playful and imaginative — kids love \
-            animals, magic, adventures, and silly things. \
+            You are a super friendly story helper talking to a kid (ages 5-10). \
+            IMPORTANT RULES FOR KID MODE: \
+            - Use ONLY simple words a 6-year-old would understand. \
+            - NEVER use words like "protagonist", "narrative", "atmosphere", "motivation", "conflict", "resolution", "emotional register", or any fancy grown-up words. \
+            - Say "hero" instead of "protagonist". Say "adventure" instead of "narrative". Say "place" or "world" instead of "setting". Say "problem" instead of "conflict". \
+            - Keep questions SHORT and FUN — one sentence max. \
+            - Make suggested answers silly, playful, and full of imagination — kids love animals, magic, silly names, and wild adventures. \
+            - Talk like you're excited to help a kid make the COOLEST story ever! \
             Always respond with valid JSON only — no extra text before or after.
             """
         case .adult:
@@ -53,7 +57,7 @@ enum StoryQAPromptTemplates {
         This is round \(roundNumber) of \(totalRounds). \(focusGuidance)
 
         Generate exactly 3 questions. For each question, provide exactly 3 suggested \
-        answers that are creative, specific, and \(audience == .kid ? "fun for kids" : "evocative").
+        answers that are creative, specific, and \(audience == .kid ? "fun for kids — use simple words a 6-year-old would understand, NO fancy vocabulary" : "evocative").
 
         Return JSON with this exact shape (no markdown, no extra text):
         [
@@ -77,9 +81,10 @@ enum StoryQAPromptTemplates {
         switch (round, audience) {
         case (1, .kid):
             return """
-            Focus on the CHARACTERS and SETTING: \
-            Who is the hero? What are they like? Where does the story happen? \
-            Make questions exciting — kids love choosing cool characters and magical places!
+            Ask about the HERO and the PLACE. \
+            Examples of good kid questions: "Who is the hero of your story?", \
+            "What makes your hero special?", "Where does the adventure happen?" \
+            Remember — simple words only! No "protagonist", no "setting", no "atmosphere".
             """
         case (1, .adult):
             return """
@@ -89,9 +94,10 @@ enum StoryQAPromptTemplates {
             """
         case (2, .kid):
             return """
-            Focus on the ADVENTURE and CHALLENGE: \
-            What problem does the hero face? Who helps them? What makes it exciting? \
-            Think big — dragons, treasure hunts, mystery puzzles!
+            Ask about the ADVENTURE and the PROBLEM. \
+            Examples of good kid questions: "What big problem does the hero face?", \
+            "Who helps the hero on the adventure?", "What's the scariest or silliest part?" \
+            Keep it fun and exciting! No grown-up words like "conflict" or "stakes".
             """
         case (2, .adult):
             return """
@@ -101,9 +107,10 @@ enum StoryQAPromptTemplates {
             """
         case (_, .kid):
             return """
-            Focus on the ENDING and FEELINGS: \
-            How does the story end? What happy thing happens? \
-            What should kids feel when the story is over?
+            Ask about the ENDING and HOW IT FEELS. \
+            Examples of good kid questions: "How does the story end?", \
+            "What happy thing happens at the end?", "How should the reader feel?" \
+            Keep it warm and simple! No "resolution" or "emotional tone".
             """
         case (_, .adult):
             return """
