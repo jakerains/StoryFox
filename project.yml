@@ -26,6 +26,9 @@ packages:
   SwiftHuggingFace:
     url: https://github.com/huggingface/swift-huggingface
     from: "0.5.0"
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.8.1"
 
 targets:
   StoryJuicer:
@@ -66,6 +69,7 @@ targets:
         product: Hub
       - package: SwiftHuggingFace
         product: HuggingFace
+      - package: Sparkle
     entitlements:
       path: Resources/StoryJuicer.entitlements
 

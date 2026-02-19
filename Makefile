@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help doctor purge-image-cache generate build build-release run run-release clean app-path dmg build-ios run-ios
+.PHONY: help doctor purge-image-cache generate build build-release run run-release clean app-path dmg build-ios run-ios sparkle-setup appcast sign-update
 
 help:
 	@echo "StoryJuicer commands:"
@@ -17,6 +17,11 @@ help:
 	@echo "  make run-ios       Build and launch in iOS Simulator"
 	@echo "  make clean         Clean Xcode build artifacts"
 	@echo "  make app-path      Print built Debug .app bundle path"
+	@echo ""
+	@echo "Sparkle auto-update:"
+	@echo "  make sparkle-setup Generate EdDSA key pair (one-time setup)"
+	@echo "  make appcast       Regenerate appcast.xml from DMGs in dist/"
+	@echo "  make sign-update   Print EdDSA signature for a DMG (usage: make sign-update DMG=dist/StoryJuicer.dmg)"
 	@echo ""
 	@echo "Note: this is an Xcode project app target, so use make/xcodebuild (not swift run)."
 
@@ -160,3 +165,47 @@ dmg:
 	@echo ""
 	@echo "✅ Done! Distributable DMG: $(DMG_DIR)/$(APP_NAME).dmg"
 	@rm -f "$(DMG_DIR)/$(APP_NAME).zip" "$(DMG_DIR)/ExportOptions.plist"
+
+# ── Sparkle Auto-Update Tooling ─────────────────────────────────────
+# Sparkle CLI tools (generate_keys, generate_appcast, sign_update)
+# live inside the resolved SPM package in DerivedData.
+
+SPARKLE_BIN_DIR = $(shell find ~/Library/Developer/Xcode/DerivedData -path "*/Sparkle/bin" -type d 2>/dev/null | head -1)
+GITHUB_REPO_URL := https://github.com/jakerains/StoryJuicer/releases/download
+
+sparkle-setup:
+	@if [ -z "$(SPARKLE_BIN_DIR)" ]; then \
+		echo "Error: Sparkle bin directory not found in DerivedData."; \
+		echo "Run 'make build' first so SPM resolves the Sparkle package."; \
+		exit 1; \
+	fi
+	@echo "──── Generating EdDSA key pair ────"
+	@echo "The private key will be stored in your Keychain."
+	@echo "Copy the public key printed below into project.yml as INFOPLIST_KEY_SUPublicEDKey."
+	@echo ""
+	"$(SPARKLE_BIN_DIR)/generate_keys"
+
+appcast:
+	@if [ -z "$(SPARKLE_BIN_DIR)" ]; then \
+		echo "Error: Sparkle bin directory not found in DerivedData."; \
+		echo "Run 'make build' first so SPM resolves the Sparkle package."; \
+		exit 1; \
+	fi
+	@echo "──── Regenerating appcast.xml ────"
+	"$(SPARKLE_BIN_DIR)/generate_appcast" \
+		--download-url-prefix "$(GITHUB_REPO_URL)/v$$(plutil -extract CFBundleShortVersionString raw $(DMG_DIR)/export/$(APP_NAME).app/Contents/Info.plist)/" \
+		-o appcast.xml \
+		$(DMG_DIR)
+	@echo "✅ appcast.xml updated. Commit and push to main."
+
+sign-update:
+	@if [ -z "$(SPARKLE_BIN_DIR)" ]; then \
+		echo "Error: Sparkle bin directory not found in DerivedData."; \
+		echo "Run 'make build' first so SPM resolves the Sparkle package."; \
+		exit 1; \
+	fi
+	@if [ -z "$(DMG)" ]; then \
+		echo "Usage: make sign-update DMG=dist/StoryJuicer.dmg"; \
+		exit 1; \
+	fi
+	"$(SPARKLE_BIN_DIR)/sign_update" "$(DMG)"

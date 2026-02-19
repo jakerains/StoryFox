@@ -3,6 +3,8 @@ import SwiftUI
 struct MacModelSettingsView: View {
     private static let customChoice = "__custom__"
 
+    var updateManager: SoftwareUpdateManager
+
     @State private var settings: ModelSelectionSettings
     @State private var curatedTextModelChoice: String
     @State private var customTextModelID: String
@@ -12,7 +14,9 @@ struct MacModelSettingsView: View {
     @State private var isTestingTextModel = false
     @State private var cloudModelCache = CloudModelListCache()
 
-    init() {
+    init(updateManager: SoftwareUpdateManager) {
+        self.updateManager = updateManager
+
         let loaded = ModelSelectionStore.load()
 
         let textModelIDs = Set(ModelSelectionSettings.curatedMLXModels.map(\.id))
@@ -51,6 +55,9 @@ struct MacModelSettingsView: View {
                 //         modelCache: cloudModelCache
                 //     )
                 // }
+
+                sectionLabel("App", systemImage: "gearshape.2")
+                softwareUpdateSection
             }
             .padding(StoryJuicerGlassTokens.Spacing.large)
         }
@@ -300,6 +307,63 @@ struct MacModelSettingsView: View {
             RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.hero)
                 .strokeBorder(Color.sjCoral.opacity(0.25), lineWidth: 1)
         }
+    }
+
+    // MARK: - Software Update
+
+    private var softwareUpdateSection: some View {
+        SettingsPanelCard {
+            SettingsSectionHeader(
+                title: "Software Update",
+                subtitle: "Keep StoryJuicer up to date with the latest features and fixes.",
+                systemImage: "arrow.triangle.2.circlepath"
+            )
+
+            SettingsControlRow(
+                title: "Version",
+                description: "Currently installed version of StoryJuicer."
+            ) {
+                Text(appVersionString)
+                    .font(StoryJuicerTypography.settingsBody)
+                    .foregroundStyle(Color.sjText)
+                    .settingsFieldChrome()
+            }
+
+            SettingsControlRow(
+                title: "Automatic Updates",
+                description: "Periodically check for new versions in the background."
+            ) {
+                Toggle("Check automatically", isOn: Binding(
+                    get: { updateManager.automaticallyChecksForUpdates },
+                    set: { updateManager.automaticallyChecksForUpdates = $0 }
+                ))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .tint(.sjCoral)
+            }
+
+            VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
+                HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                    Button("Check for Updates...") {
+                        updateManager.checkForUpdates()
+                    }
+                    .buttonStyle(.glassProminent)
+                    .disabled(!updateManager.canCheckForUpdates)
+
+                    if let lastCheck = updateManager.lastUpdateCheckDate {
+                        Text("Last checked: \(lastCheck.formatted(date: .abbreviated, time: .shortened))")
+                            .font(StoryJuicerTypography.settingsMeta)
+                            .foregroundStyle(Color.sjSecondaryText)
+                    }
+                }
+            }
+        }
+    }
+
+    private var appVersionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "\(version) (\(build))"
     }
 
     // MARK: - More Providers Label

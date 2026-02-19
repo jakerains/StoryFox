@@ -6,6 +6,10 @@ import AppKit
 
 @main
 struct StoryJuicerApp: App {
+#if os(macOS)
+    @State private var updateManager = SoftwareUpdateManager()
+#endif
+
     var body: some Scene {
         WindowGroup {
             MainView()
@@ -17,7 +21,15 @@ struct StoryJuicerApp: App {
 
 #if os(macOS)
         Settings {
-            MacModelSettingsView()
+            MacModelSettingsView(updateManager: updateManager)
+        }
+        .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates...") {
+                    updateManager.checkForUpdates()
+                }
+                .disabled(!updateManager.canCheckForUpdates)
+            }
         }
 #endif
     }
