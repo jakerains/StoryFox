@@ -8,14 +8,12 @@ enum StoryQAPromptTemplates {
         switch audience {
         case .kid:
             return """
-            You are a super friendly story helper talking to a kid (ages 5-10). \
-            IMPORTANT RULES FOR KID MODE: \
-            - Use ONLY simple words a 6-year-old would understand. \
-            - NEVER use words like "protagonist", "narrative", "atmosphere", "motivation", "conflict", "resolution", "emotional register", or any fancy grown-up words. \
-            - Say "hero" instead of "protagonist". Say "adventure" instead of "narrative". Say "place" or "world" instead of "setting". Say "problem" instead of "conflict". \
-            - Keep questions SHORT and FUN — one sentence max. \
-            - Make suggested answers silly, playful, and full of imagination — kids love animals, magic, silly names, and wild adventures. \
-            - Talk like you're excited to help a kid make the COOLEST story ever! \
+            You help kids (ages 5-8) make up stories. You talk like a fun teacher at \
+            story time. Use short, simple words only. Every question must be one short \
+            sentence a 5-year-old can read. Every suggestion must be one short sentence \
+            with fun, silly ideas kids love (animals, magic, silly names, adventures). \
+            VOCABULARY RULE: Only use words a kindergartner knows. Write at a 1st-grade \
+            reading level. \
             Always respond with valid JSON only — no extra text before or after.
             """
         case .adult:
@@ -53,24 +51,36 @@ enum StoryQAPromptTemplates {
 
         let focusGuidance = roundFocus(roundNumber, audience: audience)
 
-        prompt += """
-        This is round \(roundNumber) of \(totalRounds). \(focusGuidance)
+        if audience == .kid {
+            prompt += """
+            This is round \(roundNumber) of \(totalRounds).
 
-        Generate exactly 3 questions. For each question, provide exactly 3 suggested \
-        answers that are creative, specific, and \(audience == .kid ? "fun for kids — use simple words a 6-year-old would understand, NO fancy vocabulary" : "evocative").
+            \(focusGuidance)
 
-        Return JSON with this exact shape (no markdown, no extra text):
-        [
-          {
-            "question": "Your question here?",
-            "suggestions": [
-              "First suggestion",
-              "Second suggestion",
-              "Third suggestion"
+            IMPORTANT: Write at a kindergarten reading level. Use only words a 5-year-old knows. \
+            Keep every question to one short sentence. Keep every suggestion to one short sentence. \
+            Make it fun and silly! Return ONLY the JSON array — no other text.
+            """
+        } else {
+            prompt += """
+            This is round \(roundNumber) of \(totalRounds). \(focusGuidance)
+
+            Generate exactly 3 questions. For each question, provide exactly 3 suggested \
+            answers that are creative, specific, and evocative.
+
+            Return JSON with this exact shape (no markdown, no extra text):
+            [
+              {
+                "question": "Your question here?",
+                "suggestions": [
+                  "First suggestion",
+                  "Second suggestion",
+                  "Third suggestion"
+                ]
+              }
             ]
-          }
-        ]
-        """
+            """
+        }
 
         return prompt
     }
@@ -81,10 +91,13 @@ enum StoryQAPromptTemplates {
         switch (round, audience) {
         case (1, .kid):
             return """
-            Ask about the HERO and the PLACE. \
-            Examples of good kid questions: "Who is the hero of your story?", \
-            "What makes your hero special?", "Where does the adventure happen?" \
-            Remember — simple words only! No "protagonist", no "setting", no "atmosphere".
+            Ask about the HERO and the PLACE. Copy this style EXACTLY:
+            [
+              {"question": "Who is the hero of your story?", "suggestions": ["A brave little bunny named Pip", "A silly dragon who can't fly yet", "A kid just like you with a magic hat"]},
+              {"question": "What makes your hero super special?", "suggestions": ["They can talk to animals!", "They have a glowing magic backpack", "They are the funniest kid in town"]},
+              {"question": "Where does the adventure happen?", "suggestions": ["A candy forest with chocolate rivers", "A floating castle in the clouds", "Under the sea with friendly fish"]}
+            ]
+            Use the SAME simple words and short sentences as above. Change the content to fit the story concept but keep the same easy reading level.
             """
         case (1, .adult):
             return """
@@ -94,10 +107,13 @@ enum StoryQAPromptTemplates {
             """
         case (2, .kid):
             return """
-            Ask about the ADVENTURE and the PROBLEM. \
-            Examples of good kid questions: "What big problem does the hero face?", \
-            "Who helps the hero on the adventure?", "What's the scariest or silliest part?" \
-            Keep it fun and exciting! No grown-up words like "conflict" or "stakes".
+            Ask about the ADVENTURE and the PROBLEM. Copy this style EXACTLY:
+            [
+              {"question": "What big problem does the hero run into?", "suggestions": ["A sneaky fox stole all the cookies!", "A giant storm is coming to the town", "The hero's best friend is lost"]},
+              {"question": "Who helps the hero?", "suggestions": ["A funny talking bird", "A wise old turtle", "A group of tiny brave mice"]},
+              {"question": "What is the scariest or silliest part?", "suggestions": ["They fall into a pit of tickle monsters!", "A big shadow turns out to be a baby bunny", "The hero has to cross a wobbly bridge over goo"]}
+            ]
+            Use the SAME simple words and short sentences as above. Change the content to fit the story concept and previous answers but keep the same easy reading level.
             """
         case (2, .adult):
             return """
@@ -107,10 +123,13 @@ enum StoryQAPromptTemplates {
             """
         case (_, .kid):
             return """
-            Ask about the ENDING and HOW IT FEELS. \
-            Examples of good kid questions: "How does the story end?", \
-            "What happy thing happens at the end?", "How should the reader feel?" \
-            Keep it warm and simple! No "resolution" or "emotional tone".
+            Ask about the ENDING and HOW IT FEELS. Copy this style EXACTLY:
+            [
+              {"question": "How does the story end?", "suggestions": ["Everyone has a big party!", "The hero makes a new best friend", "They find a treasure and share it with everyone"]},
+              {"question": "What happy thing happens at the end?", "suggestions": ["The hero gets a big hug from mom", "All the animals dance together", "A rainbow appears in the sky"]},
+              {"question": "How should the story make you feel?", "suggestions": ["Happy and warm inside", "Excited and ready for more adventures", "Giggly and silly"]}
+            ]
+            Use the SAME simple words and short sentences as above. Change the content to fit the story concept and previous answers but keep the same easy reading level.
             """
         case (_, .adult):
             return """

@@ -12,6 +12,23 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.2",
+    date: "2026-02-19",
+    title: "Kid Mode Q&A — Truly Kid-Friendly",
+    changes: [
+      {
+        type: "fixed",
+        description:
+          "Kid mode Q&A now generates truly kid-friendly questions and answers — uses few-shot examples to enforce kindergarten-level vocabulary across all 3 rounds",
+      },
+      {
+        type: "changed",
+        description:
+          "Kid mode round headers now say 'Hero & World', 'Adventure & Problem', 'Ending & Feelings' instead of adult terms",
+      },
+    ],
+  },
+  {
     version: "1.2.1",
     date: "2026-02-19",
     title: "Kid Mode Q&A Language Fix",

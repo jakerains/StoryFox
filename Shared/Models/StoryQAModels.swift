@@ -117,14 +117,17 @@ enum StoryQAPhase: Sendable, Equatable {
         }
     }
 
-    var roundLabel: String {
+    func roundLabel(audience: AudienceMode = .kid) -> String {
         switch self {
         case .awaitingAnswers(let round, let total):
             let focus: String
-            switch round {
-            case 1: focus = "Characters & Setting"
-            case 2: focus = "Plot & Conflict"
-            default: focus = "Tone & Resolution"
+            switch (round, audience) {
+            case (1, .kid):  focus = "Hero & World"
+            case (1, .adult): focus = "Characters & Setting"
+            case (2, .kid):  focus = "Adventure & Problem"
+            case (2, .adult): focus = "Plot & Conflict"
+            case (_, .kid):  focus = "Ending & Feelings"
+            case (_, .adult): focus = "Tone & Resolution"
             }
             return "Round \(round) of \(total) — \(focus)"
         default:

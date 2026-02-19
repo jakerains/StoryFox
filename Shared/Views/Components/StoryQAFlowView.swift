@@ -53,7 +53,7 @@ struct StoryQAFlowView: View {
         VStack(spacing: StoryJuicerGlassTokens.Spacing.large) {
             // Round header
             SettingsSectionHeader(
-                title: viewModel.phase.roundLabel,
+                title: viewModel.phase.roundLabel(audience: ModelSelectionStore.load().audienceMode),
                 subtitle: "Answer the questions below to add detail to your story.",
                 systemImage: "bubble.left.and.text.bubble.right"
             )
