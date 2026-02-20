@@ -5,10 +5,14 @@ import SwiftUI
 
 /// Reusable settings card for a single cloud provider.
 /// Shows API key input, text/image model pickers, and refresh/test controls.
+///
+/// Set `bare: true` when embedding inside an external container (e.g. a `DisclosureGroup`)
+/// to skip the built-in `SettingsPanelCard` and `SettingsSectionHeader` wrappers.
 struct CloudProviderSettingsSection: View {
     let provider: CloudProvider
     @Binding var settings: ModelSelectionSettings
     @Bindable var modelCache: CloudModelListCache
+    var bare: Bool = false
 
     @State private var apiKeyInput: String = ""
     @State private var keyStatus: String = ""
@@ -30,25 +34,34 @@ struct CloudProviderSettingsSection: View {
     }
 
     var body: some View {
-        SettingsPanelCard {
-            SettingsSectionHeader(
-                title: provider.displayName,
-                subtitle: provider.supportsOAuth
-                    ? "Use an API token or sign in with Hugging Face."
-                    : "Enter your API key to enable \(provider.displayName) models.",
-                systemImage: cloudProviderIcon
-            )
+        if bare {
+            content
+        } else {
+            SettingsPanelCard {
+                SettingsSectionHeader(
+                    title: provider.displayName,
+                    subtitle: provider.supportsOAuth
+                        ? "Use an API token or sign in with Hugging Face."
+                        : "Enter your API key to enable \(provider.displayName) models.",
+                    systemImage: cloudProviderIcon
+                )
 
-            apiKeyRow
-
-            if provider.supportsOAuth {
-                oauthRow
+                content
             }
-
-            textModelPicker
-            imageModelPicker
-            actionButtons
         }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        apiKeyRow
+
+        if provider.supportsOAuth {
+            oauthRow
+        }
+
+        textModelPicker
+        imageModelPicker
+        actionButtons
     }
 
     private var cloudProviderIcon: String {

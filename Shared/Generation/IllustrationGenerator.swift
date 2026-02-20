@@ -163,6 +163,27 @@ final class IllustrationGenerator {
             }
         }
 
+        // Final cover rescue — if cover is still missing after all recovery passes,
+        // make one dedicated attempt with the safest prompt variants.
+        if generatedImages[0] == nil {
+            Self.logger.info("Cover still missing — attempting final cover rescue")
+            lastStatusMessage = "Retrying cover image with safest prompt..."
+            do {
+                let coverImage = try await generateSingleImage(
+                    prompt: coverPrompt,
+                    style: style,
+                    format: format,
+                    startingVariantIndex: 4
+                )
+                generatedImages[0] = coverImage
+                onImageReady(0, coverImage)
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                Self.logger.warning("Final cover rescue failed: \(String(describing: error), privacy: .public)")
+            }
+        }
+
         // Log session summary
         let sessionDuration = ContinuousClock.now - sessionStart
         let totalSeconds = Double(sessionDuration.components.seconds) + Double(sessionDuration.components.attoseconds) / 1e18

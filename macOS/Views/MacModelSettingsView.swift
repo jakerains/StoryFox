@@ -13,6 +13,7 @@ struct MacModelSettingsView: View {
     @State private var textModelProgress: Double?
     @State private var isTestingTextModel = false
     @State private var cloudModelCache = CloudModelListCache()
+    @State private var isOpenRouterExpanded = false
 
     init(updateManager: SoftwareUpdateManager) {
         self.updateManager = updateManager
@@ -48,18 +49,28 @@ struct MacModelSettingsView: View {
                     modelCache: cloudModelCache
                 )
 
+                // OpenRouter (Advanced — collapsed by default)
+                SettingsPanelCard {
+                    DisclosureGroup(isExpanded: $isOpenRouterExpanded) {
+                        CloudProviderSettingsSection(
+                            provider: .openRouter,
+                            settings: $settings,
+                            modelCache: cloudModelCache,
+                            bare: true
+                        )
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.small)
+                    } label: {
+                        SettingsSectionHeader(
+                            title: "OpenRouter",
+                            subtitle: "Advanced — bring your own API key for access to hundreds of models.",
+                            systemImage: "globe"
+                        )
+                    }
+                    .tint(.sjCoral)
+                }
+
                 sectionLabel("Local Models", systemImage: "arrow.down.circle")
                 mlxModelSection
-
-                // OpenRouter and Together AI hidden for now
-                // moreProvidersLabel
-                // ForEach(CloudProvider.allCases.filter { $0 != .huggingFace }) { provider in
-                //     CloudProviderSettingsSection(
-                //         provider: provider,
-                //         settings: $settings,
-                //         modelCache: cloudModelCache
-                //     )
-                // }
 
                 sectionLabel("App", systemImage: "gearshape.2")
                 softwareUpdateSection
@@ -190,7 +201,7 @@ struct MacModelSettingsView: View {
                 description: "Engine used for writing stories."
             ) {
                 Picker("Text Provider", selection: $settings.textProvider) {
-                    ForEach(StoryTextProvider.allCases.filter { $0 != .openRouter && $0 != .togetherAI }) { provider in
+                    ForEach(StoryTextProvider.allCases.filter { $0 != .togetherAI }) { provider in
                         Text(provider.displayName).tag(provider)
                     }
                 }
@@ -205,7 +216,7 @@ struct MacModelSettingsView: View {
                 description: "Engine used for generating illustrations."
             ) {
                 Picker("Image Provider", selection: $settings.imageProvider) {
-                    ForEach(StoryImageProvider.allCases.filter { $0 != .diffusers && $0 != .openRouter && $0 != .togetherAI }) { provider in
+                    ForEach(StoryImageProvider.allCases.filter { $0 != .diffusers && $0 != .togetherAI }) { provider in
                         Text(provider.displayName).tag(provider)
                     }
                 }

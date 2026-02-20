@@ -18,6 +18,8 @@ final class StoredStorybook {
     var formatRawValue: String
     var styleRawValue: String
     var coverImageData: Data?
+    var isFavorite: Bool = false
+    var displayOrder: Int = 0
 
     @Relationship(deleteRule: .cascade)
     var pages: [StoredPage]
@@ -29,7 +31,9 @@ final class StoredStorybook {
         format: BookFormat,
         style: IllustrationStyle,
         coverImageData: Data? = nil,
-        pages: [StoredPage] = []
+        pages: [StoredPage] = [],
+        isFavorite: Bool = false,
+        displayOrder: Int = 0
     ) {
         self.id = UUID()
         self.title = title
@@ -40,6 +44,8 @@ final class StoredStorybook {
         self.styleRawValue = style.rawValue
         self.coverImageData = coverImageData
         self.pages = pages
+        self.isFavorite = isFavorite
+        self.displayOrder = displayOrder
     }
 
     var format: BookFormat {

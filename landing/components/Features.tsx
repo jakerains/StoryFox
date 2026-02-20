@@ -9,42 +9,42 @@ const features = [
     icon: "🔒",
     title: "Works Offline",
     description:
-      "Everything runs on your device by default. No internet needed, no accounts required. Your stories stay private.",
+      "Runs entirely on your device. No internet, no accounts. Your stories never leave your Mac.",
     color: "var(--sj-mint)",
   },
   {
     icon: "🖨️",
     title: "Print-Ready PDF",
     description:
-      "Export at 300 DPI with professional book dimensions. Ready to print at home or a print shop.",
+      "Exports at 300 DPI in real book dimensions. Take the PDF to a print shop or print it at home.",
     color: "var(--sj-gold)",
   },
   {
     icon: "🛡️",
     title: "Safe for Kids",
     description:
-      "Built-in safety guardrails ensure every story is age-appropriate for ages 3–8. Peace of mind for parents.",
+      "Content filters keep stories age-appropriate for ages 3\u20138. You can also set audience mode to \u201CKid\u201D for simpler vocabulary.",
     color: "var(--sj-coral)",
   },
   {
     icon: "📖",
     title: "Choose Your Length",
     description:
-      "Create anything from a quick 3-page bedtime story to a full 20-page adventure. You pick the page count.",
+      "3 pages for a quick bedtime story, 20 for a full adventure. You set the page count.",
     color: "var(--sj-lavender)",
   },
   {
     icon: "🔄",
     title: "Redo Any Page",
     description:
-      "Not happy with a page? Regenerate just the text or illustration individually — no need to start over.",
+      "Don't like a page? Regenerate just that page's text or illustration without restarting the whole book.",
     color: "var(--sj-sky)",
   },
   {
     icon: "📚",
     title: "Save Your Library",
     description:
-      "All your storybooks are saved automatically. Come back anytime to re-read, export, or share them.",
+      "Books save automatically. Re-read, export, or share them whenever you want.",
     color: "var(--sj-gold)",
   },
 ];
@@ -64,11 +64,10 @@ export function Features() {
           variants={scaleInVariants}
         >
           <h2 className="section-title mb-4 font-serif font-bold text-sj-text">
-            Everything You Need
+            What&apos;s Built In
           </h2>
           <p className="mx-auto max-w-xl text-lg text-sj-secondary">
-            Professional-quality storybooks with powerful features built right
-            in.
+            Print-quality storybooks, offline by default, with tools to tweak every page.
           </p>
         </motion.div>
 

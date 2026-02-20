@@ -12,6 +12,58 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.5",
+    date: "2026-02-20",
+    title: "Sidebar Favorites, OpenRouter, Collapsible Sections & Landing Polish",
+    changes: [
+      {
+        type: "added",
+        description:
+          "Sidebar favorites — star any storybook to pin it in a dedicated Favorites section that floats above your library",
+      },
+      {
+        type: "added",
+        description:
+          "Collapsible sidebar sections — Favorites and Your Storybooks can be expanded/collapsed, with state persisted across launches",
+      },
+      {
+        type: "added",
+        description:
+          "Drag-to-reorder books within each sidebar section, with order persisted via SwiftData",
+      },
+      {
+        type: "added",
+        description:
+          "OpenRouter provider — now accessible in Settings as a collapsible advanced section on both macOS and iOS, with curated model picks at the top",
+      },
+      {
+        type: "added",
+        description:
+          "Final cover rescue pass — if the cover image is still missing after all recovery attempts, a dedicated last-resort retry runs with the safest prompt variants",
+      },
+      {
+        type: "changed",
+        description:
+          "Book Setup section on creation view is now collapsible with a summary line showing current page count, format, and style",
+      },
+      {
+        type: "changed",
+        description:
+          "EPUB cover image now tagged with properties=\"cover-image\" and EPUB 2 backward-compatible meta for better Kindle/older reader support",
+      },
+      {
+        type: "changed",
+        description:
+          "Selected picker items now use a stronger coral tint and border for better visual contrast",
+      },
+      {
+        type: "changed",
+        description:
+          "Landing page copy tightened across Hero, Features, HuggingFace, Requirements, and Safety sections for clarity and conciseness",
+      },
+    ],
+  },
+  {
     version: "1.2.4",
     date: "2026-02-19",
     title: "Show Active Model in Progress View",

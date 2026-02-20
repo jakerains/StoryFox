@@ -69,7 +69,7 @@ export function Hero() {
             variants={fadeUpVariants}
             className="mb-4 max-w-lg font-serif text-xl leading-relaxed text-sj-text sm:text-2xl"
           >
-            AI-powered illustrated children&apos;s storybooks — on your device.
+            AI-powered illustrated children&apos;s storybooks, on your device.
           </motion.p>
 
           <motion.p
@@ -77,7 +77,7 @@ export function Hero() {
             className="mb-8 max-w-md text-base leading-relaxed text-sj-secondary sm:text-lg"
           >
             Type a story idea, pick a style, and get a fully illustrated book
-            with text, cover art, and print-ready PDF export — all in minutes.
+            with text, cover art, and print-ready PDF export. Takes a few minutes.
           </motion.p>
 
           <motion.div variants={fadeUpVariants}>

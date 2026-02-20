@@ -22,11 +22,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://storyjuicer.app"),
   title: "StoryJuicer — AI-Powered Illustrated Children's Storybooks",
   description:
-    "Type a story idea, pick a style, and get a fully illustrated children's book with text, cover art, and 300 DPI print-ready PDF export — all on your device.",
+    "Type a story idea, pick a style, and get a fully illustrated children's book with text, cover art, and 300 DPI print-ready PDF export. All on your device.",
   openGraph: {
     title: "StoryJuicer — AI-Powered Illustrated Storybooks",
     description:
-      "Type a story idea, pick a style, and get a fully illustrated children's book — all on your Mac. Free to use, no account required.",
+      "Type a story idea, pick a style, and get a fully illustrated children's book. All on your Mac, free, no account required.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "StoryJuicer — AI-powered illustrated children's storybooks" }],
     type: "website",
     siteName: "StoryJuicer",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "StoryJuicer — AI-Powered Illustrated Storybooks",
     description:
-      "Type a story idea, pick a style, and get a fully illustrated children's book — all on your Mac. Free to use, no account required.",
+      "Type a story idea, pick a style, and get a fully illustrated children's book. All on your Mac, free, no account required.",
     images: [{ url: "/og-image.png", alt: "StoryJuicer — AI-powered illustrated children's storybooks" }],
   },
   icons: {

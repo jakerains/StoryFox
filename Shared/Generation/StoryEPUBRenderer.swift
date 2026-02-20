@@ -286,7 +286,11 @@ struct StoryEPUBRenderer: EPUBRendering {
 
         for entry in imageEntries {
             let mediaType = entry.href.hasSuffix(".png") ? "image/png" : "image/jpeg"
-            manifestItems += "        <item id=\"\(entry.id)\" href=\"\(entry.href)\" media-type=\"\(mediaType)\"/>\n"
+            if entry.id == "img-cover" {
+                manifestItems += "        <item id=\"\(entry.id)\" href=\"\(entry.href)\" media-type=\"\(mediaType)\" properties=\"cover-image\"/>\n"
+            } else {
+                manifestItems += "        <item id=\"\(entry.id)\" href=\"\(entry.href)\" media-type=\"\(mediaType)\"/>\n"
+            }
         }
 
         // Spine
@@ -295,6 +299,11 @@ struct StoryEPUBRenderer: EPUBRendering {
             spineItems += "        <itemref idref=\"page-\(page.pageNumber)\"/>\n"
         }
         spineItems += "        <itemref idref=\"end\"/>"
+
+        // EPUB 2 backward-compatible cover meta (for Kindle/older readers)
+        let hasCoverMeta = imageEntries.contains(where: { $0.id == "img-cover" })
+            ? "\n            <meta name=\"cover\" content=\"img-cover\"/>"
+            : ""
 
         return """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -306,7 +315,7 @@ struct StoryEPUBRenderer: EPUBRendering {
                 <dc:language>en</dc:language>
                 <meta property="dcterms:modified">\(iso8601Now())</meta>
                 <meta property="rendition:layout">pre-paginated</meta>
-                <meta property="rendition:spread">auto</meta>
+                <meta property="rendition:spread">auto</meta>\(hasCoverMeta)
               </metadata>
               <manifest>
             \(manifestItems)    </manifest>

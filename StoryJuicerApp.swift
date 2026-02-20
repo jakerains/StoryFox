@@ -114,7 +114,12 @@ enum AppRoute: Hashable {
 
 struct MainView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \StoredStorybook.createdAt, order: .reverse) private var savedBooks: [StoredStorybook]
+    @Query(filter: #Predicate<StoredStorybook> { $0.isFavorite == true },
+           sort: \StoredStorybook.displayOrder) private var favoriteBooks: [StoredStorybook]
+    @Query(filter: #Predicate<StoredStorybook> { $0.isFavorite == false },
+           sort: \StoredStorybook.displayOrder) private var regularBooks: [StoredStorybook]
+
+    private var allBooks: [StoredStorybook] { favoriteBooks + regularBooks }
 
     @State private var viewModel = CreationViewModel()
     @State private var route: AppRoute = .creation
@@ -122,6 +127,8 @@ struct MainView: View {
     @State private var pdfRenderer = StoryPDFRenderer()
     @State private var epubRenderer = StoryEPUBRenderer()
     @State private var selectedSavedBookID: UUID?
+    @AppStorage("sidebar.favoritesExpanded") private var isFavoritesExpanded = true
+    @AppStorage("sidebar.storybooksExpanded") private var isStorybooksExpanded = true
 #if os(iOS)
     @State private var showingSettings = false
     @Environment(\.scenePhase) private var scenePhase
@@ -134,6 +141,7 @@ struct MainView: View {
             detailView
                 .background(detailBackground)
         }
+        .tint(.sjCoral)
         .navigationSplitViewStyle(.balanced)
 #if os(macOS)
         .frame(minWidth: 860, minHeight: 580)
@@ -210,9 +218,9 @@ struct MainView: View {
                 .listRowSeparator(.hidden)
                 .padding(.vertical, 2)
 
-                if !savedBooks.isEmpty {
-                    Section {
-                        ForEach(savedBooks) { book in
+                if !favoriteBooks.isEmpty {
+                    Section(isExpanded: $isFavoritesExpanded) {
+                        ForEach(favoriteBooks) { book in
                             savedBookRow(
                                 book,
                                 isSelected: selectedSavedBookID == book.id
@@ -221,13 +229,82 @@ struct MainView: View {
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                             .padding(.vertical, 2)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    withAnimation {
+                                        modelContext.delete(book)
+                                        try? modelContext.save()
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    withAnimation(StoryJuicerMotion.standard) {
+                                        book.isFavorite = false
+                                        try? modelContext.save()
+                                    }
+                                } label: {
+                                    Label("Unfavorite", systemImage: "star.slash")
+                                }
+                                .tint(.sjGold)
+                            }
                         }
-                        .onDelete(perform: deleteBooks)
+                        .onDelete(perform: deleteFavoriteBooks)
+                        .onMove(perform: moveFavorites)
                     } header: {
-                        Text("Your Storybooks")
-                            .font(StoryJuicerTypography.uiMetaStrong)
-                            .foregroundStyle(Color.sjSecondaryText)
-                            .textCase(nil)
+                        sidebarSectionHeader(
+                            title: "Favorites",
+                            systemImage: "star.fill",
+                            count: favoriteBooks.count,
+                            tint: .sjGold
+                        )
+                    }
+                }
+
+                if !regularBooks.isEmpty {
+                    Section(isExpanded: $isStorybooksExpanded) {
+                        ForEach(regularBooks) { book in
+                            savedBookRow(
+                                book,
+                                isSelected: selectedSavedBookID == book.id
+                            )
+                            .tag(book.id)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .padding(.vertical, 2)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    withAnimation {
+                                        modelContext.delete(book)
+                                        try? modelContext.save()
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    withAnimation(StoryJuicerMotion.standard) {
+                                        book.isFavorite = true
+                                        try? modelContext.save()
+                                    }
+                                } label: {
+                                    Label("Favorite", systemImage: "star.fill")
+                                }
+                                .tint(.sjGold)
+                            }
+                        }
+                        .onDelete(perform: deleteRegularBooks)
+                        .onMove(perform: moveRegularBooks)
+                    } header: {
+                        sidebarSectionHeader(
+                            title: "Your Storybooks",
+                            systemImage: "books.vertical",
+                            count: regularBooks.count,
+                            tint: .sjSecondaryText
+                        )
                     }
                 }
             }
@@ -235,7 +312,7 @@ struct MainView: View {
             .listStyle(.sidebar)
             .background(sidebarBackground)
             .onChange(of: selectedSavedBookID) { _, newID in
-                if let id = newID, let book = savedBooks.first(where: { $0.id == id }) {
+                if let id = newID, let book = allBooks.first(where: { $0.id == id }) {
                     openSavedBook(book)
                 }
             }
@@ -322,6 +399,18 @@ struct MainView: View {
             }
 
             Spacer(minLength: 0)
+
+            Button {
+                withAnimation(StoryJuicerMotion.standard) {
+                    book.isFavorite.toggle()
+                    try? modelContext.save()
+                }
+            } label: {
+                Image(systemName: book.isFavorite ? "star.fill" : "star")
+                    .foregroundStyle(book.isFavorite ? Color.sjGold : Color.sjMuted.opacity(0.5))
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal, StoryJuicerGlassTokens.Spacing.small)
         .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
@@ -339,12 +428,44 @@ struct MainView: View {
                 )
         }
         .contextMenu {
+            Button {
+                withAnimation(StoryJuicerMotion.standard) {
+                    book.isFavorite.toggle()
+                    try? modelContext.save()
+                }
+            } label: {
+                Label(
+                    book.isFavorite ? "Remove from Favorites" : "Add to Favorites",
+                    systemImage: book.isFavorite ? "star.slash" : "star.fill"
+                )
+            }
+
+            Divider()
+
             Button(role: .destructive) {
                 modelContext.delete(book)
+                try? modelContext.save()
             } label: {
                 Label("Delete", systemImage: "trash")
             }
         }
+    }
+
+    private func sidebarSectionHeader(title: String, systemImage: String, count: Int, tint: Color) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .foregroundStyle(tint)
+                .font(.caption)
+
+            Text(title)
+                .font(StoryJuicerTypography.uiMetaStrong)
+                .foregroundStyle(Color.sjSecondaryText)
+
+            Text("\(count)")
+                .font(StoryJuicerTypography.uiMeta)
+                .foregroundStyle(Color.sjMuted)
+        }
+        .textCase(nil)
     }
 
     private var sidebarBackground: some View {
@@ -489,12 +610,18 @@ struct MainView: View {
     }
 
     private func saveBook(_ book: StoryBook) {
+        // Shift existing regular books down so the new one appears at top
+        for existing in regularBooks {
+            existing.displayOrder += 1
+        }
+
         let stored = StoredStorybook.from(
             storyBook: book,
             images: viewModel.generatedImages,
             format: viewModel.selectedFormat,
             style: viewModel.selectedStyle
         )
+        stored.displayOrder = 0
         modelContext.insert(stored)
         readerViewModel?.storedBookID = stored.id
         try? modelContext.save()
@@ -525,7 +652,7 @@ struct MainView: View {
 
     private func persistRegeneratedImage(index: Int, image: CGImage, bookID: UUID?) {
         guard let bookID,
-              let stored = savedBooks.first(where: { $0.id == bookID }) else { return }
+              let stored = allBooks.first(where: { $0.id == bookID }) else { return }
 
         let pngData = cgImageToPNGData(image)
 
@@ -540,7 +667,7 @@ struct MainView: View {
 
     private func persistEditedText(book: StoryBook, bookID: UUID?) {
         guard let bookID,
-              let stored = savedBooks.first(where: { $0.id == bookID }) else { return }
+              let stored = allBooks.first(where: { $0.id == bookID }) else { return }
 
         stored.title = book.title
         stored.authorLine = book.authorLine
@@ -556,9 +683,34 @@ struct MainView: View {
         try? modelContext.save()
     }
 
-    private func deleteBooks(at offsets: IndexSet) {
+    private func deleteFavoriteBooks(at offsets: IndexSet) {
         for index in offsets {
-            modelContext.delete(savedBooks[index])
+            modelContext.delete(favoriteBooks[index])
+        }
+        try? modelContext.save()
+    }
+
+    private func deleteRegularBooks(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(regularBooks[index])
+        }
+        try? modelContext.save()
+    }
+
+    private func moveFavorites(from source: IndexSet, to destination: Int) {
+        var books = Array(favoriteBooks)
+        books.move(fromOffsets: source, toOffset: destination)
+        for (index, book) in books.enumerated() {
+            book.displayOrder = index
+        }
+        try? modelContext.save()
+    }
+
+    private func moveRegularBooks(from source: IndexSet, to destination: Int) {
+        var books = Array(regularBooks)
+        books.move(fromOffsets: source, toOffset: destination)
+        for (index, book) in books.enumerated() {
+            book.displayOrder = index
         }
         try? modelContext.save()
     }

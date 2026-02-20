@@ -25,10 +25,16 @@ extension View {
         interactive: Bool = true
     ) -> some View {
         sjGlassCard(
-            tint: selected ? .sjCoral.opacity(StoryJuicerGlassTokens.Tint.standard) : .sjGlassWeak,
+            tint: selected ? .sjCoral.opacity(StoryJuicerGlassTokens.Tint.emphasis) : .sjGlassWeak,
             interactive: interactive,
             cornerRadius: StoryJuicerGlassTokens.Radius.chip
         )
+        .overlay {
+            if selected {
+                RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.chip)
+                    .strokeBorder(Color.sjCoral.opacity(0.5), lineWidth: 1.5)
+            }
+        }
     }
 
     @ViewBuilder

@@ -9,21 +9,21 @@ const requirements = [
     icon: "🖥",
     title: "macOS 26",
     subtitle: "Tahoe",
-    description: "Requires the latest macOS with built-in AI capabilities.",
+    description: "Requires the latest macOS with Apple Intelligence.",
     color: "var(--sj-coral)",
   },
   {
     icon: "⚡",
     title: "Apple Silicon",
     subtitle: "M1 or later",
-    description: "Optimized for the Neural Engine in every Apple Silicon chip.",
+    description: "Needs the Neural Engine in M1 or newer chips.",
     color: "var(--sj-gold)",
   },
   {
     icon: "✨",
     title: "Apple Intelligence",
     subtitle: "Enabled",
-    description: "Powers the built-in text and image generation engine.",
+    description: "The on-device text and image generation runs through Apple Intelligence.",
     color: "var(--sj-lavender)",
   },
 ];
@@ -46,7 +46,7 @@ export function Requirements() {
             What You Need
           </h2>
           <p className="mx-auto max-w-md text-lg text-sj-secondary">
-            Here&apos;s what you need to get started.
+            Three things, all free.
           </p>
         </motion.div>
 

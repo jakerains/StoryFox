@@ -8,6 +8,7 @@ struct IOSCreationView: View {
     @State private var animateHero = false
     @State private var creationMode: CreationMode = .quick
     @State private var qaViewModel = StoryQAViewModel()
+    @State private var isBookSetupExpanded = false
 
     private var horizontalPadding: CGFloat {
         sizeClass == .compact
@@ -216,17 +217,33 @@ struct IOSCreationView: View {
 
     private var settingsSection: some View {
         SettingsPanelCard(tint: .sjGlassWeak.opacity(0.68)) {
-            SettingsSectionHeader(
-                title: "Book Setup",
-                subtitle: "Tune page count, layout, and illustration style before generating.",
-                systemImage: "wand.and.stars"
-            )
+            DisclosureGroup(isExpanded: $isBookSetupExpanded) {
+                VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.medium) {
+                    pageCountRow
+                    panelDivider
+                    formatPickerSection
+                    panelDivider
+                    stylePickerSection
+                }
+                .padding(.top, StoryJuicerGlassTokens.Spacing.small)
+            } label: {
+                HStack(spacing: StoryJuicerGlassTokens.Spacing.medium) {
+                    Image(systemName: "wand.and.stars")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color.sjCoral)
 
-            pageCountRow
-            panelDivider
-            formatPickerSection
-            panelDivider
-            stylePickerSection
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Book Setup")
+                            .font(StoryJuicerTypography.uiBodyStrong)
+                            .foregroundStyle(Color.sjGlassInk)
+
+                        Text("\(viewModel.pageCount) pages · \(viewModel.selectedFormat.displayName) · \(viewModel.selectedStyle.displayName)")
+                            .font(StoryJuicerTypography.uiMeta)
+                            .foregroundStyle(Color.sjSecondaryText)
+                    }
+                }
+            }
+            .tint(.sjCoral)
         }
     }
 

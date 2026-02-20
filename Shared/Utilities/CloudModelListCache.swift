@@ -93,8 +93,13 @@ final class CloudModelListCache {
 
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let models = json["data"] as? [[String: Any]] else {
-            return ([], [])
+            // Return curated models even if the API fetch fails
+            return (Self.curatedOpenRouterTextModels, Self.curatedOpenRouterImageModels)
         }
+
+        // Collect curated model IDs to avoid duplicates
+        let curatedTextIDs = Set(Self.curatedOpenRouterTextModels.map(\.id))
+        let curatedImageIDs = Set(Self.curatedOpenRouterImageModels.map(\.id))
 
         var text: [CloudModelInfo] = []
         var image: [CloudModelInfo] = []
@@ -107,14 +112,19 @@ final class CloudModelListCache {
             let arch = model["architecture"] as? [String: Any]
             let modality = arch?["modality"] as? String ?? ""
 
-            if modality.contains("image") || id.contains("flux") || id.contains("dall-e") || id.contains("stable-diffusion") {
-                image.append(CloudModelInfo(id: id, displayName: name, provider: .openRouter, modality: .image))
+            if modality.contains("image") || id.contains("flux") || id.contains("dall-e") || id.contains("stable-diffusion") || id.contains("image") {
+                if !curatedImageIDs.contains(id) {
+                    image.append(CloudModelInfo(id: id, displayName: name, provider: .openRouter, modality: .image))
+                }
             } else {
-                text.append(CloudModelInfo(id: id, displayName: name, provider: .openRouter, modality: .text))
+                if !curatedTextIDs.contains(id) {
+                    text.append(CloudModelInfo(id: id, displayName: name, provider: .openRouter, modality: .text))
+                }
             }
         }
 
-        return (text, image)
+        // Curated models always appear at the top
+        return (Self.curatedOpenRouterTextModels + text, Self.curatedOpenRouterImageModels + image)
     }
 
     // MARK: - Together AI
@@ -207,6 +217,23 @@ final class CloudModelListCache {
         CloudModelInfo(id: "black-forest-labs/FLUX.1-Fill-dev", displayName: "FLUX.1 Fill dev", provider: .huggingFace, modality: .image),
     ]
 
+    /// Curated text models for OpenRouter — always shown at the top of the picker.
+    static let curatedOpenRouterTextModels: [CloudModelInfo] = [
+        CloudModelInfo(id: "google/gemini-3-flash-preview", displayName: "Gemini 3 Flash Preview", provider: .openRouter, modality: .text),
+        CloudModelInfo(id: "openai/gpt-5-mini", displayName: "GPT-5 Mini", provider: .openRouter, modality: .text),
+        CloudModelInfo(id: "anthropic/claude-sonnet-4.6", displayName: "Claude Sonnet 4.6", provider: .openRouter, modality: .text),
+        CloudModelInfo(id: "openai/gpt-5.2", displayName: "GPT-5.2", provider: .openRouter, modality: .text),
+        CloudModelInfo(id: "google/gemini-3.1-pro-preview", displayName: "Gemini 3.1 Pro Preview", provider: .openRouter, modality: .text),
+    ]
+
+    /// Curated image models for OpenRouter — always shown at the top of the picker.
+    static let curatedOpenRouterImageModels: [CloudModelInfo] = [
+        CloudModelInfo(id: "google/gemini-3-pro-image-preview", displayName: "Nano Banana Pro", provider: .openRouter, modality: .image),
+        CloudModelInfo(id: "google/gemini-2.5-flash-image", displayName: "Nano Banana", provider: .openRouter, modality: .image),
+        CloudModelInfo(id: "openai/gpt-5-image", displayName: "GPT-5 Image", provider: .openRouter, modality: .image),
+        CloudModelInfo(id: "openai/gpt-5-image-mini", displayName: "GPT-5 Image Mini", provider: .openRouter, modality: .image),
+    ]
+
     private func parseHuggingFaceModels(_ data: Data, provider: CloudProvider, modality: CloudModelModality) -> [CloudModelInfo] {
         // For image models, use curated Black Forest Labs list instead of dynamic API results
         if modality == .image {
@@ -243,6 +270,10 @@ final class CloudModelListCache {
         // Always seed HF image models with curated Black Forest Labs list
         imageModels[.huggingFace] = Self.curatedHFImageModels
 
+        // Always seed OpenRouter with curated models
+        textModels[.openRouter] = Self.curatedOpenRouterTextModels
+        imageModels[.openRouter] = Self.curatedOpenRouterImageModels
+
         for provider in CloudProvider.allCases {
             let key = Self.defaultsKeyPrefix + provider.rawValue
             guard let data = UserDefaults.standard.data(forKey: key),
@@ -250,13 +281,29 @@ final class CloudModelListCache {
                 continue
             }
 
-            textModels[provider] = zip(dto.textModelIDs, dto.textModelNames).map {
-                CloudModelInfo(id: $0.0, displayName: $0.1, provider: provider, modality: .text)
-            }
-            // For HF image models, always use curated list (already set above)
-            if provider != .huggingFace || dto.imageModelIDs.isEmpty {
-                imageModels[provider] = zip(dto.imageModelIDs, dto.imageModelNames).map {
-                    CloudModelInfo(id: $0.0, displayName: $0.1, provider: provider, modality: .image)
+            // For OpenRouter, merge cached models after curated ones (avoid overwriting)
+            if provider == .openRouter {
+                let curatedTextIDs = Set(Self.curatedOpenRouterTextModels.map(\.id))
+                let curatedImageIDs = Set(Self.curatedOpenRouterImageModels.map(\.id))
+
+                let extraText = zip(dto.textModelIDs, dto.textModelNames).compactMap { id, name -> CloudModelInfo? in
+                    curatedTextIDs.contains(id) ? nil : CloudModelInfo(id: id, displayName: name, provider: provider, modality: .text)
+                }
+                let extraImage = zip(dto.imageModelIDs, dto.imageModelNames).compactMap { id, name -> CloudModelInfo? in
+                    curatedImageIDs.contains(id) ? nil : CloudModelInfo(id: id, displayName: name, provider: provider, modality: .image)
+                }
+
+                textModels[provider] = Self.curatedOpenRouterTextModels + extraText
+                imageModels[provider] = Self.curatedOpenRouterImageModels + extraImage
+            } else {
+                textModels[provider] = zip(dto.textModelIDs, dto.textModelNames).map {
+                    CloudModelInfo(id: $0.0, displayName: $0.1, provider: provider, modality: .text)
+                }
+                // For HF image models, always use curated list (already set above)
+                if provider != .huggingFace || dto.imageModelIDs.isEmpty {
+                    imageModels[provider] = zip(dto.imageModelIDs, dto.imageModelNames).map {
+                        CloudModelInfo(id: $0.0, displayName: $0.1, provider: provider, modality: .image)
+                    }
                 }
             }
         }

@@ -24,22 +24,19 @@ export function SafetyDisclaimer() {
               </h3>
               <div className="space-y-2.5 text-sm leading-relaxed text-sj-secondary">
                 <p>
-                  StoryJuicer was built around a simple idea: powerful AI models are
-                  already on your Mac — so let&apos;s use them. Apple Intelligence
-                  makes it possible to generate entire storybooks without an internet
-                  connection, without an account, and without sending your
-                  children&apos;s stories to anyone&apos;s servers. That&apos;s exactly
-                  what we set out to build.
+                  StoryJuicer exists because Apple already put capable AI models on
+                  your Mac. Apple Intelligence makes it possible to generate entire
+                  storybooks without an internet connection and without an account.
+                  Your children&apos;s stories never leave your device.
                 </p>
                 <p>
-                  However, Apple&apos;s on-device model includes strict content safety
-                  filters designed to prevent inappropriate material from being
-                  generated. While this is an important safeguard, the filtering can be
-                  overly conservative with creative content — flagging perfectly
-                  innocent story pages more often than we&apos;d like. StoryJuicer
-                  automatically retries with adjusted phrasing when this happens, and
-                  most pages will generate successfully. But in some cases, the
-                  on-device model may still decline a prompt despite multiple attempts.
+                  However, Apple&apos;s on-device model has strict content safety
+                  filters. These are important, but they can be overly conservative
+                  with creative content, flagging perfectly innocent story pages more
+                  often than we&apos;d like. StoryJuicer automatically retries with
+                  adjusted phrasing when this happens, and most pages generate
+                  successfully. But sometimes the on-device model still declines a
+                  prompt despite multiple attempts.
                 </p>
                 <p>
                   When this happens, we recommend connecting a{" "}
@@ -49,9 +46,8 @@ export function SafetyDisclaimer() {
                   >
                     free Hugging Face account
                   </a>
-                  . The cloud models provide significantly more flexibility for
-                  creative storytelling while still keeping the experience simple and
-                  completely free.
+                  . The cloud models are less restrictive with creative content and
+                  still completely free.
                 </p>
               </div>
             </div>

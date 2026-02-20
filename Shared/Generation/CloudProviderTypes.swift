@@ -87,7 +87,7 @@ enum CloudProvider: String, CaseIterable, Codable, Sendable, Equatable, Identifi
 
     var defaultTextModelID: String {
         switch self {
-        case .openRouter:  return "meta-llama/llama-4-maverick"
+        case .openRouter:  return "google/gemini-3-flash-preview"
         case .togetherAI:  return "meta-llama/Llama-4-Maverick-17B-128E-Instruct-Turbo"
         case .huggingFace: return "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8"
         }
@@ -95,7 +95,7 @@ enum CloudProvider: String, CaseIterable, Codable, Sendable, Equatable, Identifi
 
     var defaultImageModelID: String {
         switch self {
-        case .openRouter:  return "black-forest-labs/flux-1.1-pro"
+        case .openRouter:  return "google/gemini-3-pro-image-preview"
         case .togetherAI:  return "black-forest-labs/FLUX.1.1-pro"
         case .huggingFace: return "black-forest-labs/FLUX.1-schnell"
         }

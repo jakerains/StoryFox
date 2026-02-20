@@ -10,46 +10,46 @@ const upgradeSteps = [
     number: "1",
     title: "Create a free account",
     description:
-      "Sign up at huggingface.co — takes less than a minute.",
+      "Sign up at huggingface.co. Takes about a minute.",
   },
   {
     number: "2",
     title: "Sign in from the app",
     description:
-      'Open StoryJuicer settings and tap "Sign in with Hugging Face." One click, done.',
+      'Open StoryJuicer settings, tap "Sign in with Hugging Face." That\'s it.',
   },
   {
     number: "3",
     title: "Pick your models",
     description:
-      "Choose from powerful cloud models for both text and illustrations. The app handles the rest.",
+      "Choose which cloud models to use for text and images. StoryJuicer connects to them automatically.",
   },
 ];
 
 const benefits = [
   {
     icon: "📝",
-    title: "Smarter Stories",
+    title: "Better Stories",
     description:
-      "Access models like Llama 4 for richer, more creative storylines with better vocabulary and plot structure.",
+      "Models like OpenAI GPT-OSS write longer, more coherent stories with varied vocabulary. The on-device model is good; these are noticeably better.",
   },
   {
     icon: "🖼️",
-    title: "Stunning Illustrations",
+    title: "Sharper Illustrations",
     description:
-      "Generate images with FLUX.1 from Black Forest Labs — dramatically more detailed and vibrant than on-device.",
+      "FLUX.1 from Black Forest Labs produces sharper details, better lighting, and more consistent characters than the on-device model.",
   },
   {
     icon: "💰",
     title: "Completely Free",
     description:
-      "Hugging Face's free tier includes generous inference limits — no subscriptions, no hidden costs.",
+      "Hugging Face's free tier covers plenty of storybooks. No subscriptions, no hidden costs.",
   },
   {
     icon: "🔐",
     title: "Secure Connection",
     description:
-      "Your login is handled through a secure sign-in window. StoryJuicer only gets permission to generate — nothing else.",
+      "Login happens through a secure sign-in window. StoryJuicer only gets permission to generate, nothing else.",
   },
 ];
 
@@ -84,12 +84,12 @@ export function HuggingFaceSection() {
             </span>
           </div>
           <h2 className="section-title mb-4 font-serif font-bold text-sj-text">
-            Supercharge with Hugging Face
+            Go Further with Hugging Face
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-sj-secondary">
-            StoryJuicer works great right out of the box with your Mac&apos;s built-in AI.
-            But connect a free Hugging Face account and unlock <strong className="text-sj-text">dramatically better</strong> stories
-            and illustrations powered by the world&apos;s best open AI models.
+            StoryJuicer works on its own with your Mac&apos;s built-in AI.
+            Connect a free Hugging Face account to unlock better stories
+            and sharper illustrations from open models like OpenAI GPT-OSS and FLUX.1.
           </p>
         </motion.div>
 
@@ -162,7 +162,7 @@ export function HuggingFaceSection() {
                   Create a Free Account
                 </a>
                 <p className="text-xs text-sj-muted">
-                  Completely free — no credit card required.
+                  Completely free. No credit card required.
                 </p>
               </div>
             </GlassCard>
@@ -177,7 +177,7 @@ export function HuggingFaceSection() {
           viewport={{ once: true }}
           variants={fadeUpVariants}
         >
-          Already have a Hugging Face account? Just open StoryJuicer settings and sign in — your existing account works perfectly.
+          Already have a Hugging Face account? Just open StoryJuicer settings and sign in. Your existing account works.
         </motion.p>
       </div>
     </section>
