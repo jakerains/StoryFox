@@ -34,7 +34,7 @@ export const changelog: ChangelogEntry[] = [
       {
         type: "added",
         description:
-          "OpenRouter provider — now accessible in Settings as a collapsible advanced section on both macOS and iOS, with curated model picks at the top",
+          "OpenRouter provider — now accessible in Settings as a collapsible advanced section with curated model picks at the top",
       },
       {
         type: "added",

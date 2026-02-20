@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## iOS Development — On Hold
+
+The iOS target (`StoryJuicer-iOS`) exists in the codebase but is **not actively being developed** right now. Until iOS development resumes:
+
+- **Do not mention iOS** in changelogs, release notes, or user-facing copy
+- **Do not prioritize iOS-specific fixes** or UI changes unless explicitly asked
+- **Shared code** (`Shared/`) still compiles for both platforms, so avoid breaking the iOS build, but don't spend time on iOS-only polish
+- The macOS target is the sole focus for features, releases, and testing
+
 ## Build System
 
 This project uses **XcodeGen** (`project.yml`) to generate `StoryJuicer.xcodeproj`. The Xcode project file is not checked in — it's generated.
