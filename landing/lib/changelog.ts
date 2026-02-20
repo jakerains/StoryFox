@@ -12,6 +12,28 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.3",
+    date: "2026-02-20",
+    title: "Fix Cloud Image Generation Routing",
+    changes: [
+      {
+        type: "fixed",
+        description:
+          "Cloud image generation now works with all listed HuggingFace models — Z-Image Turbo, HunyuanImage 3.0, SD 3.5 Medium, and HiDream I1 Fast previously returned 404 errors",
+      },
+      {
+        type: "added",
+        description:
+          "Smart inference provider routing automatically resolves the correct HuggingFace backend (hf-inference, fal-ai, replicate) for each model",
+      },
+      {
+        type: "removed",
+        description:
+          "Removed FLUX.1 Canny and FLUX.1 Depth from image model picker — these ControlNet models require a conditioning image and don't work with text-only prompts",
+      },
+    ],
+  },
+  {
     version: "1.3.2",
     date: "2026-02-20",
     title: "Expanded Cloud Model Selection",

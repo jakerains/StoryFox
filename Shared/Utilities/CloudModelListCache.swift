@@ -218,6 +218,8 @@ final class CloudModelListCache {
     ]
 
     /// Curated image models known to work well with HF Inference.
+    /// Models may use different inference providers (hf-inference, fal-ai, etc.) —
+    /// HFInferenceRouter resolves the correct provider at runtime.
     static let curatedHFImageModels: [CloudModelInfo] = [
         CloudModelInfo(id: "black-forest-labs/FLUX.1-schnell", displayName: "FLUX.1 schnell", provider: .huggingFace, modality: .image),
         CloudModelInfo(id: "black-forest-labs/FLUX.1-dev", displayName: "FLUX.1 dev", provider: .huggingFace, modality: .image),
@@ -225,8 +227,6 @@ final class CloudModelListCache {
         CloudModelInfo(id: "tencent/HunyuanImage-3.0", displayName: "HunyuanImage 3.0", provider: .huggingFace, modality: .image),
         CloudModelInfo(id: "stabilityai/stable-diffusion-3.5-medium", displayName: "Stable Diffusion 3.5 Medium", provider: .huggingFace, modality: .image),
         CloudModelInfo(id: "HiDream-ai/HiDream-I1-Fast", displayName: "HiDream I1 Fast", provider: .huggingFace, modality: .image),
-        CloudModelInfo(id: "black-forest-labs/FLUX.1-Canny-dev", displayName: "FLUX.1 Canny dev", provider: .huggingFace, modality: .image),
-        CloudModelInfo(id: "black-forest-labs/FLUX.1-Depth-dev", displayName: "FLUX.1 Depth dev", provider: .huggingFace, modality: .image),
     ]
 
     /// Curated text models for OpenRouter — always shown at the top of the picker.

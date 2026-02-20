@@ -78,9 +78,8 @@ struct CloudImageGenerator: StoryImageGenerating {
 
     // MARK: - HuggingFace Native Inference Path
 
-    /// Calls the HF Inference API directly. The SDK's `/v1/images/generations`
-    /// endpoint is broken (404), so we hit the native path instead:
-    ///   POST https://router.huggingface.co/hf-inference/models/{model}
+    /// Calls the HF Inference API via the router. The router resolves the correct
+    /// inference provider (hf-inference, fal-ai, replicate, etc.) for each model.
     /// Body: `{"inputs": "...", "parameters": {...}}`
     /// Response: raw image bytes (JPEG).
     private func generateWithHFInference(
@@ -90,7 +89,7 @@ struct CloudImageGenerator: StoryImageGenerating {
         width: Int,
         height: Int
     ) async throws -> CGImage {
-        let url = URL(string: "https://router.huggingface.co/hf-inference/models/\(model)")!
+        let url = await HFInferenceRouter.shared.inferenceURL(for: model, apiKey: apiKey)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

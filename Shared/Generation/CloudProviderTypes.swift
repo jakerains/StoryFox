@@ -115,6 +115,61 @@ enum CloudModelModality: String, Sendable, Hashable {
     case image
 }
 
+/// Resolves the correct HuggingFace Inference API URL for a given model.
+///
+/// HuggingFace routes models through different inference providers (hf-inference, fal-ai,
+/// replicate, etc.). Not all models are available on all providers. This actor queries the
+/// HF API for the model's provider mapping and picks the best available one.
+actor HFInferenceRouter {
+    static let shared = HFInferenceRouter()
+
+    private var cache: [String: URL] = [:]
+    private let preferredProviders = ["hf-inference", "fal-ai", "replicate", "together", "wavespeed", "nscale"]
+
+    /// Returns the inference URL for the given HuggingFace model ID.
+    /// Queries the HF API on first call per model, then caches the result.
+    func inferenceURL(for modelID: String, apiKey: String) async -> URL {
+        if let cached = cache[modelID] { return cached }
+
+        let url = await resolveProvider(for: modelID, apiKey: apiKey)
+        cache[modelID] = url
+        return url
+    }
+
+    /// Clear cached provider mappings (e.g. when switching accounts).
+    func clearCache() {
+        cache.removeAll()
+    }
+
+    private func resolveProvider(for modelID: String, apiKey: String) async -> URL {
+        let fallback = URL(string: "https://router.huggingface.co/hf-inference/models/\(modelID)")!
+
+        guard let apiURL = URL(string: "https://huggingface.co/api/models/\(modelID)?expand[]=inferenceProviderMapping") else {
+            return fallback
+        }
+
+        var request = URLRequest(url: apiURL)
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 10
+
+        guard let (data, _) = try? await URLSession.shared.data(for: request),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let mapping = json["inferenceProviderMapping"] as? [String: Any] else {
+            return fallback
+        }
+
+        for provider in preferredProviders {
+            if let info = mapping[provider] as? [String: Any],
+               let status = info["status"] as? String,
+               status == "live" {
+                return URL(string: "https://router.huggingface.co/\(provider)/models/\(modelID)")!
+            }
+        }
+
+        return fallback
+    }
+}
+
 /// Errors specific to cloud provider operations.
 enum CloudProviderError: LocalizedError {
     case noAPIKey(CloudProvider)

@@ -512,9 +512,8 @@ struct CloudProviderSettingsSection: View {
             let image: CGImage
 
             if provider == .huggingFace {
-                // Direct HF Inference API — the SDK's /v1/images/generations is a confirmed 404.
-                // The working endpoint is /hf-inference/models/{model}, returning raw image bytes.
-                let url = URL(string: "https://router.huggingface.co/hf-inference/models/\(modelID)")!
+                // Use the inference router to resolve the correct provider (hf-inference, fal-ai, etc.)
+                let url = await HFInferenceRouter.shared.inferenceURL(for: modelID, apiKey: apiKey)
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
