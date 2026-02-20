@@ -19,7 +19,7 @@ enum IllustrationGenerationState: Sendable {
 @Observable
 @MainActor
 final class IllustrationGenerator {
-    private nonisolated(unsafe) static let logger = Logger(subsystem: "com.storyjuicer.app", category: "Illustrations")
+    private nonisolated(unsafe) static let logger = Logger(subsystem: "com.storyfox.app", category: "Illustrations")
 
     private static let variantLabels = [
         "sanitized",          // full sanitized scene (~180 chars)
@@ -461,7 +461,7 @@ final class IllustrationGenerator {
         }
         if description.contains("backgroundcreationforbidden")
             || description.contains("background") {
-            return "Keep StoryJuicer in the foreground while images are generating."
+            return "Keep StoryFox in the foreground while images are generating."
         }
         return "Could not generate this frame right now. Please retry."
     }

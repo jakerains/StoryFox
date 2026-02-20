@@ -5,7 +5,7 @@ SHELL := /bin/bash
 .PHONY: help doctor purge-image-cache generate build build-release run run-release clean app-path dmg build-ios run-ios sparkle-setup appcast sign-update
 
 help:
-	@echo "StoryJuicer commands:"
+	@echo "StoryFox commands:"
 	@echo "  make doctor        Check local toolchain and SDK readiness"
 	@echo "  make purge-image-cache  Remove local Diffusers runtime/model cache data"
 	@echo "  make build         Generate project and build Debug app"
@@ -21,7 +21,7 @@ help:
 	@echo "Sparkle auto-update:"
 	@echo "  make sparkle-setup Generate EdDSA key pair (one-time setup)"
 	@echo "  make appcast       Regenerate appcast.xml from DMGs in dist/"
-	@echo "  make sign-update   Print EdDSA signature for a DMG (usage: make sign-update DMG=dist/StoryJuicer.dmg)"
+	@echo "  make sign-update   Print EdDSA signature for a DMG (usage: make sign-update DMG=dist/StoryFox.dmg)"
 	@echo ""
 	@echo "Note: this is an Xcode project app target, so use make/xcodebuild (not swift run)."
 
@@ -47,12 +47,12 @@ run-release:
 	./scripts/run.sh --release
 
 clean:
-	xcodebuild -project StoryJuicer.xcodeproj -scheme StoryJuicer -destination 'platform=macOS' clean
+	xcodebuild -project StoryFox.xcodeproj -scheme StoryFox -destination 'platform=macOS' clean
 
 app-path:
 	@xcodebuild \
-		-project StoryJuicer.xcodeproj \
-		-scheme StoryJuicer \
+		-project StoryFox.xcodeproj \
+		-scheme StoryFox \
 		-configuration Debug \
 		-destination 'platform=macOS' \
 		-showBuildSettings | awk -F' = ' '\
@@ -62,12 +62,12 @@ app-path:
 
 # ── iOS Targets ─────────────────────────────────────────────────────
 
-IOS_SCHEME := StoryJuicer-iOS
+IOS_SCHEME := StoryFox-iOS
 IOS_SIM_DEST := platform=iOS Simulator,name=iPhone 16 Pro,OS=26.0
 
 build-ios: generate
 	xcodebuild build \
-		-project StoryJuicer.xcodeproj \
+		-project StoryFox.xcodeproj \
 		-scheme $(IOS_SCHEME) \
 		-destination '$(IOS_SIM_DEST)' \
 		-configuration Debug
@@ -77,7 +77,7 @@ run-ios: build-ios
 	@xcrun simctl boot "iPhone 16 Pro" 2>/dev/null || true
 	@open -a Simulator
 	@APP_PATH=$$(xcodebuild \
-		-project StoryJuicer.xcodeproj \
+		-project StoryFox.xcodeproj \
 		-scheme $(IOS_SCHEME) \
 		-configuration Debug \
 		-destination '$(IOS_SIM_DEST)' \
@@ -86,21 +86,21 @@ run-ios: build-ios
 			/WRAPPER_NAME = / { wrapper=$$2 } \
 			END { if (target != "" && wrapper != "") print target "/" wrapper }') && \
 	xcrun simctl install booted "$$APP_PATH" && \
-	xcrun simctl launch booted com.jakerains.StoryJuicer
+	xcrun simctl launch booted com.jakerains.StoryFox
 
 # ── Distributable DMG ────────────────────────────────────────────────
 # Signs with Developer ID, notarizes with Apple, staples the ticket,
 # and packages into a DMG ready for distribution.
 #
 # Prerequisites (one-time):
-#   xcrun notarytool store-credentials "StoryJuicer-Notarize" \
+#   xcrun notarytool store-credentials "StoryFox-Notarize" \
 #     --apple-id <email> --team-id <team> --password <app-specific-pw>
 
 SIGN_IDENTITY := "Developer ID Application: Jacob RAINS (47347VQHQV)"
 TEAM_ID       := 47347VQHQV
-NOTARY_PROFILE := StoryJuicer-Notarize
+NOTARY_PROFILE := StoryFox-Notarize
 DMG_DIR       := dist
-APP_NAME      := StoryJuicer
+APP_NAME      := StoryFox
 
 dmg:
 	@echo "──── 1/7  Preparing output directory ────"
@@ -111,10 +111,10 @@ dmg:
 	xcodegen generate
 	@# Restore entitlements (xcodegen overwrites them to empty <dict/>)
 	@# PlistBuddy handles dotted keys; plutil treats dots as path separators
-	@rm -f Resources/StoryJuicer.entitlements
-	@/usr/libexec/PlistBuddy -c "Add :com.apple.security.network.client bool true" Resources/StoryJuicer.entitlements
-	@/usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.allow-jit bool true" Resources/StoryJuicer.entitlements
-	@/usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.allow-unsigned-executable-memory bool true" Resources/StoryJuicer.entitlements
+	@rm -f Resources/StoryFox.entitlements
+	@/usr/libexec/PlistBuddy -c "Add :com.apple.security.network.client bool true" Resources/StoryFox.entitlements
+	@/usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.allow-jit bool true" Resources/StoryFox.entitlements
+	@/usr/libexec/PlistBuddy -c "Add :com.apple.security.cs.allow-unsigned-executable-memory bool true" Resources/StoryFox.entitlements
 	@echo "    Entitlements restored."
 	@echo ""
 	@echo "──── 3/7  Building Release archive ────"
@@ -152,12 +152,12 @@ dmg:
 	@echo ""
 	@echo "──── 7/7  Creating DMG with drag-to-Applications ────"
 	@rm -f "$(DMG_DIR)/$(APP_NAME).dmg"
-	@rm -rf /tmp/storyjuicer_dmg_staging
-	@mkdir -p /tmp/storyjuicer_dmg_staging
-	@cp -R "$(DMG_DIR)/export/$(APP_NAME).app" /tmp/storyjuicer_dmg_staging/
-	@ln -s /Applications /tmp/storyjuicer_dmg_staging/Applications
-	hdiutil create -volname "$(APP_NAME)" -srcfolder /tmp/storyjuicer_dmg_staging -ov -format UDZO "$(DMG_DIR)/$(APP_NAME).dmg"
-	@rm -rf /tmp/storyjuicer_dmg_staging
+	@rm -rf /tmp/storyfox_dmg_staging
+	@mkdir -p /tmp/storyfox_dmg_staging
+	@cp -R "$(DMG_DIR)/export/$(APP_NAME).app" /tmp/storyfox_dmg_staging/
+	@ln -s /Applications /tmp/storyfox_dmg_staging/Applications
+	hdiutil create -volname "$(APP_NAME)" -srcfolder /tmp/storyfox_dmg_staging -ov -format UDZO "$(DMG_DIR)/$(APP_NAME).dmg"
+	@rm -rf /tmp/storyfox_dmg_staging
 	xcrun notarytool submit "$(DMG_DIR)/$(APP_NAME).dmg" \
 		--keychain-profile "$(NOTARY_PROFILE)" \
 		--wait
@@ -171,7 +171,7 @@ dmg:
 # live inside the resolved SPM package in DerivedData.
 
 SPARKLE_BIN_DIR = $(shell find ~/Library/Developer/Xcode/DerivedData -path "*/Sparkle/bin" -type d 2>/dev/null | head -1)
-GITHUB_REPO_URL := https://github.com/jakerains/StoryJuicer/releases/download
+GITHUB_REPO_URL := https://github.com/jakerains/StoryFox/releases/download
 
 sparkle-setup:
 	@if [ -z "$(SPARKLE_BIN_DIR)" ]; then \
@@ -205,7 +205,7 @@ sign-update:
 		exit 1; \
 	fi
 	@if [ -z "$(DMG)" ]; then \
-		echo "Usage: make sign-update DMG=dist/StoryJuicer.dmg"; \
+		echo "Usage: make sign-update DMG=dist/StoryFox.dmg"; \
 		exit 1; \
 	fi
 	"$(SPARKLE_BIN_DIR)/sign_update" "$(DMG)"

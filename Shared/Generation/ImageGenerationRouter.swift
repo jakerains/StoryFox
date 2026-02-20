@@ -10,7 +10,7 @@ struct ImageGenerationOutcome {
 }
 
 struct ImageGenerationRouter: Sendable {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "ImageRouter")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "ImageRouter")
 
     private let settingsProvider: @Sendable () -> ModelSelectionSettings
     private let imagePlaygroundGenerator: any StoryImageGenerating

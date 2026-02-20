@@ -55,8 +55,8 @@ fi
 "$ROOT_DIR/scripts/build.sh" "${build_args[@]}"
 
 app_path="$(xcodebuild \
-    -project "$ROOT_DIR/StoryJuicer.xcodeproj" \
-    -scheme StoryJuicer \
+    -project "$ROOT_DIR/StoryFox.xcodeproj" \
+    -scheme StoryFox \
     -configuration "$configuration" \
     -destination 'platform=macOS' \
     -showBuildSettings | awk -F' = ' '

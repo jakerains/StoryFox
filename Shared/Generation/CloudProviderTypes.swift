@@ -55,8 +55,8 @@ enum CloudProvider: String, CaseIterable, Codable, Sendable, Equatable, Identifi
         switch self {
         case .openRouter:
             return [
-                "HTTP-Referer": "https://storyjuicer.app",
-                "X-Title": "StoryJuicer"
+                "HTTP-Referer": "https://storyfox.app",
+                "X-Title": "StoryFox"
             ]
         case .togetherAI, .huggingFace:
             return [:]
@@ -82,7 +82,7 @@ enum CloudProvider: String, CaseIterable, Codable, Sendable, Equatable, Identifi
 
     /// Keychain service identifier for this provider.
     var keychainService: String {
-        "com.jakerains.StoryJuicer.cloud.\(rawValue)"
+        "com.jakerains.StoryFox.cloud.\(rawValue)"
     }
 
     var defaultTextModelID: String {

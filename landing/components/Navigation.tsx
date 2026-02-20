@@ -56,13 +56,13 @@ export function Navigation() {
         <a href="#" className="flex items-center gap-2.5">
           <Image
             src="/app-icon.png"
-            alt="StoryJuicer"
+            alt="StoryFox"
             width={32}
             height={32}
             className="rounded-lg"
           />
           <span className="font-serif text-lg font-bold text-sj-text">
-            StoryJuicer
+            StoryFox
           </span>
         </a>
 

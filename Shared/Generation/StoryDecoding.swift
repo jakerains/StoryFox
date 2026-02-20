@@ -45,8 +45,8 @@ struct StoryDTO: Decodable {
         let cleanMoral = StoryTextCleanup.clean(moral)
 
         return StoryBook(
-            title: cleanTitle.isEmpty ? "StoryJuicer Book" : cleanTitle,
-            authorLine: cleanAuthor.isEmpty ? "Written by StoryJuicer" : cleanAuthor,
+            title: cleanTitle.isEmpty ? "StoryFox Book" : cleanTitle,
+            authorLine: cleanAuthor.isEmpty ? "Written by StoryFox" : cleanAuthor,
             moral: cleanMoral.isEmpty ? "Kindness and curiosity guide every adventure." : cleanMoral,
             pages: orderedPages
         )

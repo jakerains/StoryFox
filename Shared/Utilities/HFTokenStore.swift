@@ -3,7 +3,7 @@ import Security
 
 enum HFTokenStore {
     static let defaultAlias = "huggingface.default"
-    private static let service = "com.jakerains.StoryJuicer.huggingface"
+    private static let service = "com.jakerains.StoryFox.huggingface"
 
     static func save(token: String, alias: String = defaultAlias) -> Bool {
         let account = normalizedAlias(alias)

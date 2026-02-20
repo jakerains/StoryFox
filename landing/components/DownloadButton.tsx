@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
 
 const DMG_URL =
-  "https://github.com/jakerains/StoryJuicer/releases/latest/download/StoryJuicer.dmg";
-const GITHUB_URL = "https://github.com/jakerains/StoryJuicer";
+  "https://github.com/jakerains/StoryFox/releases/latest/download/StoryFox.dmg";
+const GITHUB_URL = "https://github.com/jakerains/StoryFox";
 
 function AppleIcon({ className }: { className?: string }) {
   return (

@@ -39,10 +39,10 @@ enum StoryShortcutStyle: String, CaseIterable, AppEnum {
     }
 }
 
-struct QueueStoryInStoryJuicerIntent: AppIntent {
-    static let title: LocalizedStringResource = "Create Story in StoryJuicer"
+struct QueueStoryInStoryFoxIntent: AppIntent {
+    static let title: LocalizedStringResource = "Create Story in StoryFox"
     static let description = IntentDescription(
-        "Queue a story concept in StoryJuicer. This works well after a Use Model action in Shortcuts."
+        "Queue a story concept in StoryFox. This works well after a Use Model action in Shortcuts."
     )
     static let openAppWhenRun: Bool = true
 
@@ -79,16 +79,16 @@ struct QueueStoryInStoryJuicerIntent: AppIntent {
         ShortcutStoryRequestStore.save(request)
 
         if autoStart {
-            return .result(dialog: "Story queued. Opening StoryJuicer and starting generation.")
+            return .result(dialog: "Story queued. Opening StoryFox and starting generation.")
         }
-        return .result(dialog: "Story queued. Opening StoryJuicer for review.")
+        return .result(dialog: "Story queued. Opening StoryFox for review.")
     }
 }
 
-struct StoryJuicerAppShortcutsProvider: AppShortcutsProvider {
+struct StoryFoxAppShortcutsProvider: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
-            intent: QueueStoryInStoryJuicerIntent(),
+            intent: QueueStoryInStoryFoxIntent(),
             phrases: [
                 "Create a story with \(.applicationName)",
                 "Queue a story in \(.applicationName)"

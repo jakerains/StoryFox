@@ -6,7 +6,7 @@ struct StoryBook {
     @Guide(description: "A captivating title for this children's storybook")
     var title: String
 
-    @Guide(description: "The author attribution line, e.g. 'Written by StoryJuicer AI'")
+    @Guide(description: "The author attribution line, e.g. 'Written by StoryFox AI'")
     var authorLine: String
 
     @Guide(description: "A one-sentence summary of the story's moral or theme")

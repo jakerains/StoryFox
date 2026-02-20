@@ -50,7 +50,7 @@ export function Hero() {
           <motion.div variants={scaleInVariants} className="mb-6">
             <Image
               src="/app-icon.png"
-              alt="StoryJuicer"
+              alt="StoryFox"
               width={80}
               height={80}
               priority
@@ -62,7 +62,7 @@ export function Hero() {
             variants={fadeUpVariants}
             className="hero-title mb-4 font-serif font-bold text-sj-coral"
           >
-            StoryJuicer
+            StoryFox
           </motion.h1>
 
           <motion.p

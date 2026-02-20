@@ -151,7 +151,7 @@ export const changelog: ChangelogEntry[] = [
   {
     version: "1.1.1",
     date: "2026-02-19",
-    title: "Edit & Regenerate, StoryJuicer Stamp, Text Cleanup",
+    title: "Edit & Regenerate, StoryFox Stamp, Text Cleanup",
     changes: [
       {
         type: "added",
@@ -166,7 +166,7 @@ export const changelog: ChangelogEntry[] = [
       {
         type: "added",
         description:
-          "StoryJuicer library stamp on 'The End' page — a fox-on-book ink stamp appears in the reader, PDF, and EPUB exports",
+          "StoryFox library stamp on 'The End' page — a fox-on-book ink stamp appears in the reader, PDF, and EPUB exports",
       },
       {
         type: "fixed",
@@ -229,7 +229,7 @@ export const changelog: ChangelogEntry[] = [
     changes: [
       {
         type: "added",
-        description: "Landing page at storyjuicer.app with full design system",
+        description: "Landing page at storyfox.app with full design system",
       },
       {
         type: "added",

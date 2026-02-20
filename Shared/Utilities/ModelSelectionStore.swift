@@ -1,9 +1,9 @@
 import Foundation
 
 enum ModelSelectionStore {
-    private static let keyV3 = "storyjuicer.modelSelectionSettings.v3"
-    private static let legacyKeyV2 = "storyjuicer.modelSelectionSettings.v2"
-    private static let legacyKeyV1 = "storyjuicer.modelSelectionSettings.v1"
+    private static let keyV3 = "storyfox.modelSelectionSettings.v3"
+    private static let legacyKeyV2 = "storyfox.modelSelectionSettings.v2"
+    private static let legacyKeyV1 = "storyfox.modelSelectionSettings.v1"
 
     static func load(defaults: UserDefaults = .standard) -> ModelSelectionSettings {
         // Try v3 first

@@ -1,4 +1,4 @@
-name: StoryJuicer
+name: StoryFox
 options:
   bundleIdPrefix: com.jakerains
   deploymentTarget:
@@ -31,11 +31,11 @@ packages:
     from: "2.8.1"
 
 targets:
-  StoryJuicer:
+  StoryFox:
     type: application
     platform: macOS
     sources:
-      - path: StoryJuicerApp.swift
+      - path: StoryFoxApp.swift
       - path: Shared
       - path: macOS
       - path: Resources/Assets.xcassets
@@ -44,20 +44,20 @@ targets:
         type: folder
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jakerains.StoryJuicer
-        PRODUCT_NAME: StoryJuicer
+        PRODUCT_BUNDLE_IDENTIFIER: com.jakerains.StoryFox
+        PRODUCT_NAME: StoryFox
         INFOPLIST_GENERATION_MODE: GeneratedFile
         MARKETING_VERSION: "1.2.5"
         CURRENT_PROJECT_VERSION: "11"
-        CODE_SIGN_ENTITLEMENTS: Resources/StoryJuicer.entitlements
+        CODE_SIGN_ENTITLEMENTS: Resources/StoryFox.entitlements
         GENERATE_INFOPLIST_FILE: "YES"
-        INFOPLIST_FILE: Resources/StoryJuicer-Info.plist
+        INFOPLIST_FILE: Resources/StoryFox-Info.plist
         SWIFT_STRICT_CONCURRENCY: complete
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleURLTypes: >-
           <array><dict>
-          <key>CFBundleURLName</key><string>com.jakerains.StoryJuicer.oauth</string>
-          <key>CFBundleURLSchemes</key><array><string>storyjuicer</string></array>
+          <key>CFBundleURLName</key><string>com.jakerains.StoryFox.oauth</string>
+          <key>CFBundleURLSchemes</key><array><string>storyfox</string></array>
           </dict></array>
     dependencies:
       - package: MLXSwift
@@ -72,25 +72,25 @@ targets:
         product: HuggingFace
       - package: Sparkle
     entitlements:
-      path: Resources/StoryJuicer.entitlements
+      path: Resources/StoryFox.entitlements
 
-  StoryJuicer-iOS:
+  StoryFox-iOS:
     type: application
     platform: iOS
     sources:
-      - path: StoryJuicerApp.swift
+      - path: StoryFoxApp.swift
       - path: Shared
       - path: iOS
       - path: Resources/Assets.xcassets
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.jakerains.StoryJuicer
-        PRODUCT_NAME: StoryJuicer
+        PRODUCT_BUNDLE_IDENTIFIER: com.jakerains.StoryFox
+        PRODUCT_NAME: StoryFox
         DEVELOPMENT_TEAM: 47347VQHQV
         INFOPLIST_GENERATION_MODE: GeneratedFile
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
-        CODE_SIGN_ENTITLEMENTS: Resources/StoryJuicer-iOS.entitlements
+        CODE_SIGN_ENTITLEMENTS: Resources/StoryFox-iOS.entitlements
         GENERATE_INFOPLIST_FILE: "YES"
         SWIFT_STRICT_CONCURRENCY: complete
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -100,8 +100,8 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_CFBundleURLTypes: >-
           <array><dict>
-          <key>CFBundleURLName</key><string>com.jakerains.StoryJuicer.oauth</string>
-          <key>CFBundleURLSchemes</key><array><string>storyjuicer</string></array>
+          <key>CFBundleURLName</key><string>com.jakerains.StoryFox.oauth</string>
+          <key>CFBundleURLSchemes</key><array><string>storyfox</string></array>
           </dict></array>
     dependencies:
       - package: MLXSwift
@@ -115,4 +115,4 @@ targets:
       - package: SwiftHuggingFace
         product: HuggingFace
     entitlements:
-      path: Resources/StoryJuicer-iOS.entitlements
+      path: Resources/StoryFox-iOS.entitlements

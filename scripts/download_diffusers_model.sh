@@ -6,8 +6,8 @@ cd "$ROOT_DIR"
 
 alias_name="${DIFFUSERS_RUNTIME_ALIAS:-default}"
 model_id="${MODEL_ID:-black-forest-labs/FLUX.2-klein-4B}"
-runtime_root="$HOME/Library/Application Support/StoryJuicer/Diffusers/$alias_name"
-cache_root="$HOME/Library/Caches/StoryJuicer/Diffusers/$alias_name"
+runtime_root="$HOME/Library/Application Support/StoryFox/Diffusers/$alias_name"
+cache_root="$HOME/Library/Caches/StoryFox/Diffusers/$alias_name"
 venv_python="$runtime_root/venv/bin/python"
 worker_script="$ROOT_DIR/Resources/Diffusers/diffusers_worker.py"
 

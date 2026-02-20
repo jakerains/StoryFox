@@ -5,7 +5,7 @@ import os
 /// Cloud-based text generator that implements `StoryTextGenerating`.
 /// Uses `InferenceClient` for HuggingFace, `OpenAICompatibleClient` for others.
 struct CloudTextGenerator: StoryTextGenerating {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "CloudText")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "CloudText")
 
     let cloudProvider: CloudProvider
     private let client: OpenAICompatibleClient

@@ -26,11 +26,11 @@ struct CloudProviderSettingsSection: View {
 
     /// Whether the provider has a saved API key (cached in UserDefaults to avoid Keychain reads).
     private var hasStoredKey: Bool {
-        UserDefaults.standard.bool(forKey: "com.storyjuicer.\(provider.rawValue).hasAPIKey")
+        UserDefaults.standard.bool(forKey: "com.storyfox.\(provider.rawValue).hasAPIKey")
     }
 
     private static func setHasStoredKey(_ flag: Bool, for provider: CloudProvider) {
-        UserDefaults.standard.set(flag, forKey: "com.storyjuicer.\(provider.rawValue).hasAPIKey")
+        UserDefaults.standard.set(flag, forKey: "com.storyfox.\(provider.rawValue).hasAPIKey")
     }
 
     var body: some View {

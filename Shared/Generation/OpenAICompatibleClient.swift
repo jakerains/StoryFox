@@ -6,7 +6,7 @@ import os
 /// Stateless, `Sendable` HTTP client for OpenAI-compatible cloud APIs.
 /// Used by all three cloud providers (OpenRouter, Together AI, HuggingFace).
 struct OpenAICompatibleClient: Sendable {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "CloudClient")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "CloudClient")
 
     private let urlSession: URLSession
 

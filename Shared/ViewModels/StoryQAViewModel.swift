@@ -6,7 +6,7 @@ import os
 @Observable
 @MainActor
 final class StoryQAViewModel {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "StoryQA")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "StoryQA")
 
     // MARK: - Configuration
 

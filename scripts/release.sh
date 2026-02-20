@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# ── StoryJuicer Release Script ──────────────────────────────────────
+# ── StoryFox Release Script ──────────────────────────────────────
 # Automates the full release pipeline:
 #   1. Bump version in project.yml
 #   2. Build, sign, notarize, and package DMG
@@ -51,7 +51,7 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo "═══════════════════════════════════════════════════════"
-echo "  StoryJuicer Release v${VERSION}"
+echo "  StoryFox Release v${VERSION}"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
@@ -89,15 +89,15 @@ if [[ -z "$SPARKLE_BIN_DIR" ]]; then
 fi
 
 "${SPARKLE_BIN_DIR}/generate_appcast" \
-    --download-url-prefix "https://github.com/jakerains/StoryJuicer/releases/download/v${VERSION}/" \
+    --download-url-prefix "https://github.com/jakerains/StoryFox/releases/download/v${VERSION}/" \
     -o appcast.xml \
     dist
 
 # Verify signature was added
 if ! grep -q 'sparkle:edSignature' appcast.xml; then
     echo "Warning: EdDSA signature missing from appcast. Adding manually..."
-    SIGNATURE=$("${SPARKLE_BIN_DIR}/sign_update" dist/StoryJuicer.dmg | grep -o 'sparkle:edSignature="[^"]*"')
-    sed -i '' "s|url=\"https://github.com/jakerains/StoryJuicer/releases/download/v${VERSION}/StoryJuicer.dmg\"|url=\"https://github.com/jakerains/StoryJuicer/releases/download/v${VERSION}/StoryJuicer.dmg\" ${SIGNATURE}|" appcast.xml
+    SIGNATURE=$("${SPARKLE_BIN_DIR}/sign_update" dist/StoryFox.dmg | grep -o 'sparkle:edSignature="[^"]*"')
+    sed -i '' "s|url=\"https://github.com/jakerains/StoryFox/releases/download/v${VERSION}/StoryFox.dmg\"|url=\"https://github.com/jakerains/StoryFox/releases/download/v${VERSION}/StoryFox.dmg\" ${SIGNATURE}|" appcast.xml
 fi
 
 echo "    Appcast updated with v${VERSION} entry"
@@ -107,13 +107,13 @@ echo ""
 
 echo "──── 4/6  Creating GitHub release v${VERSION} ────"
 
-DEFAULT_NOTES="## StoryJuicer v${VERSION}
+DEFAULT_NOTES="## StoryFox v${VERSION}
 
-Download the DMG, mount it, and drag StoryJuicer to Applications.
+Download the DMG, mount it, and drag StoryFox to Applications.
 Existing users will be prompted to update automatically."
 
-gh release create "v${VERSION}" dist/StoryJuicer.dmg \
-    --title "StoryJuicer v${VERSION}" \
+gh release create "v${VERSION}" dist/StoryFox.dmg \
+    --title "StoryFox v${VERSION}" \
     --notes "${NOTES:-$DEFAULT_NOTES}"
 
 echo ""
@@ -122,7 +122,7 @@ echo ""
 
 echo "──── 5/6  Committing version bump and appcast ────"
 
-git add project.yml appcast.xml StoryJuicer.xcodeproj/project.pbxproj
+git add project.yml appcast.xml StoryFox.xcodeproj/project.pbxproj
 git commit -m "Release v${VERSION}
 
 - Bump to ${VERSION} (build ${NEW_BUILD})
@@ -139,9 +139,9 @@ echo ""
 echo "═══════════════════════════════════════════════════════"
 echo "  ✅ Release v${VERSION} complete!"
 echo ""
-echo "  DMG:     dist/StoryJuicer.dmg"
-echo "  Release: https://github.com/jakerains/StoryJuicer/releases/tag/v${VERSION}"
-echo "  Appcast: https://raw.githubusercontent.com/jakerains/StoryJuicer/main/appcast.xml"
+echo "  DMG:     dist/StoryFox.dmg"
+echo "  Release: https://github.com/jakerains/StoryFox/releases/tag/v${VERSION}"
+echo "  Appcast: https://raw.githubusercontent.com/jakerains/StoryFox/main/appcast.xml"
 echo ""
 echo "  Users on older versions will see the update automatically."
 echo "═══════════════════════════════════════════════════════"

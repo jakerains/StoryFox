@@ -8,8 +8,8 @@ issues=0
 
 alias_name="${DIFFUSERS_RUNTIME_ALIAS:-default}"
 model_id="${MODEL_ID:-black-forest-labs/FLUX.2-klein-4B}"
-runtime_root="$HOME/Library/Application Support/StoryJuicer/Diffusers/$alias_name"
-cache_root="$HOME/Library/Caches/StoryJuicer/Diffusers/$alias_name"
+runtime_root="$HOME/Library/Application Support/StoryFox/Diffusers/$alias_name"
+cache_root="$HOME/Library/Caches/StoryFox/Diffusers/$alias_name"
 venv_python="$runtime_root/venv/bin/python"
 worker_script="$ROOT_DIR/Resources/Diffusers/diffusers_worker.py"
 requirements_file="$ROOT_DIR/Resources/Diffusers/diffusers-requirements.txt"
@@ -22,7 +22,7 @@ printf '[INFO] Cache root: %s\n' "$cache_root"
 if [[ "$(uname -m)" == "arm64" ]]; then
     printf '[OK] Apple Silicon architecture detected\n'
 else
-    printf '[FAIL] StoryJuicer local Diffusers target is Apple Silicon (arm64)\n'
+    printf '[FAIL] StoryFox local Diffusers target is Apple Silicon (arm64)\n'
     issues=$((issues + 1))
 fi
 

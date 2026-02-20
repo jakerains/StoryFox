@@ -69,7 +69,7 @@ def patch_chat_template_compat(tokenizer_like: Any) -> None:
     if apply_chat_template is None:
         return
 
-    if getattr(tokenizer_like, "_storyjuicer_chat_patch", False):
+    if getattr(tokenizer_like, "_storyfox_chat_patch", False):
         return
 
     def wrapped_apply_chat_template(conversations: Any, *args: Any, **kwargs: Any) -> Any:
@@ -83,7 +83,7 @@ def patch_chat_template_compat(tokenizer_like: Any) -> None:
             return apply_chat_template(normalized, *args, **kwargs)
 
     setattr(tokenizer_like, "apply_chat_template", wrapped_apply_chat_template)
-    setattr(tokenizer_like, "_storyjuicer_chat_patch", True)
+    setattr(tokenizer_like, "_storyfox_chat_patch", True)
 
 
 def load_pipeline(model_id: str, device: str, dtype: Any) -> Tuple[Any, str]:

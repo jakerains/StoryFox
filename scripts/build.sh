@@ -54,8 +54,8 @@ fi
 
 build_cmd=(
     xcodebuild
-    -project StoryJuicer.xcodeproj
-    -scheme StoryJuicer
+    -project StoryFox.xcodeproj
+    -scheme StoryFox
     -configuration "$configuration"
     -destination "platform=macOS"
 )
@@ -65,6 +65,6 @@ if (( clean_first == 1 )); then
     "${build_cmd[@]}" clean
 fi
 
-printf '[INFO] Building StoryJuicer (%s)...\n' "$configuration"
+printf '[INFO] Building StoryFox (%s)...\n' "$configuration"
 "${build_cmd[@]}" build
 printf '[OK] Build completed.\n'

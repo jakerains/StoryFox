@@ -235,7 +235,7 @@ struct MacBookReaderView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 70)
 
-            storyJuicerStamp
+            storyFoxStamp
         }
         .padding(StoryJuicerGlassTokens.Spacing.xLarge)
         .sjGlassCard(
@@ -246,8 +246,8 @@ struct MacBookReaderView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private var storyJuicerStamp: some View {
-        Image("StoryJuicerStamp")
+    private var storyFoxStamp: some View {
+        Image("StoryFoxStamp")
             .resizable()
             .renderingMode(.original)
             .scaledToFit()

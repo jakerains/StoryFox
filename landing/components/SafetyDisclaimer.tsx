@@ -24,7 +24,7 @@ export function SafetyDisclaimer() {
               </h3>
               <div className="space-y-2.5 text-sm leading-relaxed text-sj-secondary">
                 <p>
-                  StoryJuicer exists because Apple already put capable AI models on
+                  StoryFox exists because Apple already put capable AI models on
                   your Mac. Apple Intelligence makes it possible to generate entire
                   storybooks without an internet connection and without an account.
                   Your children&apos;s stories never leave your device.
@@ -33,7 +33,7 @@ export function SafetyDisclaimer() {
                   However, Apple&apos;s on-device model has strict content safety
                   filters. These are important, but they can be overly conservative
                   with creative content, flagging perfectly innocent story pages more
-                  often than we&apos;d like. StoryJuicer automatically retries with
+                  often than we&apos;d like. StoryFox automatically retries with
                   adjusted phrasing when this happens, and most pages generate
                   successfully. But sometimes the on-device model still declines a
                   prompt despite multiple attempts.

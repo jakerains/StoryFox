@@ -13,8 +13,8 @@ struct RemoteStoryGeneratorConfig: Sendable {
         defaults: UserDefaults = .standard
     ) -> RemoteStoryGeneratorConfig? {
         let endpointValue = value(
-            envKeys: ["STORYJUICER_LARGE_MODEL_ENDPOINT", "STORYJUICER_REMOTE_LLM_ENDPOINT"],
-            defaultKey: "storyjuicer.largeModelEndpoint",
+            envKeys: ["STORYFOX_LARGE_MODEL_ENDPOINT", "STORYFOX_REMOTE_LLM_ENDPOINT"],
+            defaultKey: "storyfox.largeModelEndpoint",
             environment: environment,
             defaults: defaults
         )
@@ -24,33 +24,33 @@ struct RemoteStoryGeneratorConfig: Sendable {
         }
 
         let apiKey = value(
-            envKeys: ["STORYJUICER_LARGE_MODEL_API_KEY", "STORYJUICER_REMOTE_LLM_API_KEY"],
-            defaultKey: "storyjuicer.largeModelApiKey",
+            envKeys: ["STORYFOX_LARGE_MODEL_API_KEY", "STORYFOX_REMOTE_LLM_API_KEY"],
+            defaultKey: "storyfox.largeModelApiKey",
             environment: environment,
             defaults: defaults
         )
         let model = value(
-            envKeys: ["STORYJUICER_LARGE_MODEL_NAME", "STORYJUICER_REMOTE_LLM_MODEL"],
-            defaultKey: "storyjuicer.largeModelName",
+            envKeys: ["STORYFOX_LARGE_MODEL_NAME", "STORYFOX_REMOTE_LLM_MODEL"],
+            defaultKey: "storyfox.largeModelName",
             environment: environment,
             defaults: defaults
         )
         let apiHeaderName = value(
-            envKeys: ["STORYJUICER_LARGE_MODEL_API_HEADER", "STORYJUICER_REMOTE_LLM_API_HEADER"],
-            defaultKey: "storyjuicer.largeModelApiHeader",
+            envKeys: ["STORYFOX_LARGE_MODEL_API_HEADER", "STORYFOX_REMOTE_LLM_API_HEADER"],
+            defaultKey: "storyfox.largeModelApiHeader",
             environment: environment,
             defaults: defaults
         ) ?? "Authorization"
         let apiHeaderPrefix = value(
-            envKeys: ["STORYJUICER_LARGE_MODEL_API_PREFIX", "STORYJUICER_REMOTE_LLM_API_PREFIX"],
-            defaultKey: "storyjuicer.largeModelApiPrefix",
+            envKeys: ["STORYFOX_LARGE_MODEL_API_PREFIX", "STORYFOX_REMOTE_LLM_API_PREFIX"],
+            defaultKey: "storyfox.largeModelApiPrefix",
             environment: environment,
             defaults: defaults
         ) ?? "Bearer "
 
         let timeoutRaw = value(
-            envKeys: ["STORYJUICER_LARGE_MODEL_TIMEOUT_SECONDS", "STORYJUICER_REMOTE_LLM_TIMEOUT_SECONDS"],
-            defaultKey: "storyjuicer.largeModelTimeoutSeconds",
+            envKeys: ["STORYFOX_LARGE_MODEL_TIMEOUT_SECONDS", "STORYFOX_REMOTE_LLM_TIMEOUT_SECONDS"],
+            defaultKey: "storyfox.largeModelTimeoutSeconds",
             environment: environment,
             defaults: defaults
         )

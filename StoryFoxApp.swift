@@ -5,7 +5,7 @@ import AppKit
 #endif
 
 @main
-struct StoryJuicerApp: App {
+struct StoryFoxApp: App {
 #if os(macOS)
     @State private var updateManager = SoftwareUpdateManager()
 #endif
@@ -25,7 +25,7 @@ struct StoryJuicerApp: App {
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About StoryJuicer") {
+                Button("About StoryFox") {
                     NSApplication.shared.orderFrontStandardAboutPanel(options: aboutPanelOptions)
                 }
             }
@@ -331,7 +331,7 @@ struct MainView: View {
                 }
                 .shadow(color: Color.black.opacity(0.14), radius: 6, y: 3)
 
-            Text("StoryJuicer")
+            Text("StoryFox")
                 .font(StoryJuicerTypography.uiTitle)
                 .foregroundStyle(Color.sjGlassInk)
 

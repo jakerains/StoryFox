@@ -6,9 +6,9 @@ import os
 @Observable
 @MainActor
 final class CloudModelListCache {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "ModelListCache")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "ModelListCache")
     private static let cacheTTL: TimeInterval = 600 // 10 minutes
-    private static let defaultsKeyPrefix = "storyjuicer.cloudModels."
+    private static let defaultsKeyPrefix = "storyfox.cloudModels."
 
     private(set) var textModels: [CloudProvider: [CloudModelInfo]] = [:]
     private(set) var imageModels: [CloudProvider: [CloudModelInfo]] = [:]

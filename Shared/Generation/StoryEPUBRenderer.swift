@@ -224,7 +224,7 @@ struct StoryEPUBRenderer: EPUBRendering {
 
     private func endPage(storybook: StoryBook, hasStamp: Bool, vw: Int, vh: Int) -> String {
         let stampHTML = hasStamp
-            ? "<img class=\"stamp\" src=\"images/stamp.png\" alt=\"StoryJuicer stamp\"/>"
+            ? "<img class=\"stamp\" src=\"images/stamp.png\" alt=\"StoryFox stamp\"/>"
             : ""
 
         return xhtmlDocument(title: "The End", vw: vw, vh: vh, body: """
@@ -357,13 +357,13 @@ struct StoryEPUBRenderer: EPUBRendering {
 
     private func loadStampImage() -> CGImage? {
         #if os(macOS)
-        guard let nsImage = NSImage(named: "StoryJuicerStamp"),
+        guard let nsImage = NSImage(named: "StoryFoxStamp"),
               let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return nil
         }
         return cgImage
         #else
-        guard let uiImage = UIImage(named: "StoryJuicerStamp") else { return nil }
+        guard let uiImage = UIImage(named: "StoryFoxStamp") else { return nil }
         return uiImage.cgImage
         #endif
     }

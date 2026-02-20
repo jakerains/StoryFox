@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## iOS Development — On Hold
 
-The iOS target (`StoryJuicer-iOS`) exists in the codebase but is **not actively being developed** right now. Until iOS development resumes:
+The iOS target (`StoryFox-iOS`) exists in the codebase but is **not actively being developed** right now. Until iOS development resumes:
 
 - **Do not mention iOS** in changelogs, release notes, or user-facing copy
 - **Do not prioritize iOS-specific fixes** or UI changes unless explicitly asked
@@ -13,14 +13,14 @@ The iOS target (`StoryJuicer-iOS`) exists in the codebase but is **not actively 
 
 ## Build System
 
-This project uses **XcodeGen** (`project.yml`) to generate `StoryJuicer.xcodeproj`. The Xcode project file is not checked in — it's generated.
+This project uses **XcodeGen** (`project.yml`) to generate `StoryFox.xcodeproj`. The Xcode project file is not checked in — it's generated.
 
 ```bash
 # Regenerate the Xcode project (required after adding/moving/renaming Swift files)
 xcodegen generate
 
 # Build from command line
-xcodebuild -project StoryJuicer.xcodeproj -scheme StoryJuicer -destination 'platform=macOS' build
+xcodebuild -project StoryFox.xcodeproj -scheme StoryFox -destination 'platform=macOS' build
 
 # Build and run (uses scripts/build.sh + scripts/run.sh)
 make run
@@ -29,13 +29,13 @@ make run
 make dmg
 ```
 
-**Important:** XcodeGen overwrites `Resources/StoryJuicer.entitlements` on each run. If the entitlements file has custom sandbox permissions, back it up before regenerating and restore after.
+**Important:** XcodeGen overwrites `Resources/StoryFox.entitlements` on each run. If the entitlements file has custom sandbox permissions, back it up before regenerating and restore after.
 
 There are no tests, no linter, and no package dependencies beyond Apple platform frameworks and the HuggingFace Swift SDK.
 
 ## What This App Does
 
-StoryJuicer generates illustrated children's storybooks using a combination of on-device and cloud AI. The user enters a story concept, picks page count/format/style, and the app produces a complete storybook with text and illustrations.
+StoryFox generates illustrated children's storybooks using a combination of on-device and cloud AI. The user enters a story concept, picks page count/format/style, and the app produces a complete storybook with text and illustrations.
 
 **Text generation providers:**
 - Apple FoundationModels (on-device ~3B LLM) with `@Generable` structs
@@ -53,7 +53,7 @@ StoryJuicer generates illustrated children's storybooks using a combination of o
 ## Architecture
 
 ```
-StoryJuicerApp.swift              ← App entry + MainView (NavigationSplitView routing)
+StoryFoxApp.swift                 ← App entry + MainView (NavigationSplitView routing)
 Shared/
   Models/                         ← StoryBook (@Generable), BookFormat, IllustrationStyle, StoredStorybook (@Model)
   Generation/
@@ -212,30 +212,30 @@ The script handles everything: version bump → `make dmg` → appcast generatio
 1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in `project.yml` (macOS target only — iOS version is independent)
 2. `make dmg` — build, sign, notarize, package
 3. `make appcast` — regenerate `appcast.xml` with EdDSA signatures
-4. If appcast is missing `sparkle:edSignature`, run `make sign-update DMG=dist/StoryJuicer.dmg` and add it manually
-5. `gh release create v<version> dist/StoryJuicer.dmg` — upload to GitHub Releases
+4. If appcast is missing `sparkle:edSignature`, run `make sign-update DMG=dist/StoryFox.dmg` and add it manually
+5. `gh release create v<version> dist/StoryFox.dmg` — upload to GitHub Releases
 6. Commit `project.yml`, `appcast.xml`, and `project.pbxproj`, then push to main
 
 ### Auto-Update (Sparkle 2)
 
-StoryJuicer uses [Sparkle 2](https://sparkle-project.org/) for auto-updates (macOS only, not iOS).
+StoryFox uses [Sparkle 2](https://sparkle-project.org/) for auto-updates (macOS only, not iOS).
 
 **Key files:**
 - `macOS/SoftwareUpdateManager.swift` — `@Observable` wrapper around `SPUStandardUpdaterController`
-- `Resources/StoryJuicer-Info.plist` — contains `SUPublicEDKey` (Ed25519 public key for signature verification)
+- `Resources/StoryFox-Info.plist` — contains `SUPublicEDKey` (Ed25519 public key for signature verification)
 - `appcast.xml` — RSS feed at repo root listing available versions with download URLs and EdDSA signatures
 
 **Architecture:**
 - Feed URL is set programmatically via `SPUUpdaterDelegate.feedURLString(for:)` in `SoftwareUpdateManager` (XcodeGen can't inject custom Info.plist keys via `INFOPLIST_KEY_` — that only works for Apple-registered keys)
-- Public key MUST be in Info.plist (not programmatic — Sparkle enforces this for security). We use `INFOPLIST_FILE: Resources/StoryJuicer-Info.plist` as a template, and Xcode merges it with auto-generated keys since `GENERATE_INFOPLIST_FILE: YES`
+- Public key MUST be in Info.plist (not programmatic — Sparkle enforces this for security). We use `INFOPLIST_FILE: Resources/StoryFox-Info.plist` as a template, and Xcode merges it with auto-generated keys since `GENERATE_INFOPLIST_FILE: YES`
 - EdDSA private key is stored in the developer's macOS Keychain (created by `make sparkle-setup`)
-- Appcast is hosted at `https://raw.githubusercontent.com/jakerains/StoryJuicer/main/appcast.xml`
+- Appcast is hosted at `https://raw.githubusercontent.com/jakerains/StoryFox/main/appcast.xml`
 - DMGs are hosted as GitHub Release assets
 
-**Important:** Do NOT delete `Resources/StoryJuicer-Info.plist` — it carries the `SUPublicEDKey`. Without it, update signature validation fails.
+**Important:** Do NOT delete `Resources/StoryFox-Info.plist` — it carries the `SUPublicEDKey`. Without it, update signature validation fails.
 
 ### DMG Build (`make dmg`)
-Produces a signed, notarized DMG at `dist/StoryJuicer.dmg`. Pipeline:
+Produces a signed, notarized DMG at `dist/StoryFox.dmg`. Pipeline:
 1. `xcodegen generate` — regenerate project
 2. Restore entitlements (XcodeGen overwrites them)
 3. `xcodebuild archive` — Release archive with Developer ID signing
@@ -245,7 +245,7 @@ Produces a signed, notarized DMG at `dist/StoryJuicer.dmg`. Pipeline:
 7. `hdiutil create` — package into DMG, notarize + staple the DMG itself
 
 **Signing identity:** `Developer ID Application: Jacob RAINS (47347VQHQV)`
-**Notarization profile:** `StoryJuicer-Notarize` (stored in Keychain via `xcrun notarytool store-credentials`)
+**Notarization profile:** `StoryFox-Notarize` (stored in Keychain via `xcrun notarytool store-credentials`)
 
 ### Makefile Targets
 - `make help` — list all targets

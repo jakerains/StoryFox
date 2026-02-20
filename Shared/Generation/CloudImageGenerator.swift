@@ -7,7 +7,7 @@ import os
 /// Cloud-based image generator that implements `StoryImageGenerating`.
 /// Parameterized by `CloudProvider` to work with any supported provider.
 struct CloudImageGenerator: StoryImageGenerating {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "CloudImage")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "CloudImage")
 
     let cloudProvider: CloudProvider
     private let client: OpenAICompatibleClient

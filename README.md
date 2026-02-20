@@ -1,8 +1,8 @@
 <p align="center">
-  <img src=".github/app-icon.png" width="128" height="128" alt="StoryJuicer app icon" />
+  <img src=".github/app-icon.png" width="128" height="128" alt="StoryFox app icon" />
 </p>
 
-<h1 align="center">StoryJuicer</h1>
+<h1 align="center">StoryFox</h1>
 
 <p align="center">
   <strong>AI-powered illustrated children's storybooks — on your device.</strong>
@@ -15,32 +15,32 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jakerains/StoryJuicer/releases/latest/download/StoryJuicer.dmg">
-    <img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F_Download_for_Mac-StoryJuicer.dmg-D4654A?style=for-the-badge&logo=apple&logoColor=white" alt="Download for Mac" />
+  <a href="https://github.com/jakerains/StoryFox/releases/latest/download/StoryFox.dmg">
+    <img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F_Download_for_Mac-StoryFox.dmg-D4654A?style=for-the-badge&logo=apple&logoColor=white" alt="Download for Mac" />
   </a>
 </p>
 <p align="center">
-  <sub>Signed &amp; notarized &bull; Requires macOS 26 on Apple Silicon &bull; <a href="https://github.com/jakerains/StoryJuicer/releases/latest">All releases</a></sub>
+  <sub>Signed &amp; notarized &bull; Requires macOS 26 on Apple Silicon &bull; <a href="https://github.com/jakerains/StoryFox/releases/latest">All releases</a></sub>
 </p>
 
 ---
 
-StoryJuicer generates complete illustrated children's storybooks using a blend of on-device and cloud AI. Type a story idea, pick a style, and get a fully illustrated book with text, cover art, and print-ready PDF export — all in minutes.
+StoryFox generates complete illustrated children's storybooks using a blend of on-device and cloud AI. Type a story idea, pick a style, and get a fully illustrated book with text, cover art, and print-ready PDF export — all in minutes.
 
 ## How It Works
 
 ```
   Your idea          AI text generation         AI image generation        Finished book
- ┌──────────┐      ┌──────────────────┐      ┌───────────────────────┐   ┌─────────────┐
- │ "A brave │ ───> │ FoundationModels │ ───> │ ImagePlayground       │   │  Title page │
- │  little  │      │ MLX Swift        │      │ Hugging Face FLUX     │   │  10 pages   │
- │  robot"  │      │ Hugging Face     │      │                       │──>│  Cover art  │
- └──────────┘      └──────────────────┘      └───────────────────────┘   │  PDF export │
-                                                                         └─────────────┘
+ +-----------+      +------------------+      +-----------------------+   +-------------+
+ | "A brave  | ---> | FoundationModels | ---> | ImagePlayground       |   |  Title page |
+ |  little   |      | MLX Swift        |      | Hugging Face FLUX     |   |  10 pages   |
+ |  robot"   |      | Hugging Face     |      |                       |-->|  Cover art  |
+ +-----------+      +------------------+      +-----------------------+   |  PDF export |
+                                                                         +-------------+
 ```
 
 1. **Describe your story** — a concept, theme, or opening line
-2. **Choose your settings** — page count (4–20), book format, illustration style
+2. **Choose your settings** — page count (4-20), book format, illustration style
 3. **Watch it generate** — text streams in real-time, then illustrations render concurrently
 4. **Read and export** — flip through pages, then export as a 300 DPI print-ready PDF
 
@@ -92,14 +92,14 @@ Cloud features (optional):
 
 ### Download (macOS)
 
-Grab the latest signed & notarized DMG from [Releases](https://github.com/jakerains/StoryJuicer/releases/latest), mount it, and drag StoryJuicer to Applications.
+Grab the latest signed & notarized DMG from [Releases](https://github.com/jakerains/StoryFox/releases/latest), mount it, and drag StoryFox to Applications.
 
 ### Build from Source
 
 ```bash
 # Clone
-git clone https://github.com/jakerains/StoryJuicer.git
-cd StoryJuicer
+git clone https://github.com/jakerains/StoryFox.git
+cd StoryFox
 
 # Check your toolchain
 make doctor
@@ -132,18 +132,18 @@ make run-ios
 ## Architecture
 
 ```
-StoryJuicerApp.swift                    App entry point + NavigationSplitView routing
-├── Shared/
-│   ├── Models/                         StoryBook (@Generable), BookFormat, IllustrationStyle
-│   ├── Generation/                     Text & image generators, PDF renderer, prompts
-│   ├── ViewModels/                     CreationViewModel, BookReaderViewModel
-│   ├── Views/Components/              Theme colors, glass-morphism UI, shared controls
-│   └── Utilities/                      Keychain, OAuth, settings persistence, diagnostics
-├── macOS/
-│   ├── Views/                          Mac-specific creation, reader, settings, export views
-│   └── PDFRenderer+macOS.swift         Platform typealias
-└── iOS/
-    └── Views/                          iOS-specific views with responsive size class layouts
+StoryFoxApp.swift                       App entry point + NavigationSplitView routing
++-- Shared/
+|   +-- Models/                         StoryBook (@Generable), BookFormat, IllustrationStyle
+|   +-- Generation/                     Text & image generators, PDF renderer, prompts
+|   +-- ViewModels/                     CreationViewModel, BookReaderViewModel
+|   +-- Views/Components/              Theme colors, glass-morphism UI, shared controls
+|   +-- Utilities/                      Keychain, OAuth, settings persistence, diagnostics
++-- macOS/
+|   +-- Views/                          Mac-specific creation, reader, settings, export views
+|   +-- PDFRenderer+macOS.swift         Platform typealias
++-- iOS/
+    +-- Views/                          iOS-specific views with responsive size class layouts
 ```
 
 **~95% shared code** between macOS and iOS. Only the view layer is platform-specific.
@@ -159,11 +159,11 @@ StoryJuicerApp.swift                    App entry point + NavigationSplitView ro
 ### Navigation Flow
 
 ```
-.creation  ──>  .generating  ──>  .reading
-   │                │                 │
-   │  Story idea    │  Streaming      │  Page-by-page reader
-   │  Format pick   │  text + images  │  PDF export
-   │  Style pick    │  Progress grid  │  Page regeneration
+.creation  -->  .generating  -->  .reading
+   |                |                 |
+   |  Story idea    |  Streaming      |  Page-by-page reader
+   |  Format pick   |  text + images  |  PDF export
+   |  Style pick    |  Progress grid  |  Page regeneration
 ```
 
 ## Signing & Distribution

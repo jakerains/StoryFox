@@ -10,19 +10,19 @@ import os
 @Observable
 @MainActor
 final class HuggingFaceOAuth {
-    private static let logger = Logger(subsystem: "com.storyjuicer.app", category: "HFOAuth")
+    private static let logger = Logger(subsystem: "com.storyfox.app", category: "HFOAuth")
 
     /// Set this to a registered HuggingFace OAuth client ID before enabling OAuth.
     /// Register at: https://huggingface.co/settings/applications/new
-    static var clientID: String = "c44be7b9-8900-419d-9a77-a38367340e0a"
+    static var clientID: String = "c73e811a-a6e8-4c79-8935-6691e2bc6c44"
 
-    private static let callbackScheme = "storyjuicer"
-    private static let redirectURI = URL(string: "storyjuicer://oauth/hf/callback")!
-    private static let keychainService = "com.jakerains.StoryJuicer.hf.oauth"
+    private static let callbackScheme = "storyfox"
+    private static let redirectURI = URL(string: "storyfox://oauth/hf/callback")!
+    private static let keychainService = "com.jakerains.StoryFox.hf.oauth"
     private static let keychainAccount = "hf-oauth-token"
 
-    private static let loggedInDefaultsKey = "com.jakerains.StoryJuicer.hf.oauth.loggedIn"
-    private static let usernameDefaultsKey = "com.jakerains.StoryJuicer.hf.oauth.username"
+    private static let loggedInDefaultsKey = "com.jakerains.StoryFox.hf.oauth.loggedIn"
+    private static let usernameDefaultsKey = "com.jakerains.StoryFox.hf.oauth.username"
 
     private(set) var isLoggedIn: Bool = false
     private(set) var username: String?

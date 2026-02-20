@@ -1,4 +1,4 @@
-# STORYJUICER
+# STORYFOX
 
 ### AI Kids' Storybook Generator
 
@@ -16,7 +16,7 @@ February 2026
 
 ## 1. Executive Summary
 
-StoryJuicer is a native macOS application that generates complete, illustrated children's storybooks using only Apple's on-device AI models. Users enter a simple story concept, choose their page count and book format, and the app produces a fully illustrated storybook with narrative text and matching artwork for every page — all without API keys, cloud services, or subscription fees.
+StoryFox is a native macOS application that generates complete, illustrated children's storybooks using only Apple's on-device AI models. Users enter a simple story concept, choose their page count and book format, and the app produces a fully illustrated storybook with narrative text and matching artwork for every page — all without API keys, cloud services, or subscription fees.
 
 ### 1.1 Technical Foundation
 
@@ -28,12 +28,12 @@ StoryJuicer is a native macOS application that generates complete, illustrated c
 
 ## 2. Cross-Platform Architecture
 
-StoryJuicer is built as a **multi-platform SwiftUI project** from day one. macOS is the primary development target, but the codebase is structured so the iOS version shares 60-70% of the code with minimal divergence.
+StoryFox is built as a **multi-platform SwiftUI project** from day one. macOS is the primary development target, but the codebase is structured so the iOS version shares 60-70% of the code with minimal divergence.
 
 ### 2.1 Project Structure
 
 ```
-StoryJuicer/
+StoryFox/
 ├── Shared/                          # 60-70% of codebase
 │   ├── Models/
 │   │   ├── StoryBook.swift          # @Generable structs (shared)
@@ -54,7 +54,7 @@ StoryJuicer/
 │   │   ├── MacBookReaderView.swift  # Arrow key navigation
 │   │   └── MacExportView.swift      # NSSavePanel
 │   ├── PDFRenderer+macOS.swift      # NSGraphicsContext / PDFKit
-│   └── StoryJuicerApp+macOS.swift   # App entry point / menu bar
+│   └── StoryFoxApp+macOS.swift   # App entry point / menu bar
 ├── iOS/                             # iOS-specific
 │   ├── Views/
 │   │   ├── iOSCreationView.swift    # NavigationStack + Form
@@ -62,7 +62,7 @@ StoryJuicer/
 │   │   └── iOSExportView.swift      # ShareLink / UIActivity
 │   ├── PDFRenderer+iOS.swift        # UIGraphicsPDFRenderer
 │   ├── PhotosExporter.swift         # PHPhotoLibrary save
-│   └── StoryJuicerApp+iOS.swift     # App entry point
+│   └── StoryFoxApp+iOS.swift     # App entry point
 └── Resources/
     └── Assets.xcassets
 ```
@@ -131,7 +131,7 @@ Copy the entire content of this section and paste it as the initial prompt to yo
 
 **CODING AGENT PROMPT — START**
 
-Build a native macOS SwiftUI app called "StoryJuicer" targeting macOS 26
+Build a native macOS SwiftUI app called "StoryFox" targeting macOS 26
 (Tahoe) that generates illustrated children's storybooks using ONLY
 Apple's on-device AI frameworks. No API keys. No cloud services. No
 third-party dependencies beyond Apple's platform SDKs.
@@ -166,7 +166,7 @@ struct StoryBook {
     let title: String
 
     @Guide(description: "The author attribution line, e.g.
-        'Written by StoryJuicer AI'")
+        'Written by StoryFox AI'")
     let authorLine: String
 
     @Guide(description: "A one-sentence summary of the story's
@@ -287,7 +287,7 @@ UI ARCHITECTURE
 Use a NavigationSplitView or tab-based layout with these views:
 
 VIEW 1 - HOME / CREATION SCREEN:
-  - App title "StoryJuicer" with a book/lemon icon
+  - App title "StoryFox" with a book/lemon icon
   - Large text field for story concept with placeholder text:
     "Describe your story... e.g., a curious cat who explores
      the ocean and makes friends with a dolphin"

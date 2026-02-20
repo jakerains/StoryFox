@@ -142,12 +142,12 @@ actor DiffusersRuntimeManager {
         }
 
         let runtimeRootURL = appSupport
-            .appendingPathComponent("StoryJuicer", isDirectory: true)
+            .appendingPathComponent("StoryFox", isDirectory: true)
             .appendingPathComponent("Diffusers", isDirectory: true)
             .appendingPathComponent(alias, isDirectory: true)
 
         let cacheURL = cacheRoot
-            .appendingPathComponent("StoryJuicer", isDirectory: true)
+            .appendingPathComponent("StoryFox", isDirectory: true)
             .appendingPathComponent("Diffusers", isDirectory: true)
             .appendingPathComponent(alias, isDirectory: true)
 

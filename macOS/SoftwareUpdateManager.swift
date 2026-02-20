@@ -61,7 +61,7 @@ final class SoftwareUpdateManager {
 /// Provides the appcast feed URL to Sparkle since XcodeGen can't inject custom Info.plist keys.
 private final class UpdaterDelegate: NSObject, SPUUpdaterDelegate {
     func feedURLString(for updater: SPUUpdater) -> String? {
-        "https://raw.githubusercontent.com/jakerains/StoryJuicer/main/appcast.xml"
+        "https://raw.githubusercontent.com/jakerains/StoryFox/main/appcast.xml"
     }
 }
 

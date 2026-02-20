@@ -141,7 +141,7 @@ actor GenerationDiagnosticsLogger {
     }
 
     static func logFilePathString() -> String {
-        let path = ("~/Library/Application Support/StoryJuicer/Logs/" + logFileName) as NSString
+        let path = ("~/Library/Application Support/StoryFox/Logs/" + logFileName) as NSString
         return path.expandingTildeInPath
     }
 
@@ -172,7 +172,7 @@ actor GenerationDiagnosticsLogger {
             throw NSError(domain: "GenerationDiagnosticsLogger", code: 1)
         }
         let logsDirectory = appSupport
-            .appendingPathComponent("StoryJuicer", isDirectory: true)
+            .appendingPathComponent("StoryFox", isDirectory: true)
             .appendingPathComponent("Logs", isDirectory: true)
         try fileManager.createDirectory(at: logsDirectory, withIntermediateDirectories: true)
         return logsDirectory

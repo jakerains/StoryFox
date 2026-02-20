@@ -45,13 +45,13 @@ if command -v xcrun >/dev/null 2>&1; then
     fi
 fi
 
-printf '[INFO] StoryJuicer is an Xcode app target. Use make build/make run (not swift run).\n'
+printf '[INFO] StoryFox is an Xcode app target. Use make build/make run (not swift run).\n'
 printf '[INFO] Image generation currently uses Apple Image Playground for the stable path.\n'
 
-if [[ -f StoryJuicer.xcodeproj/project.pbxproj ]]; then
-    printf '[OK] StoryJuicer.xcodeproj exists\n'
+if [[ -f StoryFox.xcodeproj/project.pbxproj ]]; then
+    printf '[OK] StoryFox.xcodeproj exists\n'
 else
-    printf '[WARN] StoryJuicer.xcodeproj is missing. Run ./scripts/generate.sh\n'
+    printf '[WARN] StoryFox.xcodeproj is missing. Run ./scripts/generate.sh\n'
 fi
 
 if (( issues > 0 )); then
@@ -60,5 +60,5 @@ if (( issues > 0 )); then
     exit 1
 fi
 
-printf '\n[OK] Environment looks ready for StoryJuicer.\n'
+printf '\n[OK] Environment looks ready for StoryFox.\n'
 printf '[NEXT] Run ./scripts/build.sh to build the app.\n'

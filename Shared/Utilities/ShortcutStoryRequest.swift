@@ -33,7 +33,7 @@ struct ShortcutStoryRequest: Codable, Sendable {
 }
 
 enum ShortcutStoryRequestStore {
-    private static let key = "storyjuicer.shortcut.pendingRequest"
+    private static let key = "storyfox.shortcut.pendingRequest"
 
     static func save(_ request: ShortcutStoryRequest, defaults: UserDefaults = .standard) {
         guard let data = try? JSONEncoder().encode(request) else { return }

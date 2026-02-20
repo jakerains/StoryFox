@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
     <channel>
-        <title>StoryJuicer Updates</title>
-        <link>https://raw.githubusercontent.com/jakerains/StoryJuicer/main/appcast.xml</link>
+        <title>StoryFox Updates</title>
+        <link>https://raw.githubusercontent.com/jakerains/StoryFox/main/appcast.xml</link>
         <description>Most recent changes with links to updates.</description>
         <language>en</language>
         <!-- Items will be added by generate_appcast after the first Sparkle-enabled release -->
@@ -12,7 +12,7 @@
             <sparkle:version>11</sparkle:version>
             <sparkle:shortVersionString>1.2.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/jakerains/StoryJuicer/releases/download/v1.2.5/StoryJuicer.dmg" length="28703478" type="application/octet-stream" sparkle:edSignature="35BLla3PvqxyCchSM2jJa7uc29COrwIaQX1j4740+3y3huFbmkSEyzVGekIVISn2H3cCjV6mE9UWjSnyD3r+Dw=="/>
+            <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.2.5/StoryFox.dmg" length="28703478" type="application/octet-stream" sparkle:edSignature="35BLla3PvqxyCchSM2jJa7uc29COrwIaQX1j4740+3y3huFbmkSEyzVGekIVISn2H3cCjV6mE9UWjSnyD3r+Dw=="/>
         </item>
         <item>
             <title>1.2.3</title>
@@ -20,7 +20,7 @@
             <sparkle:version>9</sparkle:version>
             <sparkle:shortVersionString>1.2.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/jakerains/StoryJuicer/releases/download/v1.2.3/StoryJuicer.dmg" length="28639995" type="application/octet-stream" sparkle:edSignature="tg5zdk3AfsIZHgKQBwMxnXZN+oIqe4FUKtb2VHJDPIUFBlFrsmuPnhMYVmoOpi6S2FBJXwjQQFTOusOYl3aFAQ=="/>
+            <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.2.3/StoryFox.dmg" length="28639995" type="application/octet-stream" sparkle:edSignature="tg5zdk3AfsIZHgKQBwMxnXZN+oIqe4FUKtb2VHJDPIUFBlFrsmuPnhMYVmoOpi6S2FBJXwjQQFTOusOYl3aFAQ=="/>
         </item>
         <item>
             <title>1.2.2</title>
@@ -28,7 +28,7 @@
             <sparkle:version>8</sparkle:version>
             <sparkle:shortVersionString>1.2.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/jakerains/StoryJuicer/releases/download/v1.2.2/StoryJuicer.dmg" length="28637059" type="application/octet-stream" sparkle:edSignature="PqPBAu5kd9RDK19JjAF+zs748NbIoATAwbuHtCaYz5eabQyAkZIoH1MNqhk4bPPTK13Y1nwzmSHW016nN6b/DQ=="/>
+            <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.2.2/StoryFox.dmg" length="28637059" type="application/octet-stream" sparkle:edSignature="PqPBAu5kd9RDK19JjAF+zs748NbIoATAwbuHtCaYz5eabQyAkZIoH1MNqhk4bPPTK13Y1nwzmSHW016nN6b/DQ=="/>
         </item>
     </channel>
 </rss>

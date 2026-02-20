@@ -4,9 +4,9 @@ import { ChangelogTimeline } from "@/components/ChangelogTimeline";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Changelog — StoryJuicer",
+  title: "Changelog — StoryFox",
   description:
-    "See what's new in each release of StoryJuicer — the AI-powered illustrated storybook creator for Mac.",
+    "See what's new in each release of StoryFox — the AI-powered illustrated storybook creator for Mac.",
 };
 
 export default function ChangelogPage() {
@@ -18,7 +18,7 @@ export default function ChangelogPage() {
           Changelog
         </h1>
         <p className="mt-3 text-lg text-sj-secondary">
-          A history of everything new, fixed, and improved in StoryJuicer.
+          A history of everything new, fixed, and improved in StoryFox.
         </p>
         <ChangelogTimeline />
       </div>

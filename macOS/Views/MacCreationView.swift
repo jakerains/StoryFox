@@ -119,7 +119,7 @@ struct MacCreationView: View {
             .scaleEffect(animateHero ? 1 : 0.94)
 
             VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
-                Text("StoryJuicer")
+                Text("StoryFox")
                     .font(StoryJuicerTypography.brandHero)
                     .foregroundStyle(Color.sjGlassInk)
 

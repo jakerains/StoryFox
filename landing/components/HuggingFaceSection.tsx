@@ -16,13 +16,13 @@ const upgradeSteps = [
     number: "2",
     title: "Sign in from the app",
     description:
-      'Open StoryJuicer settings, tap "Sign in with Hugging Face." That\'s it.',
+      'Open StoryFox settings, tap "Sign in with Hugging Face." That\'s it.',
   },
   {
     number: "3",
     title: "Pick your models",
     description:
-      "Choose which cloud models to use for text and images. StoryJuicer connects to them automatically.",
+      "Choose which cloud models to use for text and images. StoryFox connects to them automatically.",
   },
 ];
 
@@ -49,7 +49,7 @@ const benefits = [
     icon: "🔐",
     title: "Secure Connection",
     description:
-      "Login happens through a secure sign-in window. StoryJuicer only gets permission to generate, nothing else.",
+      "Login happens through a secure sign-in window. StoryFox only gets permission to generate, nothing else.",
   },
 ];
 
@@ -87,7 +87,7 @@ export function HuggingFaceSection() {
             Go Further with Hugging Face
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-sj-secondary">
-            StoryJuicer works on its own with your Mac&apos;s built-in AI.
+            StoryFox works on its own with your Mac&apos;s built-in AI.
             Connect a free Hugging Face account to unlock better stories
             and sharper illustrations from open models like OpenAI GPT-OSS and FLUX.1.
           </p>
@@ -177,7 +177,7 @@ export function HuggingFaceSection() {
           viewport={{ once: true }}
           variants={fadeUpVariants}
         >
-          Already have a Hugging Face account? Just open StoryJuicer settings and sign in. Your existing account works.
+          Already have a Hugging Face account? Just open StoryFox settings and sign in. Your existing account works.
         </motion.p>
       </div>
     </section>

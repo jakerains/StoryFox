@@ -375,13 +375,13 @@ struct MacModelSettingsView: View {
         SettingsPanelCard {
             SettingsSectionHeader(
                 title: "Software Update",
-                subtitle: "Keep StoryJuicer up to date with the latest features and fixes.",
+                subtitle: "Keep StoryFox up to date with the latest features and fixes.",
                 systemImage: "arrow.triangle.2.circlepath"
             )
 
             SettingsControlRow(
                 title: "Version",
-                description: "Currently installed version of StoryJuicer."
+                description: "Currently installed version of StoryFox."
             ) {
                 Text(appVersionString)
                     .font(StoryJuicerTypography.settingsBody)

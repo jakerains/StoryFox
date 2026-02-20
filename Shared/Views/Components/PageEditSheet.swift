@@ -89,7 +89,7 @@ struct PageEditSheet: View {
         VStack(spacing: StoryJuicerGlassTokens.Spacing.large) {
             textEditSection(
                 label: "Author Line",
-                placeholder: "Written by StoryJuicer",
+                placeholder: "Written by StoryFox",
                 text: $editedText,
                 onSave: {
                     viewModel.updateAuthorLine(editedText)

@@ -258,13 +258,13 @@ struct StoryPDFRenderer: PDFRendering {
 
     private func loadStampImage() -> CGImage? {
         #if os(macOS)
-        guard let nsImage = NSImage(named: "StoryJuicerStamp"),
+        guard let nsImage = NSImage(named: "StoryFoxStamp"),
               let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return nil
         }
         return cgImage
         #else
-        guard let uiImage = UIImage(named: "StoryJuicerStamp") else { return nil }
+        guard let uiImage = UIImage(named: "StoryFoxStamp") else { return nil }
         return uiImage.cgImage
         #endif
     }

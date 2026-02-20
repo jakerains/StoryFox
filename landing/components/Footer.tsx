@@ -21,13 +21,13 @@ export function Footer() {
             <div className="flex items-center gap-2.5">
               <Image
                 src="/app-icon.png"
-                alt="StoryJuicer"
+                alt="StoryFox"
                 width={28}
                 height={28}
                 className="rounded-lg"
               />
               <span className="font-serif text-base font-bold text-sj-text">
-                StoryJuicer
+                StoryFox
               </span>
             </div>
             <a
@@ -44,7 +44,7 @@ export function Footer() {
           <div className="flex flex-col items-center gap-3 md:items-center">
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://github.com/jakerains/StoryJuicer"
+                href="https://github.com/jakerains/StoryFox"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => track("GitHub Click", { location: "footer" })}

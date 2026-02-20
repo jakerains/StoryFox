@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-support_root="$HOME/Library/Application Support/StoryJuicer/Diffusers"
-cache_root="$HOME/Library/Caches/StoryJuicer/Diffusers"
+support_root="$HOME/Library/Application Support/StoryFox/Diffusers"
+cache_root="$HOME/Library/Caches/StoryFox/Diffusers"
 
 printf '[INFO] Diffusers support path: %s\n' "$support_root"
 printf '[INFO] Diffusers cache path:   %s\n' "$cache_root"

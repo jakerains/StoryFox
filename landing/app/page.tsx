@@ -18,7 +18,7 @@ export default function Page() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "StoryJuicer",
+            name: "StoryFox",
             applicationCategory: "UtilitiesApplication",
             operatingSystem: "macOS 26",
             offers: {
@@ -31,7 +31,7 @@ export default function Page() {
             author: { "@type": "Person", name: "Jake Rains" },
             softwareVersion: "1.2.5",
             downloadUrl:
-              "https://github.com/jakerains/StoryJuicer/releases/latest/download/StoryJuicer.dmg",
+              "https://github.com/jakerains/StoryFox/releases/latest/download/StoryFox.dmg",
           }),
         }}
       />
