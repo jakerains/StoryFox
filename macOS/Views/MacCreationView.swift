@@ -241,7 +241,10 @@ struct MacCreationView: View {
                             .font(StoryJuicerTypography.uiMeta)
                             .foregroundStyle(Color.sjSecondaryText)
                     }
+
+                    Spacer(minLength: 0)
                 }
+                .contentShape(Rectangle())
             }
             .tint(.sjCoral)
         }

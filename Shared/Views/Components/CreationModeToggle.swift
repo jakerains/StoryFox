@@ -37,6 +37,7 @@ struct CreationModeToggle: View {
             }
             .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
             .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
+            .contentShape(Rectangle())
             .sjGlassChip(selected: isSelected, interactive: true)
         }
         .buttonStyle(.plain)
