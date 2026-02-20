@@ -12,6 +12,23 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.3",
+    date: "2026-02-19",
+    title: "Dynamic Q&A Flow & Keyboard Navigation",
+    changes: [
+      {
+        type: "changed",
+        description:
+          "Guided Q&A is now dynamic — the AI decides how many questions to ask (1-3 per round) and stops when it has enough detail, instead of always running 3 fixed rounds",
+      },
+      {
+        type: "added",
+        description:
+          "Arrow key page navigation now works reliably in the book reader on both macOS and iOS (with external keyboard)",
+      },
+    ],
+  },
+  {
     version: "1.2.2",
     date: "2026-02-19",
     title: "Kid Mode Q&A — Truly Kid-Friendly",

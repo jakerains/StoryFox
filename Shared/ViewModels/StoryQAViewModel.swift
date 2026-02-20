@@ -10,14 +10,17 @@ final class StoryQAViewModel {
 
     // MARK: - Configuration
 
-    let totalRounds = 3
-    let questionsPerRound = 3
+    /// Safety cap — the model decides when to stop, but we won't exceed this.
+    let maxRounds = 4
 
     // MARK: - State
 
     private(set) var phase: StoryQAPhase = .idle
     private(set) var rounds: [StoryQARound] = []
     private(set) var currentRoundIndex: Int = 0
+
+    /// Set by the model when it reports having enough context.
+    private(set) var modelSaysDone: Bool = false
 
     private var originalConcept: String = ""
     private var generationTask: Task<Void, Never>?
@@ -37,12 +40,12 @@ final class StoryQAViewModel {
     }
 
     var canGenerateNow: Bool {
-        // Allow early generation after at least 1 completed round
-        currentRoundIndex > 0 || (currentRound?.questions.contains(where: \.isAnswered) == true)
+        // Allow early generation once any question has been answered
+        currentRound?.questions.contains(where: \.isAnswered) == true
     }
 
     var isLastRound: Bool {
-        currentRoundIndex >= totalRounds - 1
+        modelSaysDone || currentRoundIndex >= maxRounds - 1
     }
 
     // MARK: - Actions
@@ -53,6 +56,7 @@ final class StoryQAViewModel {
         originalConcept = concept
         rounds = []
         currentRoundIndex = 0
+        modelSaysDone = false
         generateNextRound()
     }
 
@@ -67,10 +71,10 @@ final class StoryQAViewModel {
         guard canProceed else { return }
         currentRoundIndex += 1
 
-        if currentRoundIndex < totalRounds {
-            generateNextRound()
-        } else {
+        if modelSaysDone || currentRoundIndex >= maxRounds {
             finalize()
+        } else {
+            generateNextRound()
         }
     }
 
@@ -84,6 +88,7 @@ final class StoryQAViewModel {
         phase = .idle
         rounds = []
         currentRoundIndex = 0
+        modelSaysDone = false
         originalConcept = ""
     }
 
@@ -100,13 +105,28 @@ final class StoryQAViewModel {
             phase = .generatingQuestions
 
             do {
-                let questions = try await generateQuestions(roundNumber: roundNumber)
+                let result = try await generateQuestions(roundNumber: roundNumber)
 
                 guard !Task.isCancelled else { return }
 
-                let round = StoryQARound(roundNumber: roundNumber, questions: questions)
+                if result.done {
+                    modelSaysDone = true
+                }
+
+                // If model says done AND returned no questions, auto-finalize
+                if result.questions.isEmpty {
+                    if !rounds.isEmpty {
+                        finalize()
+                    } else {
+                        // Edge case: model said done on first round with no questions — retry
+                        phase = .failed("The AI didn't generate any questions. Please try again.")
+                    }
+                    return
+                }
+
+                let round = StoryQARound(roundNumber: roundNumber, questions: result.questions)
                 rounds.append(round)
-                phase = .awaitingAnswers(round: roundNumber, totalRounds: totalRounds)
+                phase = .awaitingAnswers(round: roundNumber, isFinalRound: modelSaysDone)
             } catch is CancellationError {
                 phase = .idle
             } catch {
@@ -116,7 +136,7 @@ final class StoryQAViewModel {
         }
     }
 
-    private func generateQuestions(roundNumber: Int) async throws -> [StoryQuestion] {
+    private func generateQuestions(roundNumber: Int) async throws -> (questions: [StoryQuestion], done: Bool) {
         let settings = ModelSelectionStore.load()
         let audience = settings.audienceMode
 
@@ -130,7 +150,6 @@ final class StoryQAViewModel {
         let userPrompt = StoryQAPromptTemplates.questionGenerationPrompt(
             concept: originalConcept,
             roundNumber: roundNumber,
-            totalRounds: totalRounds,
             previousQA: previousQA,
             audience: audience
         )
@@ -167,12 +186,11 @@ final class StoryQAViewModel {
             )
         }
 
-        guard let questions = StoryQAPromptTemplates.parseQuestions(from: responseText),
-              !questions.isEmpty else {
+        guard let result = StoryQAPromptTemplates.parseRound(from: responseText) else {
             throw StoryQAError.failedToParseQuestions
         }
 
-        return Array(questions.prefix(questionsPerRound))
+        return (Array(result.questions.prefix(3)), result.done)
     }
 
     // MARK: - Provider Implementations

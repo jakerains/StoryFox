@@ -90,7 +90,7 @@ struct StoryQAFlowView: View {
 
             Spacer()
 
-            // Generate Now (after at least 1 round)
+            // Generate Now — shown when there are answers and the model wants to keep going
             if viewModel.canGenerateNow && !viewModel.isLastRound {
                 Button {
                     viewModel.generateNow()
@@ -105,14 +105,14 @@ struct StoryQAFlowView: View {
                 .sjGlassChip(selected: false, interactive: true)
             }
 
-            // Next / Generate
+            // Primary action — adapts to context
             Button {
                 withAnimation(StoryJuicerMotion.emphasis) {
                     viewModel.submitCurrentRound()
                 }
             } label: {
                 Label(
-                    viewModel.isLastRound ? "Generate Story" : "Next Round",
+                    primaryButtonTitle,
                     systemImage: viewModel.isLastRound ? "wand.and.stars" : "arrow.right"
                 )
                 .font(StoryJuicerTypography.settingsControl)
@@ -124,6 +124,14 @@ struct StoryQAFlowView: View {
             .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
             .sjGlassChip(selected: viewModel.canProceed, interactive: true)
             .opacity(viewModel.canProceed ? 1 : 0.5)
+        }
+    }
+
+    private var primaryButtonTitle: String {
+        if viewModel.isLastRound {
+            return "Generate Story"
+        } else {
+            return "Keep Going"
         }
     }
 

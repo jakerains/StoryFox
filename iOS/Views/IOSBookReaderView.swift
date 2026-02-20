@@ -114,6 +114,8 @@ struct IOSBookReaderView: View {
                 }
             }
         }
+        .focusable()
+        .focusEffectDisabled()
         .onKeyPress(.leftArrow) {
             withAnimation(StoryJuicerMotion.emphasis) {
                 viewModel.previousPage()

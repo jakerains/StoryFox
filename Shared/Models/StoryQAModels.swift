@@ -105,7 +105,7 @@ struct StoryQARound: Identifiable, Sendable, Equatable {
 enum StoryQAPhase: Sendable, Equatable {
     case idle
     case generatingQuestions
-    case awaitingAnswers(round: Int, totalRounds: Int)
+    case awaitingAnswers(round: Int, isFinalRound: Bool)
     case compilingConcept
     case complete(enrichedConcept: String)
     case failed(String)
@@ -119,7 +119,7 @@ enum StoryQAPhase: Sendable, Equatable {
 
     func roundLabel(audience: AudienceMode = .kid) -> String {
         switch self {
-        case .awaitingAnswers(let round, let total):
+        case .awaitingAnswers(let round, _):
             let focus: String
             switch (round, audience) {
             case (1, .kid):  focus = "Hero & World"
@@ -129,7 +129,7 @@ enum StoryQAPhase: Sendable, Equatable {
             case (_, .kid):  focus = "Ending & Feelings"
             case (_, .adult): focus = "Tone & Resolution"
             }
-            return "Round \(round) of \(total) — \(focus)"
+            return "Round \(round) — \(focus)"
         default:
             return ""
         }
@@ -148,4 +148,11 @@ struct QuestionDTO: Decodable, Sendable {
             suggestedAnswers: Array(suggestions.prefix(3))
         )
     }
+}
+
+/// Wrapper DTO for the dynamic Q&A response format.
+/// The model returns `{"questions": [...], "done": true/false}`.
+struct QARoundResponseDTO: Decodable, Sendable {
+    let questions: [QuestionDTO]
+    let done: Bool
 }

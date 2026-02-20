@@ -14,6 +14,8 @@ enum StoryQAPromptTemplates {
             with fun, silly ideas kids love (animals, magic, silly names, adventures). \
             VOCABULARY RULE: Only use words a kindergartner knows. Write at a 1st-grade \
             reading level. \
+            You decide how many questions to ask (1-3) and whether you have enough \
+            detail to write a great story. When you have enough, set "done" to true. \
             Always respond with valid JSON only — no extra text before or after.
             """
         case .adult:
@@ -22,6 +24,8 @@ enum StoryQAPromptTemplates {
             Ask thoughtful questions about characters, world-building, narrative arc, \
             and emotional tone. Your suggested answers should be specific, evocative, \
             and help the creator envision the story clearly. \
+            You decide how many questions to ask (1-3) and whether you have enough \
+            detail to write a great story. When you have enough, set "done" to true. \
             Always respond with valid JSON only — no extra text before or after.
             """
         }
@@ -32,7 +36,6 @@ enum StoryQAPromptTemplates {
     static func questionGenerationPrompt(
         concept: String,
         roundNumber: Int,
-        totalRounds: Int,
         previousQA: [(question: String, answer: String)],
         audience: AudienceMode
     ) -> String {
@@ -53,32 +56,40 @@ enum StoryQAPromptTemplates {
 
         if audience == .kid {
             prompt += """
-            This is round \(roundNumber) of \(totalRounds).
+            This is question round \(roundNumber).
 
             \(focusGuidance)
 
             IMPORTANT: Write at a kindergarten reading level. Use only words a 5-year-old knows. \
             Keep every question to one short sentence. Keep every suggestion to one short sentence. \
-            Make it fun and silly! Return ONLY the JSON array — no other text.
+            Make it fun and silly!
+
+            Ask 1 to 3 questions (only what you still need to know). \
+            If you already have enough detail to write an amazing story, set "done" to true \
+            and return an empty questions array.
+
+            Return ONLY JSON in this exact shape — no other text:
+            {"questions": [...], "done": false}
             """
         } else {
             prompt += """
-            This is round \(roundNumber) of \(totalRounds). \(focusGuidance)
+            This is question round \(roundNumber). \(focusGuidance)
 
-            Generate exactly 3 questions. For each question, provide exactly 3 suggested \
-            answers that are creative, specific, and evocative.
+            Ask 1 to 3 questions — only what you still need to know. For each question, \
+            provide exactly 3 suggested answers that are creative, specific, and evocative. \
+            If you already have enough detail to write an amazing story, set "done" to true \
+            and return an empty questions array.
 
             Return JSON with this exact shape (no markdown, no extra text):
-            [
-              {
-                "question": "Your question here?",
-                "suggestions": [
-                  "First suggestion",
-                  "Second suggestion",
-                  "Third suggestion"
-                ]
-              }
-            ]
+            {
+              "questions": [
+                {
+                  "question": "Your question here?",
+                  "suggestions": ["First suggestion", "Second suggestion", "Third suggestion"]
+                }
+              ],
+              "done": false
+            }
             """
         }
 
@@ -92,11 +103,11 @@ enum StoryQAPromptTemplates {
         case (1, .kid):
             return """
             Ask about the HERO and the PLACE. Copy this style EXACTLY:
-            [
+            {"questions": [
               {"question": "Who is the hero of your story?", "suggestions": ["A brave little bunny named Pip", "A silly dragon who can't fly yet", "A kid just like you with a magic hat"]},
               {"question": "What makes your hero super special?", "suggestions": ["They can talk to animals!", "They have a glowing magic backpack", "They are the funniest kid in town"]},
               {"question": "Where does the adventure happen?", "suggestions": ["A candy forest with chocolate rivers", "A floating castle in the clouds", "Under the sea with friendly fish"]}
-            ]
+            ], "done": false}
             Use the SAME simple words and short sentences as above. Change the content to fit the story concept but keep the same easy reading level.
             """
         case (1, .adult):
@@ -108,12 +119,11 @@ enum StoryQAPromptTemplates {
         case (2, .kid):
             return """
             Ask about the ADVENTURE and the PROBLEM. Copy this style EXACTLY:
-            [
+            {"questions": [
               {"question": "What big problem does the hero run into?", "suggestions": ["A sneaky fox stole all the cookies!", "A giant storm is coming to the town", "The hero's best friend is lost"]},
-              {"question": "Who helps the hero?", "suggestions": ["A funny talking bird", "A wise old turtle", "A group of tiny brave mice"]},
-              {"question": "What is the scariest or silliest part?", "suggestions": ["They fall into a pit of tickle monsters!", "A big shadow turns out to be a baby bunny", "The hero has to cross a wobbly bridge over goo"]}
-            ]
-            Use the SAME simple words and short sentences as above. Change the content to fit the story concept and previous answers but keep the same easy reading level.
+              {"question": "Who helps the hero?", "suggestions": ["A funny talking bird", "A wise old turtle", "A group of tiny brave mice"]}
+            ], "done": false}
+            Use the SAME simple words and short sentences as above. Change the content to fit the story concept and previous answers but keep the same easy reading level. Ask only 1-3 questions — whatever you still need to know.
             """
         case (2, .adult):
             return """
@@ -124,18 +134,18 @@ enum StoryQAPromptTemplates {
         case (_, .kid):
             return """
             Ask about the ENDING and HOW IT FEELS. Copy this style EXACTLY:
-            [
+            {"questions": [
               {"question": "How does the story end?", "suggestions": ["Everyone has a big party!", "The hero makes a new best friend", "They find a treasure and share it with everyone"]},
-              {"question": "What happy thing happens at the end?", "suggestions": ["The hero gets a big hug from mom", "All the animals dance together", "A rainbow appears in the sky"]},
               {"question": "How should the story make you feel?", "suggestions": ["Happy and warm inside", "Excited and ready for more adventures", "Giggly and silly"]}
-            ]
-            Use the SAME simple words and short sentences as above. Change the content to fit the story concept and previous answers but keep the same easy reading level.
+            ], "done": true}
+            Use the SAME simple words and short sentences as above. Change the content to fit the story concept and previous answers but keep the same easy reading level. If you already know enough to write an amazing story, return {"questions": [], "done": true} instead.
             """
         case (_, .adult):
             return """
             Focus on the TONE and RESOLUTION: \
             What emotional register should the story maintain? \
-            How does it resolve — and what lasting impression should it leave?
+            How does it resolve — and what lasting impression should it leave? \
+            If you already have enough detail, set "done" to true with an empty questions array.
             """
         }
     }
@@ -166,27 +176,41 @@ enum StoryQAPromptTemplates {
 
     // MARK: - JSON Parsing
 
-    static func parseQuestions(from text: String) -> [StoryQuestion]? {
-        let cleaned = extractJSONArray(from: text)
+    /// Parse the model's response into questions and a `done` flag.
+    /// Supports both the new wrapper `{"questions": [...], "done": bool}`
+    /// and the legacy plain array `[{"question": ..., "suggestions": [...]}]`.
+    static func parseRound(from text: String) -> (questions: [StoryQuestion], done: Bool)? {
+        let cleaned = extractJSON(from: text)
         guard let data = cleaned.data(using: .utf8) else { return nil }
 
+        // Try new wrapper format first
+        if let roundDTO = try? JSONDecoder().decode(QARoundResponseDTO.self, from: data) {
+            let questions = roundDTO.questions.map { $0.toStoryQuestion() }
+            return (questions, roundDTO.done)
+        }
+
+        // Fall back to legacy array format
         if let dtos = try? JSONDecoder().decode([QuestionDTO].self, from: data) {
-            return dtos.map { $0.toStoryQuestion() }
+            return (dtos.map { $0.toStoryQuestion() }, false)
         }
 
         return nil
     }
 
-    private static func extractJSONArray(from text: String) -> String {
-        // Try to find a JSON array in the text (handles markdown code blocks, etc.)
+    private static func extractJSON(from text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Direct array
-        if trimmed.hasPrefix("[") {
+        // Direct object or array
+        if trimmed.hasPrefix("{") || trimmed.hasPrefix("[") {
             return trimmed
         }
 
-        // Extract from markdown code block
+        // Extract JSON object from markdown code block
+        if let range = trimmed.range(of: #"\{[\s\S]*\}"#, options: .regularExpression) {
+            return String(trimmed[range])
+        }
+
+        // Extract JSON array from markdown code block
         if let range = trimmed.range(of: #"\[[\s\S]*\]"#, options: .regularExpression) {
             return String(trimmed[range])
         }
