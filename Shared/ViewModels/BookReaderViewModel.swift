@@ -17,6 +17,8 @@ final class BookReaderViewModel {
     var onTextEdited: ((StoryBook) -> Void)?
 
     private(set) var currentPage: Int = 0
+    /// Tracks whether the last page change was forward or backward, for transition direction.
+    private(set) var navigatingForward: Bool = true
     var regeneratingPages: Set<Int> = []
     var regenerationErrors: [Int: String] = [:]
     var lastRegenerationError: String?
@@ -82,16 +84,19 @@ final class BookReaderViewModel {
 
     func nextPage() {
         guard !isLastPage else { return }
+        navigatingForward = true
         currentPage += 1
     }
 
     func previousPage() {
         guard !isFirstPage else { return }
+        navigatingForward = false
         currentPage -= 1
     }
 
     func goToPage(_ page: Int) {
         guard page >= 0 && page < totalPages else { return }
+        navigatingForward = page >= currentPage
         currentPage = page
     }
 

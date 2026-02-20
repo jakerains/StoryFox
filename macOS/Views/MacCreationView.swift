@@ -7,10 +7,10 @@ struct MacCreationView: View {
     @Bindable var viewModel: CreationViewModel
     @Environment(\.supportsImagePlayground) private var supportsImagePlayground
 
-    @State private var animateHero = false
+    @State private var animateTitle = false
     @State private var creationMode: CreationMode = .quick
     @State private var qaViewModel = StoryQAViewModel()
-    @State private var isBookSetupExpanded = false
+    @State private var showBookSetupPopover = false
 
     var body: some View {
         ZStack {
@@ -18,8 +18,11 @@ struct MacCreationView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: StoryJuicerGlassTokens.Spacing.xLarge) {
-                    headerSection
+                VStack(spacing: 0) {
+                    heroImage
+                        .padding(.bottom, StoryJuicerGlassTokens.Spacing.large)
+
+                    titleLine
 
                     if case .failed(let message) = viewModel.phase {
                         ErrorBanner(
@@ -27,9 +30,11 @@ struct MacCreationView: View {
                             onRetry: { viewModel.squeezeStory() },
                             onDismiss: { viewModel.reset() }
                         )
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.large)
                     }
 
                     conceptSection
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.xLarge)
 
                     // Q&A flow when guided mode is active and running
                     if creationMode == .guided && qaViewModel.phase != .idle {
@@ -47,15 +52,14 @@ struct MacCreationView: View {
                                 }
                             }
                         )
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.large)
                     }
-
-                    settingsSection
 
                     if creationMode == .quick {
                         SqueezeButton(isEnabled: viewModel.canGenerate) {
                             viewModel.squeezeStory()
                         }
-                        .padding(.top, StoryJuicerGlassTokens.Spacing.small)
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.large)
                     } else if qaViewModel.phase == .idle {
                         SqueezeButton(
                             title: "Explore Your Story",
@@ -65,7 +69,7 @@ struct MacCreationView: View {
                         ) {
                             qaViewModel.startQA(concept: viewModel.storyConcept)
                         }
-                        .padding(.top, StoryJuicerGlassTokens.Spacing.small)
+                        .padding(.top, StoryJuicerGlassTokens.Spacing.large)
                     }
                 }
                 .padding(.horizontal, StoryJuicerGlassTokens.Spacing.xLarge + 8)
@@ -78,10 +82,12 @@ struct MacCreationView: View {
         }
         .onAppear {
             withAnimation(StoryJuicerMotion.emphasis) {
-                animateHero = true
+                animateTitle = true
             }
         }
     }
+
+    // MARK: - Background
 
     private var backgroundLayer: some View {
         ZStack {
@@ -106,83 +112,52 @@ struct MacCreationView: View {
         }
     }
 
-    private var headerSection: some View {
-        HStack(alignment: .top, spacing: StoryJuicerGlassTokens.Spacing.large) {
-            heroBrandIcon
-            .frame(width: 66, height: 66)
-            .clipShape(.rect(cornerRadius: 18, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.35), lineWidth: 1)
-            }
-            .shadow(color: Color.black.opacity(0.16), radius: 10, y: 5)
-            .scaleEffect(animateHero ? 1 : 0.94)
+    // MARK: - Hero Image
 
-            VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
-                Text("StoryFox")
-                    .font(StoryJuicerTypography.brandHero)
-                    .foregroundStyle(Color.sjGlassInk)
-
-                Text("Create editorial-quality illustrated books with on-device Apple intelligence.")
-                    .font(StoryJuicerTypography.uiBodyStrong)
-                    .foregroundStyle(Color.sjSecondaryText)
-
-                Text("No cloud calls. No API keys. Just your idea and your Mac.")
-                    .font(StoryJuicerTypography.uiMeta)
-                    .foregroundStyle(Color.sjSecondaryText)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(StoryJuicerGlassTokens.Spacing.large)
-        .sjGlassCard(
-            tint: .sjGlassSoft.opacity(StoryJuicerGlassTokens.Tint.standard),
-            cornerRadius: StoryJuicerGlassTokens.Radius.hero
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.hero)
-                .strokeBorder(Color.sjBorder.opacity(0.65), lineWidth: 1)
-        }
+    private var heroImage: some View {
+        Image("StoryFoxHero")
+            .resizable()
+            .scaledToFit()
+            .frame(maxHeight: 220)
+            .opacity(animateTitle ? 0.85 : 0)
+            .scaleEffect(animateTitle ? 1 : 0.96)
     }
 
-    @ViewBuilder
-    private var heroBrandIcon: some View {
-#if os(macOS)
-        if let appIcon = NSImage(named: NSImage.applicationIconName) {
-            Image(nsImage: appIcon)
-                .resizable()
-                .scaledToFill()
-        } else {
-            fallbackHeroSymbol
-        }
-#else
-        fallbackHeroSymbol
-#endif
-    }
+    // MARK: - Title
 
-    private var fallbackHeroSymbol: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.sjCoral.opacity(0.9), Color.sjGold.opacity(0.9)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+    private var titleLine: some View {
+        Text("What story shall we create?")
+            .font(StoryJuicerTypography.sectionHero)
+            .foregroundStyle(
+                LinearGradient(
+                    colors: [Color.sjCoral, Color.sjGold, Color.sjHighlight, Color.sjCoral],
+                    startPoint: .leading,
+                    endPoint: .trailing
                 )
-
-            Image(systemName: "book.fill")
-                .font(.title.weight(.bold))
-                .foregroundStyle(.white)
-        }
+            )
+            .overlay(alignment: .topTrailing) {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Color.sjGold.opacity(0.8))
+                    .symbolEffect(.breathe.pulse, options: .repeating.speed(0.5))
+                    .offset(x: 8, y: -6)
+            }
+            .overlay(alignment: .bottomLeading) {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(Color.sjGold.opacity(0.6))
+                    .symbolEffect(.breathe.pulse, options: .repeating.speed(0.4))
+                    .offset(x: -6, y: 4)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .opacity(animateTitle ? 1 : 0)
+            .offset(y: animateTitle ? 0 : 8)
     }
+
+    // MARK: - Concept Input
 
     private var conceptSection: some View {
         VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
-            Label("Story Concept", systemImage: "sparkles")
-                .font(StoryJuicerTypography.uiTitle)
-                .foregroundStyle(Color.sjGlassInk)
-
             TextEditor(text: $viewModel.storyConcept)
                 .font(StoryJuicerTypography.uiBody)
                 .foregroundStyle(Color.sjText)
@@ -206,49 +181,74 @@ struct MacCreationView: View {
                 }
                 .disabled(qaViewModel.phase != .idle && creationMode == .guided)
 
-            CreationModeToggle(selection: $creationMode)
+            HStack {
+                CreationModeToggle(selection: $creationMode)
+
+                Spacer(minLength: StoryJuicerGlassTokens.Spacing.medium)
+
+                bookSetupRow
+                    .fixedSize()
+            }
+        }
+    }
+
+    // MARK: - Book Setup Chip + Popover
+
+    private var bookSetupRow: some View {
+        Button {
+            showBookSetupPopover.toggle()
+        } label: {
+            HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                Image(systemName: "wand.and.stars")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.sjCoral)
+
+                Text("\(viewModel.pageCount) pages · \(viewModel.selectedFormat.displayName) · \(viewModel.selectedStyle.displayName)")
+                    .font(StoryJuicerTypography.uiMetaStrong)
+                    .foregroundStyle(Color.sjGlassInk)
+
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.sjSecondaryText)
+                    .rotationEffect(.degrees(showBookSetupPopover ? 180 : 0))
+                    .animation(StoryJuicerMotion.fast, value: showBookSetupPopover)
+            }
+            .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
+            .padding(.vertical, StoryJuicerGlassTokens.Spacing.small + 2)
+            .contentShape(Rectangle())
+            .sjGlassChip(selected: false, interactive: true)
+        }
+        .buttonStyle(.plain)
+        .popover(isPresented: $showBookSetupPopover, arrowEdge: .bottom) {
+            bookSetupPopoverContent
+        }
+    }
+
+    private var bookSetupPopoverContent: some View {
+        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.medium) {
+            SettingsSectionHeader(
+                title: "Book Setup",
+                subtitle: "Configure pages, format, and illustration style.",
+                systemImage: "wand.and.stars"
+            )
+
+            panelDivider
+
+            pageCountRow
+
+            panelDivider
+
+            formatPickerSection
+
+            panelDivider
+
+            stylePickerSection
         }
         .padding(StoryJuicerGlassTokens.Spacing.large)
-        .sjGlassCard(
-            tint: .sjGlassSoft.opacity(StoryJuicerGlassTokens.Tint.subtle),
-            cornerRadius: StoryJuicerGlassTokens.Radius.hero
-        )
+        .frame(width: 420)
     }
 
-    private var settingsSection: some View {
-        SettingsPanelCard(tint: .sjGlassWeak.opacity(0.68)) {
-            DisclosureGroup(isExpanded: $isBookSetupExpanded) {
-                VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.medium) {
-                    pageCountRow
-                    panelDivider
-                    formatPickerSection
-                    panelDivider
-                    stylePickerSection
-                }
-                .padding(.top, StoryJuicerGlassTokens.Spacing.small)
-            } label: {
-                HStack(spacing: StoryJuicerGlassTokens.Spacing.medium) {
-                    Image(systemName: "wand.and.stars")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Color.sjCoral)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Book Setup")
-                            .font(StoryJuicerTypography.uiBodyStrong)
-                            .foregroundStyle(Color.sjGlassInk)
-
-                        Text("\(viewModel.pageCount) pages · \(viewModel.selectedFormat.displayName) · \(viewModel.selectedStyle.displayName)")
-                            .font(StoryJuicerTypography.uiMeta)
-                            .foregroundStyle(Color.sjSecondaryText)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-                .contentShape(Rectangle())
-            }
-            .tint(.sjCoral)
-        }
-    }
+    // MARK: - Settings Content (reused in popover)
 
     private var panelDivider: some View {
         Rectangle()

@@ -12,6 +12,43 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.4.0",
+    date: "2026-02-20",
+    title: "Redesigned Creation Screen",
+    changes: [
+      {
+        type: "changed",
+        description:
+          "Creation screen redesigned with an open, cardless layout — hero illustration, gradient title with sparkle accents, and breathing room throughout",
+      },
+      {
+        type: "added",
+        description:
+          "StoryFox hero illustration on the creation screen and About panel, replacing the standard app icon",
+      },
+      {
+        type: "changed",
+        description:
+          "Book setup moved from a disclosure card to a compact chip that opens a popover — sits inline with Quick/Guided toggle",
+      },
+      {
+        type: "changed",
+        description:
+          "Sidebar streamlined — removed header branding so New Story is the first element",
+      },
+      {
+        type: "fixed",
+        description:
+          "Sidebar selection highlight now uses coral instead of system blue across all macOS accent color settings",
+      },
+      {
+        type: "changed",
+        description:
+          "App accent color set to coral globally — focus rings, toggles, and system chrome all match the StoryFox palette",
+      },
+    ],
+  },
+  {
     version: "1.3.3",
     date: "2026-02-20",
     title: "Fix Cloud Image Generation Routing",

@@ -24,7 +24,7 @@ struct MacBookReaderView: View {
                 ZStack {
                     pageContent
                         .id(viewModel.currentPage)
-                        .transition(.push(from: viewModel.currentPage > 0 ? .trailing : .leading))
+                        .transition(.push(from: viewModel.navigatingForward ? .trailing : .leading))
                         .animation(StoryJuicerMotion.emphasis, value: viewModel.currentPage)
 
                     navigationOverlay
@@ -142,6 +142,8 @@ struct MacBookReaderView: View {
                     .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.hero))
                     .shadow(color: StoryJuicerGlassTokens.Shadow.color, radius: 18, y: 10)
                     .frame(maxHeight: 430)
+            } else {
+                coverPlaceholder
             }
 
             VStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
@@ -177,23 +179,7 @@ struct MacBookReaderView: View {
                             .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.card))
                             .shadow(color: Color.black.opacity(0.12), radius: 12, y: 6)
                     } else {
-                        VStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
-                            Image(systemName: "photo")
-                                .font(.largeTitle)
-                                .foregroundStyle(Color.sjMuted)
-
-                            Text(page.imagePrompt)
-                                .font(StoryJuicerTypography.uiMeta)
-                                .foregroundStyle(Color.sjSecondaryText)
-                                .multilineTextAlignment(.center)
-                                .lineLimit(4)
-                                .padding(.horizontal)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 220)
-                        .sjGlassCard(
-                            tint: .sjGlassWeak,
-                            cornerRadius: StoryJuicerGlassTokens.Radius.card
-                        )
+                        imagePlaceholder(for: page)
                     }
                 }
                 .frame(maxHeight: .infinity)
@@ -216,6 +202,101 @@ struct MacBookReaderView: View {
                     .padding(.bottom, StoryJuicerGlassTokens.Spacing.medium)
             }
         }
+    }
+
+    private var coverPlaceholder: some View {
+        let isRegenerating = viewModel.regeneratingPages.contains(0)
+
+        return VStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+            if isRegenerating {
+                ProgressView()
+                    .controlSize(.large)
+                    .tint(.sjCoral)
+
+                Text("Regenerating cover...")
+                    .font(StoryJuicerTypography.uiBodyStrong)
+                    .foregroundStyle(Color.sjSecondaryText)
+            } else {
+                Image(systemName: "book.closed")
+                    .font(.system(size: 40))
+                    .foregroundStyle(Color.sjMuted)
+
+                Text("Cover illustration not available")
+                    .font(StoryJuicerTypography.uiMeta)
+                    .foregroundStyle(Color.sjSecondaryText)
+
+                Button {
+                    Task {
+                        await viewModel.regenerateImage(index: 0)
+                    }
+                } label: {
+                    Label("Regenerate Cover", systemImage: "arrow.clockwise")
+                        .font(StoryJuicerTypography.settingsControl)
+                        .foregroundStyle(Color.sjCoral)
+                        .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
+                        .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
+                        .contentShape(Rectangle())
+                        .sjGlassChip(selected: true, interactive: true)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, StoryJuicerGlassTokens.Spacing.xSmall)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 220, maxHeight: 430)
+        .sjGlassCard(
+            tint: .sjGlassWeak,
+            cornerRadius: StoryJuicerGlassTokens.Radius.hero
+        )
+        .animation(StoryJuicerMotion.standard, value: isRegenerating)
+    }
+
+    private func imagePlaceholder(for page: StoryPage) -> some View {
+        let isRegenerating = viewModel.regeneratingPages.contains(page.pageNumber)
+
+        return VStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+            if isRegenerating {
+                ProgressView()
+                    .controlSize(.large)
+                    .tint(.sjCoral)
+
+                Text("Regenerating illustration...")
+                    .font(StoryJuicerTypography.uiBodyStrong)
+                    .foregroundStyle(Color.sjSecondaryText)
+            } else {
+                Image(systemName: "photo")
+                    .font(.largeTitle)
+                    .foregroundStyle(Color.sjMuted)
+
+                Text(page.imagePrompt)
+                    .font(StoryJuicerTypography.uiMeta)
+                    .foregroundStyle(Color.sjSecondaryText)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(4)
+                    .padding(.horizontal)
+
+                Button {
+                    Task {
+                        await viewModel.regenerateImage(index: page.pageNumber)
+                    }
+                } label: {
+                    Label("Regenerate", systemImage: "arrow.clockwise")
+                        .font(StoryJuicerTypography.settingsControl)
+                        .foregroundStyle(Color.sjCoral)
+                        .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
+                        .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
+                        .contentShape(Rectangle())
+                        .sjGlassChip(selected: true, interactive: true)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, StoryJuicerGlassTokens.Spacing.xSmall)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 220)
+        .sjGlassCard(
+            tint: .sjGlassWeak,
+            cornerRadius: StoryJuicerGlassTokens.Radius.card
+        )
+        .animation(StoryJuicerMotion.standard, value: isRegenerating)
     }
 
     private var endPage: some View {

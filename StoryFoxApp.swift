@@ -88,13 +88,15 @@ struct StoryFoxApp: App {
             .credits: credits
         ]
 
-        // Larger app icon in the About panel
-        if let appIcon = NSImage(named: NSImage.applicationIconName) {
-            let size = NSSize(width: 200, height: 200)
+        // Hero illustration in the About panel
+        if let heroImage = NSImage(named: "StoryFoxHero") {
+            let targetWidth: CGFloat = 300
+            let aspect = heroImage.size.height / heroImage.size.width
+            let size = NSSize(width: targetWidth, height: targetWidth * aspect)
             let resized = NSImage(size: size)
             resized.lockFocus()
-            appIcon.draw(in: NSRect(origin: .zero, size: size),
-                         from: .zero, operation: .copy, fraction: 1.0)
+            heroImage.draw(in: NSRect(origin: .zero, size: size),
+                           from: .zero, operation: .copy, fraction: 1.0)
             resized.unlockFocus()
             options[.applicationIcon] = resized
         }
@@ -177,11 +179,6 @@ struct MainView: View {
 
     private var sidebar: some View {
         VStack(spacing: 0) {
-            sidebarHeader
-                .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
-                .padding(.top, StoryJuicerGlassTokens.Spacing.medium)
-                .padding(.bottom, StoryJuicerGlassTokens.Spacing.small)
-
             List(selection: $selectedSavedBookID) {
                 Button {
                     selectedSavedBookID = nil
@@ -207,6 +204,7 @@ struct MainView: View {
                     }
                     .padding(.horizontal, StoryJuicerGlassTokens.Spacing.small)
                     .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
+                    .contentShape(Rectangle())
                     .sjGlassCard(
                         tint: .sjCoral.opacity(StoryJuicerGlassTokens.Tint.standard),
                         interactive: true,
@@ -226,7 +224,7 @@ struct MainView: View {
                                 isSelected: selectedSavedBookID == book.id
                             )
                             .tag(book.id)
-                            .listRowBackground(Color.clear)
+                            .listRowBackground(sidebarRowBackground)
                             .listRowSeparator(.hidden)
                             .padding(.vertical, 2)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -271,7 +269,7 @@ struct MainView: View {
                                 isSelected: selectedSavedBookID == book.id
                             )
                             .tag(book.id)
-                            .listRowBackground(Color.clear)
+                            .listRowBackground(sidebarRowBackground)
                             .listRowSeparator(.hidden)
                             .padding(.vertical, 2)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -310,6 +308,8 @@ struct MainView: View {
             }
             .scrollContentBackground(.hidden)
             .listStyle(.sidebar)
+            .tint(.sjCoral)
+            .accentColor(.sjCoral)
             .background(sidebarBackground)
             .onChange(of: selectedSavedBookID) { _, newID in
                 if let id = newID, let book = allBooks.first(where: { $0.id == id }) {
@@ -466,6 +466,15 @@ struct MainView: View {
                 .foregroundStyle(Color.sjMuted)
         }
         .textCase(nil)
+    }
+
+    private var sidebarRowBackground: some View {
+        // Opaque background that covers the system blue selection highlight
+        LinearGradient(
+            colors: [Color.sjPaperTop, Color.sjPaperBottom],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 
     private var sidebarBackground: some View {

@@ -94,7 +94,7 @@ Shared/
     PlatformImage.swift          ← Cross-platform image typealias
 macOS/
   Views/
-    MacCreationView.swift        ← Story concept input, format/style pickers
+    MacCreationView.swift        ← Story creation: hero image, gradient title, concept input, book setup popover
     MacGenerationProgressView    ← Streaming text, image progress grid
     MacBookReaderView.swift      ← Page-by-page reader with overview grid
     MacExportView.swift          ← PDF/image export
@@ -263,6 +263,8 @@ Produces a signed, notarized DMG at `dist/StoryFox.dmg`. Pipeline:
 
 All custom colors are defined as `Color.sj*` extensions in `Color+Theme.swift` ("Warm Library at Dusk" palette). Primary accent is `sjCoral` (terracotta). Use these consistently — don't introduce new color literals.
 
+**AccentColor** is set to `sjCoral` in `Resources/Assets.xcassets/AccentColor.colorset` (light: `#B4543A`, dark: `#D98A73`). This controls system-level accent colors like focus rings, toggles, and default buttons. However, it does **NOT** control macOS sidebar List selection highlights — see macOS Sidebar Gotchas below.
+
 ## UI Components
 
 Glass-morphism design system defined in `SettingsPanelStyle.swift`:
@@ -273,6 +275,49 @@ Glass-morphism design system defined in `SettingsPanelStyle.swift`:
 - `.glass` / `.glassProminent` button styles
 - `StoryJuicerGlassTokens` — spacing, radius, tint constants
 - `StoryJuicerTypography` — font presets for settings UI
+
+Glass chip modifier in `View+StoryJuicerGlass.swift`:
+- `.sjGlassCard(tint:interactive:cornerRadius:)` — glass effect card
+- `.sjGlassChip(selected:interactive:)` — compact pill/chip styling
+- `.sjGlassToolbarItem(prominent:)` — toolbar button styling
+
+## Creation View Design (`MacCreationView.swift`)
+
+The creation screen uses an **open, cardless layout** — no glass card containers around the main content. Typography and spacing establish visual hierarchy.
+
+**Layout (top to bottom):**
+1. **Hero image** — `StoryFoxHero` asset (fox on open book illustration), centered, 220pt max height, 85% opacity, animated entrance
+2. **Title** — `"What story shall we create?"` in `sectionHero` (34pt bold serif) with coral→gold gradient text. Two small breathing sparkle SF Symbol accents on corners.
+3. **TextEditor** — Sits directly on the gradient background with field chrome (rounded rect + border). No enclosing card, no label.
+4. **Controls row** — `CreationModeToggle` (Quick/Guided pills) on the left, book setup chip on the right, same line.
+5. **Book setup chip** — Content-hugging pill with wand icon + summary text (`"8 pages · Standard Square · Illustration"`). Opens a **popover** (420pt wide) with full settings: page count stepper, format grid, style picker.
+6. **Squeeze button** — Full-width primary CTA.
+7. **Q&A flow** — Appears between controls row and squeeze button when guided mode is active.
+
+**Key implementation details:**
+- Use `.contentShape(Rectangle())` on buttons with `.buttonStyle(.plain)` to ensure full-area tappability
+- The book setup chip uses `.fixedSize()` to hug content rather than stretching
+- Hero image uses `Image("StoryFoxHero")` from the asset catalog (`Resources/Assets.xcassets/StoryFoxHero.imageset/`)
+- **Do NOT use GeometryReader** for decorative overlays on the title — it causes layout instability and makes the text slide around
+- **Do NOT use animated gradient stops** (shimmer) on the title text — SwiftUI re-lays out the text during animation, causing visible jitter
+
+## Hero Image (`StoryFoxHero`)
+
+The fox-on-book hero illustration is stored at `Resources/Assets.xcassets/StoryFoxHero.imageset/storyfox-hero.png`. It's used in two places:
+1. **Creation screen** — centered above the title, decorative
+2. **About panel** — replaces the standard app icon in `StoryFoxApp.swift`'s `aboutPanelOptions`
+
+## Sidebar
+
+The sidebar in `MainView` (in `StoryFoxApp.swift`) has **no header** — the "New Story" button is the first element. The StoryFox name/icon was removed to keep it clean.
+
+**Selection highlight fix:** macOS sidebar `List` selection uses the user's system accent color (typically blue). `.tint()`, `.accentColor()`, and even the AccentColor asset catalog entry do NOT override this. The fix is to use `.listRowBackground()` with an **opaque** background that paints over the system highlight. We use `sidebarRowBackground` (a `LinearGradient` matching the sidebar background) so the system blue is never visible. The rows' own `.sjGlassCard()` styling with coral tint provides the selection state feedback.
+
+## macOS Sidebar Gotchas
+
+- **System blue selection:** `.tint()` and `.accentColor()` on a `List` do NOT change the sidebar selection highlight on macOS. The system draws it via AppKit using `NSColor.controlAccentColor`. Use opaque `.listRowBackground()` to cover it.
+- **`.buttonStyle(.plain)` hit targets:** On macOS, plain buttons only respond to clicks on visible content (text, icons), not transparent areas like `Spacer`. Add `.contentShape(Rectangle())` before glass modifiers to make the full area tappable.
+- **AccentColor in asset catalog:** Controls focus rings, toggles, and some system chrome, but NOT sidebar List selection. Still worth setting to `sjCoral` for consistency across other UI elements.
 
 ## Settings Layout Order
 
