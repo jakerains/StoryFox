@@ -12,6 +12,58 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.5.0",
+    date: "2026-02-20",
+    title: "Modular Settings & Visual Polish",
+    changes: [
+      {
+        type: "added",
+        description:
+          "Settings redesigned with a sidebar-tabbed layout — General, On-Device, Cloud, and About tabs for easy navigation and future extensibility",
+      },
+      {
+        type: "added",
+        description:
+          "Paper texture overlay adds warm, storybook-quality grain to the app background and landing page",
+      },
+      {
+        type: "added",
+        description:
+          "Sparkle star accents scattered around the hero illustration on the creation screen",
+      },
+      {
+        type: "added",
+        description:
+          "Hugging Face and OpenRouter logos replace generic icons in Cloud settings",
+      },
+      {
+        type: "changed",
+        description:
+          "Hugging Face OAuth sign-in is now front and center in Cloud settings — API token input collapsed as an alternative",
+      },
+      {
+        type: "changed",
+        description:
+          "Hero illustration enlarged for a more impactful creation screen",
+      },
+      {
+        type: "changed",
+        description:
+          "\"Squeeze a Story\" renamed to \"Craft a Story\" to match the StoryFox brand",
+      },
+      {
+        type: "fixed",
+        description:
+          "About panel hero image no longer appears distorted",
+      },
+      {
+        type: "removed",
+        description:
+          "Removed Z-Image Turbo from curated image models — only free HuggingFace Inference models are listed",
+      },
+    ],
+  },
+  {
     version: "1.4.1",
     date: "2026-02-20",
     title: "Auto-Check for Updates on Launch",

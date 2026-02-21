@@ -113,6 +113,8 @@ struct MacBookReaderView: View {
                 endPoint: .bottom
             )
 
+            PaperTextureOverlay()
+
             RadialGradient(
                 colors: [Color.sjHighlight.opacity(0.16), .clear],
                 center: .top,

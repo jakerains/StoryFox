@@ -29,6 +29,8 @@ struct MacGenerationProgressView: View {
                 endPoint: .bottomTrailing
             )
 
+            PaperTextureOverlay()
+
             RadialGradient(
                 colors: [Color.sjCoral.opacity(0.14), .clear],
                 center: .topTrailing,

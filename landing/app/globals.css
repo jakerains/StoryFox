@@ -152,6 +152,25 @@ body {
   background: radial-gradient(circle, rgba(141,92,70,0.12) 0%, transparent 70%);
 }
 
+/* Paper grain texture overlay */
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  pointer-events: none;
+  background-image: url('/images/paper-texture.png');
+  background-size: 512px 512px;
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+.dark .paper-texture::before {
+  opacity: 0.15;
+  mix-blend-mode: soft-light;
+}
+
 /* Scroll progress bar */
 .scroll-progress {
   transform-origin: left;

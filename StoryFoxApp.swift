@@ -21,7 +21,7 @@ struct StoryFoxApp: App {
 
 #if os(macOS)
         Settings {
-            MacModelSettingsView(updateManager: updateManager)
+            MacSettingsView(updateManager: updateManager)
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
@@ -89,14 +89,18 @@ struct StoryFoxApp: App {
         ]
 
         // Hero illustration in the About panel
-        if let heroImage = NSImage(named: "StoryFoxHero") {
-            let targetWidth: CGFloat = 300
-            let aspect = heroImage.size.height / heroImage.size.width
+        if let heroImage = NSImage(named: "StoryFoxHero"),
+           let bestRep = heroImage.bestRepresentation(for: NSRect(origin: .zero, size: heroImage.size), context: nil, hints: nil) {
+            let pixelW = CGFloat(bestRep.pixelsWide)
+            let pixelH = CGFloat(bestRep.pixelsHigh)
+            let aspect = pixelH / pixelW
+            let targetWidth: CGFloat = 200
             let size = NSSize(width: targetWidth, height: targetWidth * aspect)
             let resized = NSImage(size: size)
             resized.lockFocus()
             heroImage.draw(in: NSRect(origin: .zero, size: size),
-                           from: .zero, operation: .copy, fraction: 1.0)
+                           from: NSRect(origin: .zero, size: heroImage.size),
+                           operation: .copy, fraction: 1.0)
             resized.unlockFocus()
             options[.applicationIcon] = resized
         }
@@ -486,11 +490,15 @@ struct MainView: View {
     }
 
     private var detailBackground: some View {
-        LinearGradient(
-            colors: [Color.sjPaperTop, Color.sjBackground],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        ZStack {
+            LinearGradient(
+                colors: [Color.sjPaperTop, Color.sjBackground],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            PaperTextureOverlay()
+        }
     }
 
     // MARK: - Detail View

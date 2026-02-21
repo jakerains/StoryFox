@@ -23,6 +23,7 @@ struct CloudProviderSettingsSection: View {
     @State private var isTestingImage: Bool = false
     @State private var imageTestResult: String = ""
     @State private var hfOAuth = HuggingFaceOAuth()
+    @State private var isAPIKeyExpanded = false
 
     /// Whether the provider has a saved API key (cached in UserDefaults to avoid Keychain reads).
     private var hasStoredKey: Bool {
@@ -43,7 +44,8 @@ struct CloudProviderSettingsSection: View {
                     subtitle: provider.supportsOAuth
                         ? "Use an API token or sign in with Hugging Face."
                         : "Enter your API key to enable \(provider.displayName) models.",
-                    systemImage: cloudProviderIcon
+                    systemImage: cloudProviderSystemIcon,
+                    customImage: cloudProviderCustomImage
                 )
 
                 content
@@ -53,10 +55,36 @@ struct CloudProviderSettingsSection: View {
 
     @ViewBuilder
     private var content: some View {
-        apiKeyRow
-
         if provider.supportsOAuth {
             oauthRow
+
+            Button {
+                withAnimation(StoryJuicerMotion.fast) {
+                    isAPIKeyExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.sjMuted)
+                        .rotationEffect(.degrees(isAPIKeyExpanded ? 90 : 0))
+
+                    Text("Use an API token instead")
+                        .font(StoryJuicerTypography.settingsMeta)
+                        .foregroundStyle(Color.sjSecondaryText)
+
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isAPIKeyExpanded {
+                apiKeyRow
+                    .padding(.top, StoryJuicerGlassTokens.Spacing.small)
+            }
+        } else {
+            apiKeyRow
         }
 
         textModelPicker
@@ -64,11 +92,18 @@ struct CloudProviderSettingsSection: View {
         actionButtons
     }
 
-    private var cloudProviderIcon: String {
+    private var cloudProviderSystemIcon: String? {
         switch provider {
-        case .openRouter:  return "cloud"
         case .togetherAI:  return "server.rack"
-        case .huggingFace: return "face.smiling"
+        case .openRouter, .huggingFace: return nil
+        }
+    }
+
+    private var cloudProviderCustomImage: String? {
+        switch provider {
+        case .huggingFace: return "HuggingFaceLogo"
+        case .openRouter:  return "OpenRouterLogo"
+        case .togetherAI:  return nil
         }
     }
 
@@ -114,12 +149,9 @@ struct CloudProviderSettingsSection: View {
 
     private var oauthRow: some View {
         VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
-            Divider()
-                .padding(.vertical, StoryJuicerGlassTokens.Spacing.small)
-
-            Text("Or sign in with Hugging Face")
-                .font(StoryJuicerTypography.settingsMeta)
-                .foregroundStyle(Color.sjSecondaryText)
+            Text("Sign in with Hugging Face")
+                .font(StoryJuicerTypography.settingsBody.weight(.semibold))
+                .foregroundStyle(Color.sjText)
 
             if hfOAuth.isLoggedIn {
                 HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {

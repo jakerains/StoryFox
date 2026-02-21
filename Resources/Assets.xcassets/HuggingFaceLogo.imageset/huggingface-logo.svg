@@ -1,0 +1,16 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="18" fill="#FFD21E"/>
+  <circle cx="20" cy="20" r="18" fill="none" stroke="#FFAC03" stroke-width="2"/>
+  <!-- Left eye -->
+  <ellipse cx="14" cy="15.5" rx="2.5" ry="3" fill="#3A3B45" transform="rotate(10, 14, 15.5)"/>
+  <!-- Right eye -->
+  <ellipse cx="26" cy="15.5" rx="2.5" ry="3" fill="#3A3B45" transform="rotate(-10, 26, 15.5)"/>
+  <!-- Left cheek -->
+  <circle cx="9.5" cy="18" r="1.8" fill="#FFD21E" opacity="0.6" style="mix-blend-mode:multiply"/>
+  <!-- Right cheek -->
+  <circle cx="30.5" cy="18" r="1.8" fill="#FFD21E" opacity="0.6" style="mix-blend-mode:multiply"/>
+  <!-- Smile -->
+  <path d="M13.5,22 C13.5,22 14.5,28 20,28 C25.5,28 26.5,22 26.5,22" fill="#3A3B45"/>
+  <!-- Tongue -->
+  <ellipse cx="20" cy="27" rx="3.5" ry="3" fill="#EF4E4E"/>
+</svg>

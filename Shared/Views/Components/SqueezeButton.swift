@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SqueezeButton: View {
-    var title: String = "Squeeze a Story"
+    var title: String = "Craft a Story"
     var subtitle: String = "Generate text + illustrations"
     var icon: String = "wand.and.stars"
     let isEnabled: Bool

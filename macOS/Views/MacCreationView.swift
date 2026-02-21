@@ -19,8 +19,7 @@ struct MacCreationView: View {
 
             ScrollView {
                 VStack(spacing: 0) {
-                    heroImage
-                        .padding(.bottom, StoryJuicerGlassTokens.Spacing.large)
+                    heroSection
 
                     titleLine
 
@@ -97,6 +96,8 @@ struct MacCreationView: View {
                 endPoint: .bottomTrailing
             )
 
+            PaperTextureOverlay()
+
             RadialGradient(
                 colors: [Color.sjHighlight.opacity(0.24), .clear],
                 center: .topTrailing,
@@ -112,15 +113,66 @@ struct MacCreationView: View {
         }
     }
 
-    // MARK: - Hero Image
+    // MARK: - Hero Section (image + sparkles)
 
-    private var heroImage: some View {
+    private var heroSection: some View {
+        // The hero illustration — sparkles are positioned relative to its center
         Image("StoryFoxHero")
             .resizable()
             .scaledToFit()
-            .frame(maxHeight: 220)
+            .frame(maxHeight: 340)
             .opacity(animateTitle ? 0.85 : 0)
             .scaleEffect(animateTitle ? 1 : 0.96)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .overlay {
+                // Sparkle stars scattered around the image
+                ForEach(Array(allSparkles.enumerated()), id: \.offset) { _, s in
+                    SparkleStarShape()
+                        .fill(s.color)
+                        .frame(width: s.size, height: s.size)
+                        .offset(x: s.offsetX, y: s.offsetY)
+                        .opacity(animateTitle ? s.opacity : 0)
+                        .scaleEffect(animateTitle ? 1.0 : 0.5)
+                        .rotationEffect(.degrees(s.rotates ? (animateTitle ? 180 : 0) : 0))
+                        .animation(
+                            .easeInOut(duration: s.duration)
+                                .repeatForever(autoreverses: true)
+                                .delay(s.delay),
+                            value: animateTitle
+                        )
+                }
+            }
+            .padding(.bottom, StoryJuicerGlassTokens.Spacing.large)
+    }
+
+    // All sparkles — floating accents around the image + twinkling background dots
+    // Offsets scaled for 340pt hero image
+    private var allSparkles: [SparkleData] {
+        [
+            // Close sparkles around the image edges (larger, brighter)
+            SparkleData(size: 16, color: .sjGold, offsetX: -200, offsetY: -50, delay: 0, duration: 5, rotates: true, opacity: 0.8),
+            SparkleData(size: 13, color: .sjCoral, offsetX: 195, offsetY: -80, delay: 1.5, duration: 4.5, opacity: 0.75),
+            SparkleData(size: 12, color: .sjHighlight, offsetX: 210, offsetY: 60, delay: 0.8, duration: 5.5, rotates: true, opacity: 0.8),
+            SparkleData(size: 11, color: .sjGold, offsetX: -215, offsetY: 75, delay: 2, duration: 6, opacity: 0.7),
+            SparkleData(size: 14, color: .sjCoral, offsetX: -95, offsetY: -135, delay: 0.5, duration: 5, rotates: true, opacity: 0.75),
+            SparkleData(size: 15, color: .sjGold, offsetX: 120, offsetY: -120, delay: 3, duration: 4, opacity: 0.8),
+            SparkleData(size: 10, color: .sjHighlight, offsetX: -165, offsetY: 15, delay: 1, duration: 7, rotates: true, opacity: 0.7),
+            SparkleData(size: 12, color: .sjGold, offsetX: 75, offsetY: 110, delay: 2.5, duration: 5.2, opacity: 0.75),
+
+            // Wider scattered sparkles (smaller, subtler — beyond the image)
+            SparkleData(size: 8, color: .sjGold, offsetX: -300, offsetY: -90, delay: 0, duration: 3, opacity: 0.4),
+            SparkleData(size: 6, color: .sjCoral, offsetX: 290, offsetY: -120, delay: 1.2, duration: 2.5, opacity: 0.35),
+            SparkleData(size: 9, color: .sjHighlight, offsetX: -275, offsetY: 60, delay: 0.6, duration: 3.5, opacity: 0.4),
+            SparkleData(size: 6, color: .sjGold, offsetX: 270, offsetY: 105, delay: 2, duration: 2.8, opacity: 0.3),
+            SparkleData(size: 7, color: .sjCoral, offsetX: -140, offsetY: -155, delay: 1.8, duration: 3.2, rotates: true, opacity: 0.35),
+            SparkleData(size: 6, color: .sjGold, offsetX: 170, offsetY: -155, delay: 0.3, duration: 2.6, opacity: 0.3),
+            SparkleData(size: 7, color: .sjHighlight, offsetX: -340, offsetY: -30, delay: 2.5, duration: 3, rotates: true, opacity: 0.35),
+            SparkleData(size: 8, color: .sjGold, offsetX: 325, offsetY: 15, delay: 0.9, duration: 2.4, opacity: 0.4),
+            SparkleData(size: 5, color: .sjCoral, offsetX: -60, offsetY: 170, delay: 1.5, duration: 3.8, opacity: 0.3),
+            SparkleData(size: 5, color: .sjGold, offsetX: 60, offsetY: 170, delay: 0.4, duration: 3.3, opacity: 0.3),
+            SparkleData(size: 6, color: .sjHighlight, offsetX: -245, offsetY: 140, delay: 2.2, duration: 2.7, rotates: true, opacity: 0.3),
+            SparkleData(size: 7, color: .sjGold, offsetX: 240, offsetY: -25, delay: 1, duration: 3.6, opacity: 0.35),
+        ]
     }
 
     // MARK: - Title
@@ -374,4 +426,54 @@ struct MacCreationView: View {
                 .strokeBorder(Color.sjCoral.opacity(0.38), lineWidth: 1)
         }
     }
+}
+
+// MARK: - Sparkle Star Shape (4-point star matching landing page SVG)
+
+/// Draws the same 4-point sparkle star used on the landing page:
+/// SVG path: M12 0C12.5 7 17 11.5 24 12C17 12.5 12.5 17 12 24C11.5 17 7 12.5 0 12C7 11.5 11.5 7 12 0Z
+struct SparkleStarShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width
+        let h = rect.height
+        var p = Path()
+        // Top point → right point
+        p.move(to: CGPoint(x: w * 0.5, y: 0))
+        p.addCurve(
+            to: CGPoint(x: w, y: h * 0.5),
+            control1: CGPoint(x: w * 0.521, y: h * 0.292),
+            control2: CGPoint(x: w * 0.708, y: h * 0.479)
+        )
+        // Right point → bottom point
+        p.addCurve(
+            to: CGPoint(x: w * 0.5, y: h),
+            control1: CGPoint(x: w * 0.708, y: h * 0.521),
+            control2: CGPoint(x: w * 0.521, y: h * 0.708)
+        )
+        // Bottom point → left point
+        p.addCurve(
+            to: CGPoint(x: 0, y: h * 0.5),
+            control1: CGPoint(x: w * 0.479, y: h * 0.708),
+            control2: CGPoint(x: w * 0.292, y: h * 0.521)
+        )
+        // Left point → top point
+        p.addCurve(
+            to: CGPoint(x: w * 0.5, y: 0),
+            control1: CGPoint(x: w * 0.292, y: h * 0.479),
+            control2: CGPoint(x: w * 0.479, y: h * 0.292)
+        )
+        p.closeSubpath()
+        return p
+    }
+}
+
+struct SparkleData {
+    let size: CGFloat
+    let color: Color
+    let offsetX: CGFloat
+    let offsetY: CGFloat
+    let delay: Double
+    let duration: Double
+    var rotates: Bool = false
+    var opacity: Double = 0.8
 }

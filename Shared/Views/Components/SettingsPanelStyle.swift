@@ -43,16 +43,24 @@ struct SettingsSectionHeader: View {
     let title: String
     let subtitle: String?
     let systemImage: String?
+    let customImage: String?
 
-    init(title: String, subtitle: String? = nil, systemImage: String? = nil) {
+    init(title: String, subtitle: String? = nil, systemImage: String? = nil, customImage: String? = nil) {
         self.title = title
         self.subtitle = subtitle
         self.systemImage = systemImage
+        self.customImage = customImage
     }
 
     var body: some View {
         HStack(alignment: .top, spacing: StoryJuicerGlassTokens.Spacing.small) {
-            if let systemImage {
+            if let customImage {
+                Image(customImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 26, height: 26)
+                    .clipShape(Circle())
+            } else if let systemImage {
                 Image(systemName: systemImage)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.sjCoral)
