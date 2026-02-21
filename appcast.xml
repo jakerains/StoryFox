@@ -7,6 +7,17 @@
         <language>en</language>
         <!-- Items will be added by generate_appcast after the first Sparkle-enabled release -->
         <item>
+            <title>1.7.2</title>
+            <pubDate>Sat, 21 Feb 2026 10:31:37 -0600</pubDate>
+            <sparkle:version>23</sparkle:version>
+            <sparkle:shortVersionString>1.7.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.7.2/StoryFox.dmg" length="33253195" type="application/octet-stream" sparkle:edSignature="m6+rJ94UIFy8OHLa8PdIp0TRbRh8u1pzYutSzogMTwdPkIu0BqE7EKmJ8JkIdQ7zhuT/2FH7WglZjI91MQjRDQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.7.2/StoryFox23-11.delta" sparkle:deltaFrom="11" length="17532066" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860560" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="X/hSNKecTBzuGah8jfgDkpfXd1/1ri/cH6OIgCrCfRnQCpdPjpHFB2G3OGE07bIv2FrSacgN5vQkB8lXvNTZAg=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>1.7.1</title>
             <pubDate>Sat, 21 Feb 2026 08:46:29 -0600</pubDate>
             <sparkle:version>22</sparkle:version>
@@ -26,17 +37,6 @@
             <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.7.1/StoryFox.dmg" length="32308074" type="application/octet-stream" sparkle:edSignature="fe7zQ5T9Ay4lmCwETFoblu5M3CclHMfjSBn54mdGVCfi2jrFIF4JC8V0OeKJFkQleFdwH0AnI3uTDH6BC6+DBg=="/>
             <sparkle:deltas>
                 <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.7.1/StoryFox21-11.delta" sparkle:deltaFrom="11" length="17443310" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860560" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="5pSVpBMmXdcWt2pxeV7fF4N9810OiqZUE5U0VSsjmbTzCJ3MNUhmqxIcbfNYWQYDbmZZQAob1HXhw+iiQtHcBA=="/>
-            </sparkle:deltas>
-        </item>
-        <item>
-            <title>1.6.0</title>
-            <pubDate>Fri, 20 Feb 2026 21:34:24 -0600</pubDate>
-            <sparkle:version>20</sparkle:version>
-            <sparkle:shortVersionString>1.6.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.6.0/StoryFox.dmg" length="32065787" type="application/octet-stream" sparkle:edSignature="PTS2urKdkr+cVlyTEmYuoMAxus1RWzOEaccx1+CMSYIWTqBt3+9IpCHUxwueJyzDTpxZf6iJHp642erGP1QNBA=="/>
-            <sparkle:deltas>
-                <enclosure url="https://github.com/jakerains/StoryFox/releases/download/v1.6.0/StoryFox20-11.delta" sparkle:deltaFrom="11" length="17340530" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860560" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="cTSAu5ER6PPMxN35ffduocOXzbe+FARTMJsME5vkLVstUvWuEx1dtRne7SWYru10mTjMg4HL9UPPQB/PA7OmBw=="/>
             </sparkle:deltas>
         </item>
     </channel>

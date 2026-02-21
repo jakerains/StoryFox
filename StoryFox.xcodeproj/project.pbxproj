@@ -16,6 +16,7 @@
 		08C2FD6B07DBC60A20A5F202 /* StoryQAModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7B4A619552F5482DBC9798 /* StoryQAModels.swift */; };
 		091B8C09F4663B031DEE57B2 /* StoryQAFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E107D6DA83C430CFEF52035 /* StoryQAFlowView.swift */; };
 		0A79BBD6BC9745B4EA22F0F8 /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28035CCBC39E80B154412C6 /* SettingsTab.swift */; };
+		0C254D099D969AACBB1F6C5F /* StoryInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B659227CA456616AE515375D /* StoryInfoSheet.swift */; };
 		0DBDCCC3D8A3D302792FD4F1 /* StoredStorybook.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A07AFF2F430B55881DE6FA /* StoredStorybook.swift */; };
 		0FF18F597C75A7F43D5B8C36 /* StoryBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DAB37454973A6ECE96CBCFE /* StoryBook.swift */; };
 		103B50409CCDCE857A27F1B5 /* StoryGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53925B150A03573922FF932C /* StoryGenerator.swift */; };
@@ -32,11 +33,13 @@
 		25473CD53417CD7E2307AEB2 /* SafetyInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279BE085C4013B45A6A8B99E /* SafetyInfoSheet.swift */; };
 		25EF5B5068E8BBEE0B49F5AC /* CreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421AE84EC5FD7E61E3D24419 /* CreationViewModel.swift */; };
 		2656379D969FC3A0C600400E /* StoryEPUBRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C74B5B02C2B8B6386FD8770 /* StoryEPUBRenderer.swift */; };
+		272BD3592583BD21CC265C11 /* PageTurnEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBEE705247A789AB1AB0D8A /* PageTurnEffect.swift */; };
 		28A391F50D03B221F53255A0 /* View+StoryJuicerGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD8111F1323A2B66CC7EE4C /* View+StoryJuicerGlass.swift */; };
 		2902957737A311EC7A1D4BB7 /* MacSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF24DE73920FE0751F3136A /* MacSettingsView.swift */; };
 		2A535CB2F890B06B09440D75 /* SettingsPanelStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DDDC800E10F3D73BF26FAC /* SettingsPanelStyle.swift */; };
 		2BA6BD72DB227D7E4EAEE245 /* PromptAnalysisEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C626CEFD9E043CBC9574812C /* PromptAnalysisEngine.swift */; };
 		2BAC1BC0E649A40BAB98CE98 /* IOSModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5700BE98B253E23B2CAAC3B5 /* IOSModelSettingsView.swift */; };
+		2D3DB80829269A852891A835 /* StoryInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B659227CA456616AE515375D /* StoryInfoSheet.swift */; };
 		2F3A4BF2AE92A8E0E8DAA164 /* StoryQAViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 150DA078AD5CD1BC2526CD28 /* StoryQAViewModel.swift */; };
 		306F4D03BC6C04477ACFBD43 /* DiffusersRuntimeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FD2320BC4EE909309C2334 /* DiffusersRuntimeManager.swift */; };
 		30D21F5AE7A14F54A31440E1 /* Hub in Frameworks */ = {isa = PBXBuildFile; productRef = 61D53278CD0E4D1D6B869AB0 /* Hub */; };
@@ -152,6 +155,7 @@
 		C8A76176008C74A05AFC7859 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F2CFCC0C2197A231A9063A72 /* Sparkle */; };
 		C964A12EF09F0D30E86F18C0 /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = 75BC367ADA65D04BEFC1DD9C /* HuggingFace */; };
 		C9991EAB741D5D5A6B3A36B2 /* StylePickerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBB9A5C9AA4F2EFDB4E4894 /* StylePickerItem.swift */; };
+		CA80A4946BFE71F6CB409764 /* PageTurnState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3451E8F951A8D9247FDAB75 /* PageTurnState.swift */; };
 		CD3934AD3802E864C1F77BEC /* GenerationOptions+Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39563DA81B4BFA3A8A8CC766 /* GenerationOptions+Defaults.swift */; };
 		CD49933D590AD60B415598EE /* UnavailableOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375FB38423AC0B77E463B1F7 /* UnavailableOverlay.swift */; };
 		D00855980BD91C695553C351 /* CloudProviderLoginButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05B419486C78A41275EABDD /* CloudProviderLoginButton.swift */; };
@@ -165,12 +169,14 @@
 		D96011C8B5D8B9C9B0709477 /* CharacterDescriptionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D9E5531F937CE56ADB0198 /* CharacterDescriptionValidator.swift */; };
 		D99BF5BA755F7DDFD9A2709D /* SqueezeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0803EDC67C88DDF7BE27D24 /* SqueezeButton.swift */; };
 		DC6F62ECC372AFDE96B8F610 /* ShortcutStoryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D042474E0F78738D3CB66A /* ShortcutStoryRequest.swift */; };
+		DDAF57D9A753FDC2CD007DA4 /* PageTurnState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3451E8F951A8D9247FDAB75 /* PageTurnState.swift */; };
 		DDCFB0B59AD4EE0D0B03D4DB /* RemoteStoryGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049E2F347E23FB900283D775 /* RemoteStoryGenerator.swift */; };
 		DE7A5D4B848E0A95CE5DA05D /* MacGenerationProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDB6356A28BDA1C0929920D /* MacGenerationProgressView.swift */; };
 		DFF2672F539D2BADFC1E210F /* PlatformImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC609FC9A2B05469549394F /* PlatformImage.swift */; };
 		E15C84767B5A74E6DAE78B38 /* IllustrationGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86CF76180F3DD78A2B946383 /* IllustrationGenerator.swift */; };
 		E538F19E295D678543D62025 /* IllustrationPromptRewrite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3D7970973159E83B8BF8 /* IllustrationPromptRewrite.swift */; };
 		ED0B304553A81731C7845467 /* PDFRenderer+macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4F66E397C85DABACA34BD7 /* PDFRenderer+macOS.swift */; };
+		ED9F8499DDEEC1B942365629 /* PageTurnEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBEE705247A789AB1AB0D8A /* PageTurnEffect.swift */; };
 		EFAE6A6B91EE57BA1959D835 /* CloudTextGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5755B3133929F71D3B363834 /* CloudTextGenerator.swift */; };
 		F05A0E5EC507E017441C6815 /* EPUBRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23B538248D7C245F002827E1 /* EPUBRendering.swift */; };
 		F1AF15770F50E0337A66DB6D /* StoryJuicerGlassTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C5397FB4C868DFF2016FD4 /* StoryJuicerGlassTokens.swift */; };
@@ -205,6 +211,7 @@
 		37BF3D7970973159E83B8BF8 /* IllustrationPromptRewrite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationPromptRewrite.swift; sourceTree = "<group>"; };
 		39563DA81B4BFA3A8A8CC766 /* GenerationOptions+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenerationOptions+Defaults.swift"; sourceTree = "<group>"; };
 		3C2A0E5A140FC8AE89B47F5D /* OpenAICompatibleClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAICompatibleClient.swift; sourceTree = "<group>"; };
+		3DBEE705247A789AB1AB0D8A /* PageTurnEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTurnEffect.swift; sourceTree = "<group>"; };
 		40348DD12A8429E9CBE2A24F /* BookReaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReaderViewModel.swift; sourceTree = "<group>"; };
 		417624B2B032CF3FA26F7ED5 /* CloudImageGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudImageGenerator.swift; sourceTree = "<group>"; };
 		421AE84EC5FD7E61E3D24419 /* CreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationViewModel.swift; sourceTree = "<group>"; };
@@ -257,6 +264,7 @@
 		AFB879FD47BE594F3328938C /* StoryFox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryFox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5A07AFF2F430B55881DE6FA /* StoredStorybook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredStorybook.swift; sourceTree = "<group>"; };
 		B5C8B484B662FA846071FD0D /* IOSExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSExportView.swift; sourceTree = "<group>"; };
+		B659227CA456616AE515375D /* StoryInfoSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryInfoSheet.swift; sourceTree = "<group>"; };
 		B66D1AA8AD08BD66E65B426A /* IOSGenerationProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSGenerationProgressView.swift; sourceTree = "<group>"; };
 		BC7B4A619552F5482DBC9798 /* StoryQAModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQAModels.swift; sourceTree = "<group>"; };
 		BEC609FC9A2B05469549394F /* PlatformImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformImage.swift; sourceTree = "<group>"; };
@@ -268,6 +276,7 @@
 		CFBD50FB4E1A6901D6DF83EE /* StoryFoxShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryFoxShortcuts.swift; sourceTree = "<group>"; };
 		D034CD483BD2374E56774339 /* PDFRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFRendering.swift; sourceTree = "<group>"; };
 		D260737C3E0ADED961E1D928 /* ImagePromptEnricher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePromptEnricher.swift; sourceTree = "<group>"; };
+		D3451E8F951A8D9247FDAB75 /* PageTurnState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTurnState.swift; sourceTree = "<group>"; };
 		D64228589CE83CF12F9737CD /* PageOverviewGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageOverviewGrid.swift; sourceTree = "<group>"; };
 		D7D042474E0F78738D3CB66A /* ShortcutStoryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutStoryRequest.swift; sourceTree = "<group>"; };
 		D968E428DCB03D6E685B300D /* StoryPDFRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryPDFRenderer.swift; sourceTree = "<group>"; };
@@ -498,11 +507,14 @@
 				9DF195CFFEE2055F5EAE3712 /* PageEditSheet.swift */,
 				D64228589CE83CF12F9737CD /* PageOverviewGrid.swift */,
 				1CFFAC355E53D85F1171749F /* PageThumbnail.swift */,
+				3DBEE705247A789AB1AB0D8A /* PageTurnEffect.swift */,
+				D3451E8F951A8D9247FDAB75 /* PageTurnState.swift */,
 				BED3C794DEB91FED9BEE6189 /* PaperTextureOverlay.swift */,
 				60FA528ECA965557746FBEE1 /* ReportIssueSheet.swift */,
 				279BE085C4013B45A6A8B99E /* SafetyInfoSheet.swift */,
 				94DDDC800E10F3D73BF26FAC /* SettingsPanelStyle.swift */,
 				F0803EDC67C88DDF7BE27D24 /* SqueezeButton.swift */,
+				B659227CA456616AE515375D /* StoryInfoSheet.swift */,
 				A9C5397FB4C868DFF2016FD4 /* StoryJuicerGlassTokens.swift */,
 				DDDC86776CF9946190CC7A70 /* StoryJuicerMotion.swift */,
 				A5B4B87EE5BD03F3480E09D7 /* StoryJuicerTypography.swift */,
@@ -683,6 +695,8 @@
 				FDE549A5D5FA215555B1C573 /* PageEditSheet.swift in Sources */,
 				C6A9D3AB85C625CF91419931 /* PageOverviewGrid.swift in Sources */,
 				F309B2020FA4A5B9FF306BFC /* PageThumbnail.swift in Sources */,
+				272BD3592583BD21CC265C11 /* PageTurnEffect.swift in Sources */,
+				CA80A4946BFE71F6CB409764 /* PageTurnState.swift in Sources */,
 				5EDC3EAB41DBEB544667359E /* PaperTextureOverlay.swift in Sources */,
 				DFF2672F539D2BADFC1E210F /* PlatformImage.swift in Sources */,
 				8D008B15D99AF1CCD5E0440B /* PromptAnalysis.swift in Sources */,
@@ -701,6 +715,7 @@
 				D915B8CCF44EC7C84D678892 /* StoryFoxShortcuts.swift in Sources */,
 				8A7E9F092D9B3223CEAFBE3E /* StoryGenerator.swift in Sources */,
 				8513C1380DD98D66924BEC73 /* StoryImageGenerating.swift in Sources */,
+				2D3DB80829269A852891A835 /* StoryInfoSheet.swift in Sources */,
 				F1AF15770F50E0337A66DB6D /* StoryJuicerGlassTokens.swift in Sources */,
 				99BEFFF3734205C8CFBB54B1 /* StoryJuicerMotion.swift in Sources */,
 				88385477D8F39D70753F59A2 /* StoryJuicerTypography.swift in Sources */,
@@ -772,6 +787,8 @@
 				699D5E1DDA2D90F4FF887108 /* PageEditSheet.swift in Sources */,
 				530D119C746E37BF9E9F9161 /* PageOverviewGrid.swift in Sources */,
 				D7D4D98EC11E002EEBAECFDF /* PageThumbnail.swift in Sources */,
+				ED9F8499DDEEC1B942365629 /* PageTurnEffect.swift in Sources */,
+				DDAF57D9A753FDC2CD007DA4 /* PageTurnState.swift in Sources */,
 				A38A25969D2B322189C207D1 /* PaperTextureOverlay.swift in Sources */,
 				D65465D328CA2A926D9FA897 /* PlatformImage.swift in Sources */,
 				3A7E84A8C64CC9C7FAAC9AD7 /* PromptAnalysis.swift in Sources */,
@@ -793,6 +810,7 @@
 				3EE9DE3B191B856ED4286DCE /* StoryFoxShortcuts.swift in Sources */,
 				103B50409CCDCE857A27F1B5 /* StoryGenerator.swift in Sources */,
 				4F278300638D65865F318E06 /* StoryImageGenerating.swift in Sources */,
+				0C254D099D969AACBB1F6C5F /* StoryInfoSheet.swift in Sources */,
 				3407CA77122526DDE8B89B8C /* StoryJuicerGlassTokens.swift in Sources */,
 				A629F10B2A1C0567367E7A94 /* StoryJuicerMotion.swift in Sources */,
 				C56E545B77EA9A9A07E02627 /* StoryJuicerTypography.swift in Sources */,
@@ -910,7 +928,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Resources/StoryFox.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Resources/StoryFox-Info.plist";
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
@@ -919,7 +937,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = 1.7.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jakerains.StoryFox;
 				PRODUCT_NAME = StoryFox;
 				SDKROOT = macosx;
@@ -1016,7 +1034,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Resources/StoryFox.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Resources/StoryFox-Info.plist";
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
@@ -1025,7 +1043,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = 1.7.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jakerains.StoryFox;
 				PRODUCT_NAME = StoryFox;
 				SDKROOT = macosx;
