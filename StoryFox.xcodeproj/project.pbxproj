@@ -76,6 +76,7 @@
 		6B278792C41F29FD28DEE92A /* HuggingFaceOAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845E9C7149836BB55336C941 /* HuggingFaceOAuth.swift */; };
 		6CB7DF03B5278F3C6561AC04 /* BookReaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40348DD12A8429E9CBE2A24F /* BookReaderViewModel.swift */; };
 		6CCC288469272CA7DF4BC912 /* MLXStoryGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A989A272CF8EF85C157AF9DC /* MLXStoryGenerator.swift */; };
+		6E49698DB8720F8DB483FBD7 /* CharacterDescriptionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D9E5531F937CE56ADB0198 /* CharacterDescriptionValidator.swift */; };
 		70A06D69A128054AFD3AADF4 /* SettingsPanelStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DDDC800E10F3D73BF26FAC /* SettingsPanelStyle.swift */; };
 		70E769DFFB161BFBCA3607DD /* ImagePlaygroundImageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193651E2CD6B873D3B416F98 /* ImagePlaygroundImageGenerator.swift */; };
 		727B452A4B3D57DAB28CE815 /* MacBookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2578B7D4BBED86EC50BCC267 /* MacBookReaderView.swift */; };
@@ -149,6 +150,7 @@
 		D6A19B6BE398E3DB44E08948 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA7660D344DF49A6D4D33C0 /* Color+Theme.swift */; };
 		D7D4D98EC11E002EEBAECFDF /* PageThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFFAC355E53D85F1171749F /* PageThumbnail.swift */; };
 		D915B8CCF44EC7C84D678892 /* StoryFoxShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD50FB4E1A6901D6DF83EE /* StoryFoxShortcuts.swift */; };
+		D96011C8B5D8B9C9B0709477 /* CharacterDescriptionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D9E5531F937CE56ADB0198 /* CharacterDescriptionValidator.swift */; };
 		D99BF5BA755F7DDFD9A2709D /* SqueezeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0803EDC67C88DDF7BE27D24 /* SqueezeButton.swift */; };
 		DC6F62ECC372AFDE96B8F610 /* ShortcutStoryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D042474E0F78738D3CB66A /* ShortcutStoryRequest.swift */; };
 		DDCFB0B59AD4EE0D0B03D4DB /* RemoteStoryGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049E2F347E23FB900283D775 /* RemoteStoryGenerator.swift */; };
@@ -251,6 +253,7 @@
 		D968E428DCB03D6E685B300D /* StoryPDFRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryPDFRenderer.swift; sourceTree = "<group>"; };
 		DDDC86776CF9946190CC7A70 /* StoryJuicerMotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryJuicerMotion.swift; sourceTree = "<group>"; };
 		E05B419486C78A41275EABDD /* CloudProviderLoginButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudProviderLoginButton.swift; sourceTree = "<group>"; };
+		E1D9E5531F937CE56ADB0198 /* CharacterDescriptionValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDescriptionValidator.swift; sourceTree = "<group>"; };
 		E4AC2D8DD138CAE566DE7C2A /* StoryImageGenerating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryImageGenerating.swift; sourceTree = "<group>"; };
 		E6003A5EB9DB3B34D6CA5AC5 /* SettingsSidebarRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSidebarRow.swift; sourceTree = "<group>"; };
 		EF5CA9A4C193548F64944800 /* MacCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCreationView.swift; sourceTree = "<group>"; };
@@ -290,6 +293,7 @@
 		11C9B6A1B28F39C13E93CCAE /* Generation */ = {
 			isa = PBXGroup;
 			children = (
+				E1D9E5531F937CE56ADB0198 /* CharacterDescriptionValidator.swift */,
 				417624B2B032CF3FA26F7ED5 /* CloudImageGenerator.swift */,
 				6DF1548BFB2E8BCDD2A5B217 /* CloudProviderTypes.swift */,
 				5755B3133929F71D3B363834 /* CloudTextGenerator.swift */,
@@ -611,6 +615,7 @@
 			files = (
 				A89491B98B947B0F37F66EDB /* BookFormat.swift in Sources */,
 				6CB7DF03B5278F3C6561AC04 /* BookReaderViewModel.swift in Sources */,
+				6E49698DB8720F8DB483FBD7 /* CharacterDescriptionValidator.swift in Sources */,
 				9EE014C987A9F270DB9F63BD /* CloudCredentialStore.swift in Sources */,
 				A1C75E651DAB113AD3793C94 /* CloudImageGenerator.swift in Sources */,
 				91D941B1F77DA98E53CA72AA /* CloudModelListCache.swift in Sources */,
@@ -688,6 +693,7 @@
 				79E7A8C009C969B63E960D55 /* AboutSettingsTab.swift in Sources */,
 				B182EC2AE3F55D482834BEDE /* BookFormat.swift in Sources */,
 				C3DB3430BF9E01ADFFCA285A /* BookReaderViewModel.swift in Sources */,
+				D96011C8B5D8B9C9B0709477 /* CharacterDescriptionValidator.swift in Sources */,
 				897B081E6815C0B69350A816 /* CloudCredentialStore.swift in Sources */,
 				5EDC5105FD329F124EBD172D /* CloudImageGenerator.swift in Sources */,
 				7DA9BBAD0EE0F42D02EBEA26 /* CloudModelListCache.swift in Sources */,

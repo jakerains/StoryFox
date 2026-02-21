@@ -47,6 +47,7 @@ final class IllustrationGenerator {
     func generateIllustrations(
         for pages: [StoryPage],
         coverPrompt: String,
+        characterDescriptions: String = "",
         style: IllustrationStyle,
         format: BookFormat = .standard,
         onImageReady: @MainActor @Sendable (Int, CGImage) -> Void
@@ -59,6 +60,10 @@ final class IllustrationGenerator {
         state = .generating(currentPage: 0, completedCount: 0, totalCount: totalCount)
         let sessionStart = ContinuousClock.now
 
+        // Build character prefix once, prepend to all prompts for consistency
+        let charPrefix = Self.buildCharacterPrefix(from: characterDescriptions)
+        let enrichedCover = charPrefix + coverPrompt
+
         let semaphore = AsyncSemaphore(limit: GenerationConfig.maxConcurrentImages)
         var completedCount = 0
         var failedJobs: [(index: Int, prompt: String)] = []
@@ -70,36 +75,37 @@ final class IllustrationGenerator {
                 defer { Task { await semaphore.signal() } }
                 do {
                     let image = try await self.generateSingleImage(
-                        prompt: coverPrompt,
+                        prompt: enrichedCover,
                         style: style,
                         format: format
                     )
-                    return (0, coverPrompt, image)
+                    return (0, enrichedCover, image)
                 } catch is CancellationError {
                     throw CancellationError()
                 } catch {
                     Self.logger.warning("Cover image failed in parallel pass: \(String(describing: error), privacy: .public)")
-                    return (0, coverPrompt, nil)
+                    return (0, enrichedCover, nil)
                 }
             }
 
             // Page illustrations (index = pageNumber)
             for page in pages {
+                let enrichedPrompt = charPrefix + page.imagePrompt
                 group.addTask { [style] in
                     await semaphore.wait()
                     defer { Task { await semaphore.signal() } }
                     do {
                         let image = try await self.generateSingleImage(
-                            prompt: page.imagePrompt,
+                            prompt: enrichedPrompt,
                             style: style,
                             format: format
                         )
-                        return (page.pageNumber, page.imagePrompt, image)
+                        return (page.pageNumber, enrichedPrompt, image)
                     } catch is CancellationError {
                         throw CancellationError()
                     } catch {
                         Self.logger.warning("Page \(page.pageNumber) failed in parallel pass: \(String(describing: error), privacy: .public)")
-                        return (page.pageNumber, page.imagePrompt, nil)
+                        return (page.pageNumber, enrichedPrompt, nil)
                     }
                 }
             }
@@ -215,8 +221,9 @@ final class IllustrationGenerator {
         var lastError: Error = IllustrationError.noImageGenerated
         lastStatusMessage = nil
         let allVariantsStart = ContinuousClock.now
+        let hasCharPrefix = prompt.hasPrefix("Characters: ")
         var promptVariants = [
-            ContentSafetyPolicy.safeIllustrationPrompt(prompt),
+            ContentSafetyPolicy.safeIllustrationPrompt(prompt, extendedLimit: hasCharPrefix),
             shortenedScenePrompt(from: prompt),
             highReliabilityIllustrationPrompt(from: prompt),
             fallbackIllustrationPrompt(from: prompt),
@@ -322,48 +329,54 @@ final class IllustrationGenerator {
         throw lastError
     }
 
-    private func shortenedScenePrompt(from prompt: String) -> String {
-        let sanitized = ContentSafetyPolicy.sanitizeConcept(prompt)
-        let words = sanitized
-            .replacingOccurrences(of: #"[^\p{L}\p{N}\s]"#, with: " ", options: .regularExpression)
-            .split(whereSeparator: \.isWhitespace)
-            .prefix(18)
-            .joined(separator: " ")
+    /// Split a prompt into character prefix and scene text.
+    /// Character-enriched prompts have the format "Characters: ... Scene: ..."
+    /// The prefix is preserved intact across all fallback variants so character
+    /// consistency is never lost during retries.
+    private func splitCharacterPrefix(from prompt: String) -> (prefix: String, scene: String) {
+        guard prompt.hasPrefix("Characters: "),
+              let sceneRange = prompt.range(of: ". Scene: ") else {
+            return ("", prompt)
+        }
+        let prefix = String(prompt[..<sceneRange.upperBound])
+        let scene = String(prompt[sceneRange.upperBound...])
+        return (prefix, scene)
+    }
 
-        return words.isEmpty ? "friendly animals in a sunny meadow" : words
+    private func shortenedScenePrompt(from prompt: String) -> String {
+        let (prefix, scene) = splitCharacterPrefix(from: prompt)
+        let words = extractKeywords(from: scene, count: 18)
+        let sceneText = words.isEmpty ? "friendly animals in a sunny meadow" : words
+        return prefix + sceneText
     }
 
     private func highReliabilityIllustrationPrompt(from prompt: String) -> String {
-        let sanitized = ContentSafetyPolicy.sanitizeConcept(prompt)
-        let words = sanitized
-            .replacingOccurrences(of: #"[^\p{L}\p{N}\s]"#, with: " ", options: .regularExpression)
-            .split(whereSeparator: \.isWhitespace)
-            .prefix(12)
-            .joined(separator: " ")
-
-        return words.isEmpty ? "friendly animals playing together" : words
+        let (prefix, scene) = splitCharacterPrefix(from: prompt)
+        let words = extractKeywords(from: scene, count: 12)
+        let sceneText = words.isEmpty ? "friendly animals playing together" : words
+        return prefix + sceneText
     }
 
     private func fallbackIllustrationPrompt(from prompt: String) -> String {
-        let sanitized = ContentSafetyPolicy.sanitizeConcept(prompt)
-        let words = sanitized
-            .replacingOccurrences(of: #"[^\p{L}\p{N}\s]"#, with: " ", options: .regularExpression)
-            .split(whereSeparator: \.isWhitespace)
-            .prefix(8)
-            .joined(separator: " ")
-
-        return words.isEmpty ? "happy animals in a garden" : "\(words) in a cheerful scene"
+        let (prefix, scene) = splitCharacterPrefix(from: prompt)
+        let words = extractKeywords(from: scene, count: 8)
+        let sceneText = words.isEmpty ? "happy animals in a garden" : "\(words) in a cheerful scene"
+        return prefix + sceneText
     }
 
     private func ultraSafeIllustrationPrompt(from prompt: String) -> String {
-        let sanitized = ContentSafetyPolicy.sanitizeConcept(prompt)
-        let words = sanitized
+        let (prefix, scene) = splitCharacterPrefix(from: prompt)
+        let words = extractKeywords(from: scene, count: 4)
+        let sceneText = words.isEmpty ? "cute animals sunny day" : "\(words) sunny day"
+        return prefix + sceneText
+    }
+
+    private func extractKeywords(from text: String, count: Int) -> String {
+        ContentSafetyPolicy.sanitizeConcept(text)
             .replacingOccurrences(of: #"[^\p{L}\p{N}\s]"#, with: " ", options: .regularExpression)
             .split(whereSeparator: \.isWhitespace)
-            .prefix(4)
+            .prefix(count)
             .joined(separator: " ")
-
-        return words.isEmpty ? "cute animals sunny day" : "\(words) sunny day"
     }
 
     private func rewrittenPromptFromFoundationModel(originalPrompt: String) async -> String? {
@@ -471,6 +484,15 @@ final class IllustrationGenerator {
         lastStatusMessage = nil
         variantSuccessCounts = [:]
         state = .idle
+    }
+
+    /// Build a character description prefix from the LLM-generated character sheet.
+    /// Sanitizes once and formats for prepending to image prompts.
+    static func buildCharacterPrefix(from descriptions: String) -> String {
+        let trimmed = descriptions.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "" }
+        let sanitized = ContentSafetyPolicy.sanitizeConcept(trimmed, maxLength: 200)
+        return "Characters: \(sanitized). Scene: "
     }
 }
 

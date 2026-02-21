@@ -20,18 +20,6 @@ final class StoryGenerator {
     private(set) var state: StoryGenerationState = .idle
     private var generationTask: Task<Void, Never>?
 
-    private static let systemInstructions = """
-        You are an award-winning children's storybook author. \
-        You write engaging, age-appropriate stories for children ages 3-8. \
-        Your stories have clear beginnings, middles, and endings. \
-        Each page has vivid, simple prose that's fun to read aloud. \
-        You create detailed scene descriptions that would make beautiful illustrations. \
-        Stories should have a positive message or gentle moral. \
-        Safety requirements are strict and non-negotiable: \
-        never include violence, weapons, gore, horror, sexual content, nudity, substance use, hate, abuse, or self-harm. \
-        If the concept hints at unsafe content, reinterpret it into a gentle, child-safe adventure.
-        """
-
     /// Check if the on-device language model is available.
     var isAvailable: Bool {
         SystemLanguageModel.default.availability == .available
@@ -108,17 +96,14 @@ final class StoryGenerator {
         onProgress: @escaping @MainActor @Sendable (String) -> Void
     ) async throws -> StoryBook {
         let session = LanguageModelSession(
-            instructions: Self.systemInstructions
+            instructions: StoryPromptTemplates.systemInstructions
         )
 
         let safeConcept = ContentSafetyPolicy.sanitizeConcept(concept)
-        let prompt = """
-            Story concept: <concept>\(safeConcept)</concept>. \
-            Create a \(pageCount)-page children's storybook based on that concept. \
-            Generate exactly \(pageCount) pages. Number them from 1 to \(pageCount). \
-            Each page should have 2-4 sentences of story text and a detailed illustration prompt. \
-            Keep the story warm, comforting, and suitable for ages 3-8.
-            """
+        let prompt = StoryPromptTemplates.structuredOutputPrompt(
+            concept: safeConcept,
+            pageCount: pageCount
+        )
 
         let options = GenerationOptions(
             temperature: Double(GenerationConfig.defaultTemperature),

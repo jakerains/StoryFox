@@ -222,6 +222,12 @@ body {
   pointer-events: none;
 }
 
+@media (max-width: 639px) {
+  .bento-hero {
+    padding: 1.25rem;
+  }
+}
+
 .bento-compact {
   display: flex;
   align-items: flex-start;

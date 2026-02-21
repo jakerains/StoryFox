@@ -31,7 +31,7 @@ const styles = [
 export function StylesShowcase() {
   return (
     <section id="styles" className="relative py-20 sm:py-28 overflow-hidden">
-      <div className="glow-amber pointer-events-none absolute -left-32 top-0 h-[400px] w-[400px]" />
+      <div className="glow-amber pointer-events-none absolute -left-32 top-0 hidden h-[400px] w-[400px] sm:block" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -49,9 +49,9 @@ export function StylesShowcase() {
           </p>
         </motion.div>
 
-        {/* Fan layout */}
+        {/* Fan layout — desktop only */}
         <motion.div
-          className="flex items-center justify-center"
+          className="hidden sm:flex items-center justify-center"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -81,7 +81,7 @@ export function StylesShowcase() {
                 transition={{ duration: 0.3 }}
               >
                 <div
-                  className="relative w-[220px] sm:w-[260px] md:w-[300px] overflow-hidden rounded-2xl ring-1 ring-black/8 transition-shadow duration-300 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
+                  className="relative w-[260px] md:w-[300px] overflow-hidden rounded-2xl ring-1 ring-black/8 transition-shadow duration-300 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
                   style={{
                     boxShadow: `0 ${8 + Math.abs(style.rotation)}px ${24 + Math.abs(style.rotation) * 2}px rgba(0,0,0,0.12)`,
                   }}
@@ -95,8 +95,8 @@ export function StylesShowcase() {
                       sizes="(max-width: 768px) 260px, 300px"
                     />
 
-                    {/* Overlay that reveals on hover (always visible on mobile) */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:opacity-0 max-sm:opacity-100">
+                    {/* Overlay that reveals on hover */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                       <p className="font-serif text-sm leading-snug text-white/90">
                         &ldquo;{style.tagline}&rdquo;
                       </p>
@@ -114,6 +114,55 @@ export function StylesShowcase() {
               </motion.div>
             ))}
           </div>
+        </motion.div>
+
+        {/* Stacked layout — mobile only */}
+        <motion.div
+          className="flex flex-col items-center gap-8 sm:hidden"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          {styles.map((style) => (
+            <motion.div
+              key={style.name}
+              variants={fadeUpVariants}
+              className="flex w-full max-w-[280px] flex-col items-center"
+            >
+              <div
+                className="relative w-full overflow-hidden rounded-2xl ring-1 ring-black/8"
+                style={{
+                  boxShadow: `0 8px 24px rgba(0,0,0,0.12)`,
+                }}
+              >
+                <div className="relative aspect-[3/4]">
+                  <Image
+                    src={style.image}
+                    alt={`${style.name} style storybook illustration`}
+                    fill
+                    className="object-cover"
+                    sizes="280px"
+                  />
+
+                  {/* Tagline overlay — always visible on mobile */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5">
+                    <p className="font-serif text-sm leading-snug text-white/90">
+                      &ldquo;{style.tagline}&rdquo;
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Label below */}
+              <p
+                className="mt-3 text-center font-serif text-sm font-semibold"
+                style={{ color: style.accentColor }}
+              >
+                {style.name}
+              </p>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </section>

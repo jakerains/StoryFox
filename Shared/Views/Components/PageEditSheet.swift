@@ -19,6 +19,22 @@ struct PageEditSheet: View {
         return viewModel.regeneratingPages.contains(idx)
     }
 
+    private var isRegeneratingCurrentText: Bool {
+        guard let page = viewModel.currentStoryPage else { return false }
+        return viewModel.regeneratingText.contains(page.pageNumber)
+    }
+
+    /// The original image prompt for the current page.
+    private var originalImagePrompt: String? {
+        if viewModel.isTitlePage {
+            return ContentSafetyPolicy.safeCoverPrompt(
+                title: viewModel.storyBook.title,
+                concept: viewModel.storyBook.moral
+            )
+        }
+        return viewModel.currentStoryPage?.imagePrompt
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             header
@@ -91,6 +107,7 @@ struct PageEditSheet: View {
                 label: "Author Line",
                 placeholder: "Written by StoryFox",
                 text: $editedText,
+                showRegenerate: false,
                 onSave: {
                     viewModel.updateAuthorLine(editedText)
                     hasEdited = true
@@ -110,6 +127,7 @@ struct PageEditSheet: View {
                 placeholder: "Once upon a time...",
                 text: $editedText,
                 lineLimit: 6,
+                showRegenerate: true,
                 onSave: {
                     if let page = viewModel.currentStoryPage {
                         viewModel.updatePageText(pageNumber: page.pageNumber, newText: editedText)
@@ -131,6 +149,7 @@ struct PageEditSheet: View {
                 placeholder: "Kindness and curiosity guide every adventure.",
                 text: $editedText,
                 lineLimit: 3,
+                showRegenerate: false,
                 onSave: {
                     viewModel.updateMoral(editedText)
                     hasEdited = true
@@ -146,6 +165,7 @@ struct PageEditSheet: View {
         placeholder: String,
         text: Binding<String>,
         lineLimit: Int = 1,
+        showRegenerate: Bool = false,
         onSave: @escaping () -> Void
     ) -> some View {
         VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
@@ -171,20 +191,59 @@ struct PageEditSheet: View {
                 cornerRadius: StoryJuicerGlassTokens.Radius.chip
             )
 
-            Button {
-                onSave()
-            } label: {
-                Label("Save Changes", systemImage: "checkmark.circle.fill")
-                    .font(StoryJuicerTypography.uiMetaStrong)
+            HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                Button {
+                    onSave()
+                } label: {
+                    Label("Save Changes", systemImage: "checkmark.circle.fill")
+                        .font(StoryJuicerTypography.uiMetaStrong)
+                }
+                .buttonStyle(.glassProminent)
+                .tint(Color.sjCoral)
+                .controlSize(.small)
+
+                if showRegenerate {
+                    Button {
+                        guard let page = viewModel.currentStoryPage else { return }
+                        Task {
+                            await viewModel.regeneratePageText(pageNumber: page.pageNumber)
+                            // Update the editor with the new text
+                            if let updated = viewModel.currentStoryPage {
+                                editedText = updated.text
+                                customImagePrompt = updated.imagePrompt
+                            }
+                        }
+                    } label: {
+                        Label(
+                            isRegeneratingCurrentText ? "Rewriting..." : "Regenerate Text",
+                            systemImage: "arrow.clockwise"
+                        )
+                        .font(StoryJuicerTypography.uiMetaStrong)
+                    }
+                    .buttonStyle(.glass)
+                    .controlSize(.small)
+                    .disabled(isRegeneratingCurrentText)
+
+                    if isRegeneratingCurrentText {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
             }
-            .buttonStyle(.glassProminent)
-            .tint(Color.sjCoral)
-            .controlSize(.small)
 
             if hasEdited {
                 Text("Changes saved")
                     .font(StoryJuicerTypography.uiMeta)
                     .foregroundStyle(Color.sjGold)
+            }
+
+            // Show text regeneration error
+            if let page = viewModel.currentStoryPage,
+               let error = viewModel.textRegenerationErrors[page.pageNumber] {
+                Text(error)
+                    .font(StoryJuicerTypography.uiMeta)
+                    .foregroundStyle(Color.sjCoral)
+                    .lineLimit(3)
             }
         }
         .padding(StoryJuicerGlassTokens.Spacing.medium)
@@ -200,11 +259,33 @@ struct PageEditSheet: View {
                 .font(StoryJuicerTypography.uiMetaStrong)
                 .foregroundStyle(Color.sjGlassInk)
 
-            Text("Optionally describe what you'd like, or leave blank to regenerate with the original prompt.")
+            // Show the original prompt so user can see what generated the image
+            if let prompt = originalImagePrompt {
+                VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
+                    Text("Current Prompt")
+                        .font(StoryJuicerTypography.uiMeta)
+                        .foregroundStyle(Color.sjSecondaryText)
+
+                    Text(prompt)
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundStyle(Color.sjSecondaryText)
+                        .italic()
+                        .lineLimit(6)
+                        .textSelection(.enabled)
+                }
+                .padding(StoryJuicerGlassTokens.Spacing.small)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .sjGlassCard(
+                    tint: .sjGlassWeak,
+                    cornerRadius: StoryJuicerGlassTokens.Radius.chip
+                )
+            }
+
+            Text("Edit the prompt below, or leave as-is to regenerate with the current prompt.")
                 .font(StoryJuicerTypography.uiMeta)
                 .foregroundStyle(Color.sjSecondaryText)
 
-            TextField("e.g. A bunny reading under a tree", text: $customImagePrompt)
+            TextField("Image prompt", text: $customImagePrompt)
                 .font(.system(.body, design: .rounded))
                 .textFieldStyle(.plain)
                 .padding(StoryJuicerGlassTokens.Spacing.small)
@@ -268,10 +349,17 @@ struct PageEditSheet: View {
     private func loadCurrentValues() {
         if viewModel.isTitlePage {
             editedText = viewModel.storyBook.authorLine
+            // Pre-fill with the cover prompt
+            customImagePrompt = ContentSafetyPolicy.safeCoverPrompt(
+                title: viewModel.storyBook.title,
+                concept: viewModel.storyBook.moral
+            )
         } else if viewModel.isEndPage {
             editedText = viewModel.storyBook.moral
         } else if let page = viewModel.currentStoryPage {
             editedText = page.text
+            // Pre-fill with the original image prompt so user can tweak it
+            customImagePrompt = page.imagePrompt
         }
     }
 }

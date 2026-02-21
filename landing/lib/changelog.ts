@@ -12,6 +12,58 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.6.0",
+    date: "2026-02-20",
+    title: "Character Consistency & Smarter Harness",
+    changes: [
+      {
+        type: "added",
+        description:
+          "Character consistency across illustrations — the app now generates a character sheet and mechanically injects it into every image prompt so characters look the same on every page",
+      },
+      {
+        type: "added",
+        description:
+          "Guided mode now asks about your hero's visual appearance first (colors, clothing, features) to anchor character consistency from the start",
+      },
+      {
+        type: "added",
+        description:
+          "Character description validation — if the AI returns weak character details, the harness extracts names and appearance from image prompts as a fallback",
+      },
+      {
+        type: "added",
+        description:
+          "JSON repair for truncated model output — small models that run out of tokens no longer cause hard failures",
+      },
+      {
+        type: "changed",
+        description:
+          "All text generators (Foundation Models, MLX, Cloud) now share a single unified prompt template instead of maintaining separate copies",
+      },
+      {
+        type: "changed",
+        description:
+          "Guided mode Q&A answers are now organized into structured sections (Characters, Setting, Plot, Tone) instead of a flat dump, helping the small model produce better stories",
+      },
+      {
+        type: "changed",
+        description:
+          "Image retry fallbacks now preserve character descriptions — shorter prompt variants only trim the scene, never the character identity",
+      },
+      {
+        type: "changed",
+        description:
+          "Landing page visual refresh with updated illustrations and layout improvements",
+      },
+      {
+        type: "fixed",
+        description:
+          "Forward/back navigation buttons in the reader are now clickable across the entire circle, not just the chevron icon",
+      },
+    ],
+  },
+  {
     version: "1.5.0",
     date: "2026-02-20",
     title: "Modular Settings & Visual Polish",

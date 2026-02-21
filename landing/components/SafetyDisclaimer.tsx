@@ -22,7 +22,7 @@ export function SafetyDisclaimer() {
               alt="A fox sitting at a cozy desk, surrounded by a warm privacy shield glow"
               width={1536}
               height={1024}
-              className="h-52 w-full object-cover sm:h-72"
+              className="h-36 w-full object-cover sm:h-52 md:h-72"
             />
           </motion.div>
 

@@ -61,7 +61,7 @@ struct ContentSafetyPolicy: Sendable {
         return "\(safeTitle) book cover, \(safeConcept), warm whimsical colors, friendly characters"
     }
 
-    static func safeIllustrationPrompt(_ prompt: String) -> String {
+    static func safeIllustrationPrompt(_ prompt: String, extendedLimit: Bool = false) -> String {
         var sanitized = sanitizeConcept(prompt)
 
         for rule in illustrationPromptReplacements {
@@ -73,11 +73,11 @@ struct ContentSafetyPolicy: Sendable {
         }
 
         // Keep prompts short and purely descriptive for Image Playground.
-        // The style parameter already handles art style — instructional
-        // wrappers like "Create one cheerful illustration of..." confuse
-        // the diffusion model and can trigger content filters.
-        if sanitized.count > 180 {
-            sanitized = String(sanitized.prefix(180))
+        // Extended limit (300) accommodates character description prefix (~120 chars)
+        // plus scene description (~180 chars).
+        let limit = extendedLimit ? 300 : 180
+        if sanitized.count > limit {
+            sanitized = String(sanitized.prefix(limit))
         }
 
         return sanitized

@@ -127,6 +127,7 @@ final class CreationViewModel {
                 try await illustrationGenerator.generateIllustrations(
                     for: book.pages,
                     coverPrompt: coverPrompt,
+                    characterDescriptions: book.characterDescriptions,
                     style: selectedStyle,
                     format: selectedFormat
                 ) { [weak self] index, image in

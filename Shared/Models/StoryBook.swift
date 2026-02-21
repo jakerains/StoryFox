@@ -12,6 +12,9 @@ struct StoryBook {
     @Guide(description: "A one-sentence summary of the story's moral or theme")
     var moral: String
 
+    @Guide(description: "A brief visual reference for each main character. List each character on one line: name, species or type, colors, clothing, and one distinguishing feature. Example line: 'Luna - small white rabbit, pink dress, floppy left ear, blue eyes'")
+    var characterDescriptions: String
+
     @Guide(description: "The story pages array - generate exactly the number of pages the user requested")
     var pages: [StoryPage]
 }

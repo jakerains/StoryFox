@@ -140,7 +140,7 @@ export function HowItWorks() {
           </div>
         </motion.div>
 
-        {/* Mobile: vertical cards */}
+        {/* Mobile: stacked visual cards */}
         <motion.div
           className="relative lg:hidden"
           variants={staggerContainer}
@@ -148,43 +148,41 @@ export function HowItWorks() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
         >
-          <div className="flex flex-col gap-8">
+          <div className="mx-auto flex max-w-sm flex-col gap-6">
             {steps.map((step) => (
               <motion.div
                 key={step.number}
                 variants={fadeUpVariants}
-                className="flex items-start gap-4"
+                className="overflow-hidden rounded-2xl border"
+                style={{
+                  borderColor: `color-mix(in srgb, ${step.color} 20%, transparent)`,
+                  boxShadow: `0 6px 20px color-mix(in srgb, ${step.color} 10%, transparent)`,
+                }}
               >
-                {/* Illustration — rounded rectangle, not circle */}
-                <div
-                  className="shrink-0 overflow-hidden rounded-xl border"
-                  style={{
-                    borderColor: `color-mix(in srgb, ${step.color} 25%, transparent)`,
-                    boxShadow: `0 4px 12px color-mix(in srgb, ${step.color} 10%, transparent)`,
-                  }}
-                >
+                {/* Large illustration */}
+                <div className="relative">
                   <Image
                     src={step.image}
                     alt={step.title}
-                    width={96}
-                    height={96}
-                    className="h-24 w-24 object-cover"
+                    width={400}
+                    height={220}
+                    className="h-44 w-full object-cover"
                   />
+
+                  {/* Step badge overlapping bottom edge */}
+                  <div
+                    className="absolute -bottom-3.5 left-4 z-10 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-md"
+                    style={{ backgroundColor: step.color }}
+                  >
+                    {step.number}
+                  </div>
                 </div>
 
-                {/* Text */}
-                <div className="pt-1">
-                  <div className="mb-1 flex items-center gap-2">
-                    <span
-                      className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white"
-                      style={{ backgroundColor: step.color }}
-                    >
-                      {step.number}
-                    </span>
-                    <h3 className="font-serif text-lg font-semibold text-sj-text">
-                      {step.title}
-                    </h3>
-                  </div>
+                {/* Text below image */}
+                <div className="px-4 pb-4 pt-5">
+                  <h3 className="mb-1 font-serif text-lg font-semibold text-sj-text">
+                    {step.title}
+                  </h3>
                   <p className="text-sm leading-relaxed text-sj-secondary">
                     {step.description}
                   </p>

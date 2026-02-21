@@ -18,6 +18,7 @@ struct StoryDTO: Decodable {
     let title: String
     let authorLine: String
     let moral: String
+    let characterDescriptions: String?
     let pages: [StoryPageDTO]
 
     func toStoryBook(pageCount: Int, fallbackConcept: String) -> StoryBook {
@@ -44,10 +45,19 @@ struct StoryDTO: Decodable {
         let cleanAuthor = StoryTextCleanup.clean(authorLine)
         let cleanMoral = StoryTextCleanup.clean(moral)
 
+        // Validate character descriptions — if the model returned garbage or nothing,
+        // try to extract character references from image prompts as a fallback.
+        let validatedDescriptions = CharacterDescriptionValidator.validate(
+            descriptions: characterDescriptions ?? "",
+            pages: orderedPages,
+            title: cleanTitle
+        )
+
         return StoryBook(
             title: cleanTitle.isEmpty ? "StoryFox Book" : cleanTitle,
             authorLine: cleanAuthor.isEmpty ? "Written by StoryFox" : cleanAuthor,
             moral: cleanMoral.isEmpty ? "Kindness and curiosity guide every adventure." : cleanMoral,
+            characterDescriptions: validatedDescriptions,
             pages: orderedPages
         )
     }
@@ -127,13 +137,31 @@ enum StoryDecoding {
         }
 
         let decoder = JSONDecoder()
+
+        // Try direct decode
         if let data = trimmed.data(using: .utf8),
            let story = try? decoder.decode(StoryDTO.self, from: data) {
             return story
         }
 
+        // Try extracting JSON object from surrounding text
         if let jsonString = extractFirstJSONObjectString(from: trimmed),
            let data = jsonString.data(using: .utf8),
+           let story = try? decoder.decode(StoryDTO.self, from: data) {
+            return story
+        }
+
+        // Last resort: attempt JSON repair for truncated output from small models
+        if let repaired = repairTruncatedJSON(trimmed),
+           let data = repaired.data(using: .utf8),
+           let story = try? decoder.decode(StoryDTO.self, from: data) {
+            return story
+        }
+
+        // Also try repair on extracted JSON
+        if let jsonString = extractFirstJSONObjectString(from: trimmed),
+           let repaired = repairTruncatedJSON(jsonString),
+           let data = repaired.data(using: .utf8),
            let story = try? decoder.decode(StoryDTO.self, from: data) {
             return story
         }
@@ -187,5 +215,57 @@ enum StoryDecoding {
             return nil
         }
         return String(text[firstBrace...lastBrace])
+    }
+
+    // MARK: - JSON Repair
+
+    /// Attempt to repair truncated JSON from small models that ran out of tokens.
+    /// Closes unclosed brackets, braces, and strings to salvage partial output.
+    static func repairTruncatedJSON(_ text: String) -> String? {
+        var json = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard json.hasPrefix("{") || json.hasPrefix("[") else { return nil }
+
+        // Strip trailing comma (common truncation artifact)
+        while json.hasSuffix(",") {
+            json = String(json.dropLast()).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        // Count open brackets/braces and close them
+        var openBraces = 0
+        var openBrackets = 0
+        var inString = false
+        var prevChar: Character = " "
+
+        for char in json {
+            if char == "\"" && prevChar != "\\" {
+                inString.toggle()
+            }
+            if !inString {
+                switch char {
+                case "{": openBraces += 1
+                case "}": openBraces -= 1
+                case "[": openBrackets += 1
+                case "]": openBrackets -= 1
+                default: break
+                }
+            }
+            prevChar = char
+        }
+
+        // Close unclosed string
+        if inString {
+            json += "\""
+        }
+
+        // Close brackets and braces in reverse order of expected nesting
+        // Pages array is typically the deepest nesting level
+        for _ in 0..<max(0, openBrackets) {
+            json += "]"
+        }
+        for _ in 0..<max(0, openBraces) {
+            json += "}"
+        }
+
+        return json
     }
 }

@@ -83,14 +83,13 @@ export function Features() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {/* Hero features — two large cards with prominent images */}
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {/* Hero features — desktop: side-by-side bento cards, mobile: image-topped cards */}
+          <div className="hidden gap-5 md:grid md:grid-cols-2">
             {heroFeatures.map((feature) => (
               <motion.div key={feature.title} variants={fadeUpVariants}>
                 <div
-                  className={`bento-hero flex flex-col items-center gap-5 bg-gradient-to-br sm:flex-row sm:items-start ${feature.gradient}`}
+                  className={`bento-hero flex flex-row items-start gap-5 bg-gradient-to-br ${feature.gradient}`}
                 >
-                  {/* Image — large rounded showcase */}
                   <div
                     className="shrink-0 overflow-hidden rounded-2xl"
                     style={{
@@ -102,12 +101,10 @@ export function Features() {
                       alt={feature.title}
                       width={140}
                       height={140}
-                      className="h-[120px] w-[120px] object-cover sm:h-[140px] sm:w-[140px]"
+                      className="h-[140px] w-[140px] object-cover"
                     />
                   </div>
-
-                  {/* Text */}
-                  <div className="text-center sm:text-left">
+                  <div>
                     <h3 className="mb-2 font-serif text-2xl font-semibold text-sj-text">
                       {feature.title}
                     </h3>
@@ -120,8 +117,39 @@ export function Features() {
             ))}
           </div>
 
-          {/* Compact features — image + text rows */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Hero features — mobile: card with banner image */}
+          <div className="flex flex-col gap-5 md:hidden">
+            {heroFeatures.map((feature) => (
+              <motion.div key={feature.title} variants={fadeUpVariants}>
+                <div
+                  className="overflow-hidden rounded-2xl border"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${feature.accentColor} 20%, transparent)`,
+                    boxShadow: `0 6px 20px color-mix(in srgb, ${feature.accentColor} 10%, transparent)`,
+                  }}
+                >
+                  <Image
+                    src={feature.image}
+                    alt={feature.title}
+                    width={400}
+                    height={200}
+                    className="h-40 w-full object-cover"
+                  />
+                  <div className="px-4 pb-4 pt-4">
+                    <h3 className="mb-1 font-serif text-lg font-semibold text-sj-text">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-sj-secondary">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Compact features — desktop: image + text rows */}
+          <div className="hidden gap-4 sm:grid sm:grid-cols-2">
             {compactFeatures.map((feature) => (
               <motion.div key={feature.title} variants={fadeUpVariants}>
                 <div className="bento-compact">
@@ -141,6 +169,37 @@ export function Features() {
                   </div>
                   <div>
                     <h3 className="mb-1 font-serif text-base font-semibold text-sj-text">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-sj-secondary">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Compact features — mobile: card with banner image */}
+          <div className="flex flex-col gap-5 sm:hidden">
+            {compactFeatures.map((feature) => (
+              <motion.div key={feature.title} variants={fadeUpVariants}>
+                <div
+                  className="overflow-hidden rounded-2xl border"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${feature.color} 20%, transparent)`,
+                    boxShadow: `0 4px 16px color-mix(in srgb, ${feature.color} 10%, transparent)`,
+                  }}
+                >
+                  <Image
+                    src={feature.image}
+                    alt={feature.title}
+                    width={400}
+                    height={160}
+                    className="h-32 w-full object-cover"
+                  />
+                  <div className="px-4 pb-3 pt-3">
+                    <h3 className="mb-0.5 font-serif text-base font-semibold text-sj-text">
                       {feature.title}
                     </h3>
                     <p className="text-sm leading-relaxed text-sj-secondary">

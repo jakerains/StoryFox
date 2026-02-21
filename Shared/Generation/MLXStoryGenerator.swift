@@ -105,8 +105,8 @@ struct MLXStoryGenerator: StoryTextGenerating, Sendable {
 
         let userInput = UserInput(
             chat: [
-                .system(Self.systemInstructions),
-                .user(Self.userPrompt(concept: safeConcept, pageCount: pageCount))
+                .system(StoryPromptTemplates.jsonModeSystemInstructions),
+                .user(StoryPromptTemplates.userPrompt(concept: safeConcept, pageCount: pageCount))
             ]
         )
 
@@ -174,35 +174,5 @@ struct MLXStoryGenerator: StoryTextGenerating, Sendable {
         return HubApi(downloadBase: downloadBase)
     }
 
-    private static var systemInstructions: String {
-        """
-        You are an award-winning children's storybook writer and art director.
-        Output must be safe for ages 3-8.
-        Avoid violence, weapons, gore, horror, sexual content, nudity, substance use, hate, abuse, and self-harm.
-        Respond with JSON only.
-        """
-    }
-
-    private static func userPrompt(concept: String, pageCount: Int) -> String {
-        """
-        Create a \(pageCount)-page children's storybook from this concept: "\(concept)".
-        Return strict JSON with this exact shape:
-        {
-          "title": "string",
-          "authorLine": "string",
-          "moral": "string",
-          "pages": [
-            {
-              "pageNumber": 1,
-              "text": "2-4 child-friendly sentences",
-              "imagePrompt": "Detailed child-safe picture book illustration prompt. No text overlays."
-            }
-          ]
-        }
-        Requirements:
-        - Exactly \(pageCount) pages, numbered 1...\(pageCount).
-        - Keep language warm, gentle, and easy to read aloud.
-        - Every page prompt must be safe and suitable for children.
-        """
-    }
+    // Prompt templates are centralized in StoryPromptTemplates — no local copies.
 }

@@ -91,7 +91,7 @@ function HFLogo({ className }: { className?: string }) {
 export function HuggingFaceSection() {
   return (
     <section id="huggingface" className="relative py-20 sm:py-28">
-      <div className="glow-amber pointer-events-none absolute -right-32 top-1/3 h-[500px] w-[500px]" />
+      <div className="glow-amber pointer-events-none absolute -right-32 top-1/3 hidden h-[500px] w-[500px] sm:block" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -127,7 +127,7 @@ export function HuggingFaceSection() {
         >
           {/* Top: Why upgrade — HF logo + 4 benefit cards */}
           <motion.div
-            className="p-8 sm:p-10"
+            className="p-4 sm:p-8 md:p-10"
             style={{
               background: `linear-gradient(135deg, color-mix(in srgb, var(--sj-coral) 5%, transparent), color-mix(in srgb, var(--sj-gold) 4%, transparent))`,
             }}
@@ -149,8 +149,8 @@ export function HuggingFaceSection() {
               </h3>
             </div>
 
-            {/* 4 benefit cards in a row */}
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {/* 4 benefit cards — desktop: 4-col grid */}
+            <div className="hidden gap-4 lg:grid lg:grid-cols-4">
               {benefits.map((benefit) => (
                 <div
                   key={benefit.title}
@@ -171,7 +171,7 @@ export function HuggingFaceSection() {
                       alt={benefit.title}
                       width={100}
                       height={100}
-                      className="h-20 w-20 object-cover sm:h-[100px] sm:w-[100px]"
+                      className="h-[100px] w-[100px] object-cover"
                     />
                   </div>
                   <h4 className="mb-1 font-sans text-sm font-semibold text-sj-text">
@@ -183,6 +183,45 @@ export function HuggingFaceSection() {
                 </div>
               ))}
             </div>
+
+            {/* 4 benefit cards — mobile/tablet: full-width image-topped cards */}
+            <div className="flex flex-col gap-4 lg:hidden">
+              {benefits.map((benefit) => (
+                <div
+                  key={benefit.title}
+                  className="overflow-hidden rounded-2xl border"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${benefit.color} 20%, transparent)`,
+                    background: `color-mix(in srgb, ${benefit.color} 4%, transparent)`,
+                  }}
+                >
+                  <div className="flex items-center gap-4 p-4">
+                    <div
+                      className="shrink-0 overflow-hidden rounded-xl"
+                      style={{
+                        boxShadow: `0 4px 12px color-mix(in srgb, ${benefit.color} 12%, transparent)`,
+                      }}
+                    >
+                      <Image
+                        src={benefit.image}
+                        alt={benefit.title}
+                        width={72}
+                        height={72}
+                        className="h-[72px] w-[72px] object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="mb-0.5 font-sans text-sm font-semibold text-sj-text">
+                        {benefit.title}
+                      </h4>
+                      <p className="text-xs leading-relaxed text-sj-secondary">
+                        {benefit.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
           {/* Divider */}
@@ -190,22 +229,44 @@ export function HuggingFaceSection() {
 
           {/* Bottom: Get started steps + CTA */}
           <motion.div
-            className="bg-[var(--sj-card)]/40 p-8 sm:p-10"
+            className="bg-[var(--sj-card)]/40 p-4 sm:p-8 md:p-10"
             variants={fadeUpVariants}
           >
             <h3 className="mb-8 text-center font-serif text-xl font-semibold text-sj-text">
               Get started in 3 steps
             </h3>
 
-            {/* Horizontal steps on desktop, vertical on mobile */}
-            <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
+            {/* Desktop: horizontal steps with circles */}
+            <div className="mx-auto hidden max-w-4xl grid-cols-3 gap-6 sm:grid">
               {upgradeSteps.map((step) => (
-                <div key={step.number} className="flex items-start gap-3 sm:flex-col sm:items-center sm:text-center">
+                <div key={step.number} className="flex flex-col items-center text-center">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sj-coral font-serif text-sm font-bold text-white">
                     {step.number}
                   </div>
-                  <div className="sm:mt-2">
+                  <div className="mt-2">
                     <h4 className="mb-0.5 font-sans text-sm font-semibold text-sj-text">
+                      {step.title}
+                    </h4>
+                    <p className="text-xs leading-relaxed text-sj-secondary">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile: accent-bordered step cards */}
+            <div className="flex flex-col gap-3 sm:hidden">
+              {upgradeSteps.map((step) => (
+                <div
+                  key={step.number}
+                  className="flex items-center gap-3 rounded-xl border-l-[3px] border-sj-coral bg-[var(--sj-card)]/30 px-4 py-3"
+                >
+                  <span className="font-serif text-lg font-bold text-sj-coral">
+                    {step.number}.
+                  </span>
+                  <div>
+                    <h4 className="font-sans text-sm font-semibold text-sj-text">
                       {step.title}
                     </h4>
                     <p className="text-xs leading-relaxed text-sj-secondary">

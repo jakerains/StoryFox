@@ -32,7 +32,7 @@ export function Requirements() {
   return (
     <section id="requirements" className="relative py-14 sm:py-20">
       {/* Ambient glow */}
-      <div className="glow-amber pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2" />
+      <div className="glow-amber pointer-events-none absolute left-1/2 top-0 hidden h-[300px] w-[500px] -translate-x-1/2 sm:block" />
 
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -50,8 +50,9 @@ export function Requirements() {
           </p>
         </motion.div>
 
+        {/* Desktop: 3-column centered cards */}
         <motion.div
-          className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+          className="hidden gap-4 sm:grid sm:grid-cols-3"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
@@ -97,6 +98,59 @@ export function Requirements() {
               <p className="mt-1 text-xs leading-relaxed text-sj-secondary">
                 {req.description}
               </p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Mobile: horizontal row cards */}
+        <motion.div
+          className="flex flex-col gap-3 sm:hidden"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainer}
+        >
+          {requirements.map((req) => (
+            <motion.div
+              key={req.title}
+              variants={fadeUpVariants}
+              className="flex items-center gap-4 rounded-2xl border p-4"
+              style={{
+                borderColor: `color-mix(in srgb, ${req.color} 20%, transparent)`,
+                background: `color-mix(in srgb, var(--sj-card) 30%, transparent)`,
+              }}
+            >
+              <div
+                className="shrink-0 overflow-hidden rounded-xl"
+                style={{
+                  boxShadow: `0 4px 12px color-mix(in srgb, ${req.color} 12%, transparent)`,
+                }}
+              >
+                <Image
+                  src={req.image}
+                  alt={req.title}
+                  width={64}
+                  height={64}
+                  className="h-16 w-16 object-cover"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-serif text-base font-bold text-sj-text">
+                    {req.title}
+                  </span>
+                  <span
+                    className="text-xs font-medium"
+                    style={{ color: req.color }}
+                  >
+                    ({req.subtitle})
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs leading-relaxed text-sj-secondary">
+                  {req.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </motion.div>

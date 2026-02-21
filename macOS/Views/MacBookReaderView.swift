@@ -47,7 +47,7 @@ struct MacBookReaderView: View {
                 Button {
                     activeSheet = .pageEdit
                 } label: {
-                    Label("Edit Page", systemImage: "pencil.circle")
+                    Label("Edit Page", systemImage: "slider.horizontal.3")
                 }
                 .sjGlassToolbarItem(prominent: false)
 
@@ -227,6 +227,29 @@ struct MacBookReaderView: View {
                     .font(StoryJuicerTypography.uiMeta)
                     .foregroundStyle(Color.sjSecondaryText)
 
+                // Show the cover prompt so user can see what was attempted
+                Text(ContentSafetyPolicy.safeCoverPrompt(
+                    title: viewModel.storyBook.title,
+                    concept: viewModel.storyBook.moral
+                ))
+                .font(StoryJuicerTypography.uiMeta)
+                .foregroundStyle(Color.sjSecondaryText)
+                .italic()
+                .multilineTextAlignment(.center)
+                .lineLimit(4)
+                .textSelection(.enabled)
+                .padding(.horizontal)
+
+                // Show error if regeneration failed
+                if let error = viewModel.regenerationErrors[0] {
+                    Text(error)
+                        .font(StoryJuicerTypography.uiMeta)
+                        .foregroundStyle(Color.sjCoral)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                        .padding(.horizontal)
+                }
+
                 Button {
                     Task {
                         await viewModel.regenerateImage(index: 0)
@@ -272,9 +295,21 @@ struct MacBookReaderView: View {
                 Text(page.imagePrompt)
                     .font(StoryJuicerTypography.uiMeta)
                     .foregroundStyle(Color.sjSecondaryText)
+                    .italic()
                     .multilineTextAlignment(.center)
                     .lineLimit(4)
+                    .textSelection(.enabled)
                     .padding(.horizontal)
+
+                // Show error if regeneration failed
+                if let error = viewModel.regenerationErrors[page.pageNumber] {
+                    Text(error)
+                        .font(StoryJuicerTypography.uiMeta)
+                        .foregroundStyle(Color.sjCoral)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                        .padding(.horizontal)
+                }
 
                 Button {
                     Task {
@@ -368,6 +403,7 @@ struct MacBookReaderView: View {
                 .font(.title3.weight(.bold))
                 .foregroundStyle(Color.sjCoral)
                 .frame(width: 46, height: 46)
+                .contentShape(Circle())
                 .sjGlassCard(
                     tint: .sjGlassSoft.opacity(StoryJuicerGlassTokens.Tint.standard),
                     interactive: true,

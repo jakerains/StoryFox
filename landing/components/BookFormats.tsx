@@ -61,7 +61,7 @@ export function BookFormats() {
           viewport={{ once: true, amount: 0.15 }}
         >
           {/* Book shapes on shelf */}
-          <div className="flex items-end justify-center gap-8 sm:gap-12 md:gap-16 pb-4">
+          <div className="flex items-end justify-center gap-4 pb-4 scale-[0.7] sm:scale-100 sm:gap-12 md:gap-16 origin-bottom">
             {formats.map((format) => (
               <motion.div
                 key={format.name}
@@ -107,10 +107,10 @@ export function BookFormats() {
           </div>
 
           {/* Bookshelf */}
-          <div className="bookshelf-line w-full max-w-lg" />
+          <div className="bookshelf-line w-full max-w-[280px] sm:max-w-lg" />
 
           {/* Labels below shelf */}
-          <div className="mt-6 flex items-start justify-center gap-8 sm:gap-12 md:gap-16">
+          <div className="mt-2 flex items-start justify-center gap-3 scale-[0.7] sm:scale-100 sm:mt-6 sm:gap-12 md:gap-16 origin-top">
             {formats.map((format) => (
               <motion.div
                 key={format.name}

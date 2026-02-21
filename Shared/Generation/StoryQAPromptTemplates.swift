@@ -102,19 +102,20 @@ enum StoryQAPromptTemplates {
         switch (round, audience) {
         case (1, .kid):
             return """
-            Ask about the HERO and the PLACE. Copy this style EXACTLY:
+            Ask about what the HERO LOOKS LIKE, who they are, and the PLACE. Copy this style EXACTLY:
             {"questions": [
+              {"question": "What does your hero look like?", "suggestions": ["Bright red fur with a big fluffy tail", "Tiny with sparkly wings and a flower crown", "Big and round with polka-dot spots"]},
               {"question": "Who is the hero of your story?", "suggestions": ["A brave little bunny named Pip", "A silly dragon who can't fly yet", "A kid just like you with a magic hat"]},
-              {"question": "What makes your hero super special?", "suggestions": ["They can talk to animals!", "They have a glowing magic backpack", "They are the funniest kid in town"]},
               {"question": "Where does the adventure happen?", "suggestions": ["A candy forest with chocolate rivers", "A floating castle in the clouds", "Under the sea with friendly fish"]}
             ], "done": false}
+            The FIRST question must always be about what the hero LOOKS LIKE — their colors, size, and what they wear. \
             Use the SAME simple words and short sentences as above. Change the content to fit the story concept but keep the same easy reading level.
             """
         case (1, .adult):
             return """
-            Focus on the CHARACTERS and SETTING: \
-            Who is the protagonist? What's their personality, motivation, and world? \
-            What atmosphere and time period should the story evoke?
+            Focus on the CHARACTERS and SETTING. \
+            Your FIRST question must ask about the protagonist's visual appearance — their colors, clothing, and distinguishing features. \
+            Then ask about their personality, motivation, world, and atmosphere.
             """
         case (2, .kid):
             return """
@@ -156,7 +157,7 @@ enum StoryQAPromptTemplates {
         originalConcept: String,
         rounds: [StoryQARound]
     ) -> String {
-        var enriched = originalConcept
+        var enriched = "Story concept: \(originalConcept)"
 
         let answeredPairs = rounds.flatMap { round in
             round.questions.filter(\.isAnswered).map { q in
@@ -166,9 +167,39 @@ enum StoryQAPromptTemplates {
 
         guard !answeredPairs.isEmpty else { return enriched }
 
-        enriched += "\n\nAdditional story details:\n"
+        // Categorize answers into semantic sections so the small model
+        // can parse them without guessing which Q&A maps to which element.
+        var characters: [String] = []
+        var setting: [String] = []
+        var plot: [String] = []
+        var tone: [String] = []
+
         for (question, answer) in answeredPairs {
-            enriched += "- \(question): \(answer)\n"
+            let q = question.lowercased()
+            if q.contains("hero") || q.contains("character") || q.contains("look")
+                || q.contains("special") || q.contains("who") {
+                characters.append(answer)
+            } else if q.contains("where") || q.contains("place") || q.contains("setting") {
+                setting.append(answer)
+            } else if q.contains("problem") || q.contains("adventure") || q.contains("help")
+                        || q.contains("end") || q.contains("conflict") || q.contains("plot") {
+                plot.append(answer)
+            } else {
+                tone.append(answer)
+            }
+        }
+
+        if !characters.isEmpty {
+            enriched += "\nCharacters: \(characters.joined(separator: ". "))"
+        }
+        if !setting.isEmpty {
+            enriched += "\nSetting: \(setting.joined(separator: ". "))"
+        }
+        if !plot.isEmpty {
+            enriched += "\nPlot: \(plot.joined(separator: ". "))"
+        }
+        if !tone.isEmpty {
+            enriched += "\nTone: \(tone.joined(separator: ". "))"
         }
 
         return enriched

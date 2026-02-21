@@ -1,5 +1,6 @@
 import Foundation
 import CoreGraphics
+import FoundationModels
 
 @Observable
 @MainActor
@@ -23,6 +24,10 @@ final class BookReaderViewModel {
     var regenerationErrors: [Int: String] = [:]
     var lastRegenerationError: String?
     private var pageRetryCount: [Int: Int] = [:]
+
+    // Text regeneration state
+    var regeneratingText: Set<Int> = []
+    var textRegenerationErrors: [Int: String] = [:]
 
     /// The UUID of the corresponding StoredStorybook, if persisted.
     var storedBookID: UUID?
@@ -107,6 +112,7 @@ final class BookReaderViewModel {
             title: storyBook.title,
             authorLine: newAuthor,
             moral: storyBook.moral,
+            characterDescriptions: storyBook.characterDescriptions,
             pages: storyBook.pages
         )
         onTextEdited?(storyBook)
@@ -117,6 +123,7 @@ final class BookReaderViewModel {
             title: storyBook.title,
             authorLine: storyBook.authorLine,
             moral: newMoral,
+            characterDescriptions: storyBook.characterDescriptions,
             pages: storyBook.pages
         )
         onTextEdited?(storyBook)
@@ -137,6 +144,7 @@ final class BookReaderViewModel {
             title: storyBook.title,
             authorLine: storyBook.authorLine,
             moral: storyBook.moral,
+            characterDescriptions: storyBook.characterDescriptions,
             pages: updatedPages
         )
         onTextEdited?(storyBook)
@@ -146,16 +154,17 @@ final class BookReaderViewModel {
     func regenerateImage(index: Int, customPrompt: String? = nil) async {
         guard !regeneratingPages.contains(index) else { return }
 
+        let charPrefix = IllustrationGenerator.buildCharacterPrefix(from: storyBook.characterDescriptions)
         let prompt: String
         if let custom = customPrompt, !custom.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            prompt = ContentSafetyPolicy.safeIllustrationPrompt(custom)
+            prompt = charPrefix + ContentSafetyPolicy.safeIllustrationPrompt(custom)
         } else if index == 0 {
-            prompt = ContentSafetyPolicy.safeCoverPrompt(
+            prompt = charPrefix + ContentSafetyPolicy.safeCoverPrompt(
                 title: storyBook.title,
                 concept: storyBook.moral
             )
         } else if let page = storyBook.pages.first(where: { $0.pageNumber == index }) {
-            prompt = page.imagePrompt
+            prompt = charPrefix + page.imagePrompt
         } else {
             return
         }
@@ -185,19 +194,102 @@ final class BookReaderViewModel {
         regeneratingPages.remove(index)
     }
 
+    // MARK: - Text Regeneration
+
+    /// Regenerate a single page's text and imagePrompt using the on-device LLM.
+    func regeneratePageText(pageNumber: Int) async {
+        guard !regeneratingText.contains(pageNumber) else { return }
+
+        guard let pageIndex = storyBook.pages.firstIndex(where: { $0.pageNumber == pageNumber }) else { return }
+
+        regeneratingText.insert(pageNumber)
+        textRegenerationErrors[pageNumber] = nil
+
+        do {
+            let session = LanguageModelSession(
+                instructions: """
+                    You are an award-winning children's storybook author. \
+                    You write engaging, age-appropriate stories for children ages 3-8. \
+                    Your stories have vivid, simple prose that's fun to read aloud. \
+                    You create detailed scene descriptions that would make beautiful illustrations. \
+                    Safety requirements: never include violence, weapons, gore, horror, \
+                    sexual content, nudity, substance use, hate, abuse, or self-harm.
+                    """
+            )
+
+            // Build context from surrounding pages
+            let prevText = pageIndex > 0 ? storyBook.pages[pageIndex - 1].text : nil
+            let nextText = pageIndex < storyBook.pages.count - 1 ? storyBook.pages[pageIndex + 1].text : nil
+
+            var contextParts: [String] = []
+            contextParts.append("Story title: \"\(storyBook.title)\"")
+            contextParts.append("Story moral: \"\(storyBook.moral)\"")
+            if let prev = prevText {
+                contextParts.append("Previous page text: \"\(prev)\"")
+            }
+            if let next = nextText {
+                contextParts.append("Next page text: \"\(next)\"")
+            }
+
+            let prompt = """
+                \(contextParts.joined(separator: "\n"))
+
+                Rewrite page \(pageNumber) of this children's storybook. \
+                Generate fresh story text (2-4 sentences) and a new detailed illustration prompt. \
+                Keep the page number as \(pageNumber). \
+                The new text should flow naturally between the surrounding pages. \
+                Keep the tone warm, comforting, and suitable for ages 3-8.
+                """
+
+            let response = try await session.respond(
+                to: prompt,
+                generating: StoryPage.self
+            )
+
+            let newPage = StoryPage(
+                pageNumber: pageNumber,
+                text: response.content.text,
+                imagePrompt: response.content.imagePrompt
+            )
+
+            let updatedPages = storyBook.pages.map { page in
+                page.pageNumber == pageNumber ? newPage : page
+            }
+            storyBook = StoryBook(
+                title: storyBook.title,
+                authorLine: storyBook.authorLine,
+                moral: storyBook.moral,
+                characterDescriptions: storyBook.characterDescriptions,
+                pages: updatedPages
+            )
+            onTextEdited?(storyBook)
+        } catch {
+            let message: String
+            if let genError = error as? LanguageModelSession.GenerationError,
+               case .guardrailViolation = genError {
+                message = "Safety filter blocked this text. Try regenerating again."
+            } else {
+                message = "Text regeneration failed: \(error.localizedDescription)"
+            }
+            textRegenerationErrors[pageNumber] = message
+        }
+        regeneratingText.remove(pageNumber)
+    }
+
     // MARK: - Regeneration (legacy)
 
     func regeneratePage(index: Int) async {
         guard !regeneratingPages.contains(index) else { return }
 
+        let charPrefix = IllustrationGenerator.buildCharacterPrefix(from: storyBook.characterDescriptions)
         let prompt: String
         if index == 0 {
-            prompt = ContentSafetyPolicy.safeCoverPrompt(
+            prompt = charPrefix + ContentSafetyPolicy.safeCoverPrompt(
                 title: storyBook.title,
                 concept: storyBook.moral
             )
         } else if let page = storyBook.pages.first(where: { $0.pageNumber == index }) {
-            prompt = page.imagePrompt
+            prompt = charPrefix + page.imagePrompt
         } else {
             return
         }

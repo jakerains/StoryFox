@@ -208,30 +208,21 @@ struct MacCreationView: View {
 
     // MARK: - Concept Input
 
+    /// Whether the Q&A flow is actively running (not idle)
+    private var isQAActive: Bool {
+        creationMode == .guided && qaViewModel.phase != .idle
+    }
+
     private var conceptSection: some View {
         VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.small) {
-            TextEditor(text: $viewModel.storyConcept)
-                .font(StoryJuicerTypography.uiBody)
-                .foregroundStyle(Color.sjText)
-                .frame(minHeight: 120, maxHeight: 190)
-                .padding(StoryJuicerGlassTokens.Spacing.small)
-                .scrollContentBackground(.hidden)
-                .background(Color.sjReadableCard.opacity(0.9))
-                .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
-                .overlay {
-                    RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
-                        .strokeBorder(Color.sjBorder.opacity(0.75), lineWidth: 1)
-                }
-                .overlay(alignment: .topLeading) {
-                    if viewModel.storyConcept.isEmpty {
-                        Text("Describe your story idea... e.g. a curious fox building a moonlight library in the forest")
-                            .font(StoryJuicerTypography.uiBody)
-                            .foregroundStyle(Color.sjSecondaryText)
-                            .padding(StoryJuicerGlassTokens.Spacing.medium)
-                            .allowsHitTesting(false)
-                    }
-                }
-                .disabled(qaViewModel.phase != .idle && creationMode == .guided)
+            // When guided Q&A is active, collapse the editor into a compact read-only line
+            if isQAActive {
+                conceptReadOnlyLine
+                    .transition(.opacity.combined(with: .scale(scale: 0.98, anchor: .top)))
+            } else {
+                conceptEditor
+                    .transition(.opacity.combined(with: .scale(scale: 0.98, anchor: .top)))
+            }
 
             HStack {
                 CreationModeToggle(selection: $creationMode)
@@ -241,6 +232,57 @@ struct MacCreationView: View {
                 bookSetupRow
                     .fixedSize()
             }
+        }
+        .animation(StoryJuicerMotion.emphasis, value: isQAActive)
+    }
+
+    /// Full TextEditor for typing or editing the story concept.
+    private var conceptEditor: some View {
+        TextEditor(text: $viewModel.storyConcept)
+            .font(StoryJuicerTypography.uiBody)
+            .foregroundStyle(Color.sjText)
+            .frame(minHeight: 120, maxHeight: 190)
+            .padding(StoryJuicerGlassTokens.Spacing.small)
+            .scrollContentBackground(.hidden)
+            .background(Color.sjReadableCard.opacity(0.9))
+            .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
+            .overlay {
+                RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
+                    .strokeBorder(Color.sjBorder.opacity(0.75), lineWidth: 1)
+            }
+            .overlay(alignment: .topLeading) {
+                if viewModel.storyConcept.isEmpty {
+                    Text("Describe your story idea... e.g. a curious fox building a moonlight library in the forest")
+                        .font(StoryJuicerTypography.uiBody)
+                        .foregroundStyle(Color.sjSecondaryText)
+                        .padding(StoryJuicerGlassTokens.Spacing.medium)
+                        .allowsHitTesting(false)
+                }
+            }
+    }
+
+    /// Compact read-only line showing the concept while Q&A is active.
+    private var conceptReadOnlyLine: some View {
+        HStack(alignment: .top, spacing: StoryJuicerGlassTokens.Spacing.small) {
+            Image(systemName: "text.quote")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.sjCoral.opacity(0.7))
+                .padding(.top, 2)
+
+            Text(viewModel.storyConcept)
+                .font(StoryJuicerTypography.uiBody.italic())
+                .foregroundStyle(Color.sjSecondaryText)
+                .lineLimit(2)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, StoryJuicerGlassTokens.Spacing.medium)
+        .padding(.vertical, StoryJuicerGlassTokens.Spacing.small + 2)
+        .background(Color.sjReadableCard.opacity(0.5))
+        .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
+        .overlay {
+            RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
+                .strokeBorder(Color.sjBorder.opacity(0.4), lineWidth: 1)
         }
     }
 
