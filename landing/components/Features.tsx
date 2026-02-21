@@ -1,47 +1,52 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { scaleInVariants, staggerContainer } from "@/lib/motion";
-import { GlassCard } from "./GlassCard";
+import { fadeUpVariants, scaleInVariants, staggerContainer } from "@/lib/motion";
 
-const features = [
+const heroFeatures = [
   {
-    icon: "🔒",
+    image: "/images/feature-offline.png",
     title: "Works Offline",
     description:
       "Runs entirely on your device. No internet, no accounts. Your stories never leave your Mac.",
-    color: "var(--sj-mint)",
+    gradient: "from-[var(--sj-mint)]/6 to-transparent",
+    accentColor: "var(--sj-mint)",
   },
   {
-    icon: "🖨️",
+    image: "/images/feature-print.png",
     title: "Print-Ready PDF",
     description:
       "Exports at 300 DPI in real book dimensions. Take the PDF to a print shop or print it at home.",
-    color: "var(--sj-gold)",
+    gradient: "from-[var(--sj-gold)]/6 to-transparent",
+    accentColor: "var(--sj-gold)",
   },
+];
+
+const compactFeatures = [
   {
-    icon: "🛡️",
+    image: "/images/feature-safe.png",
     title: "Safe for Kids",
     description:
-      "Content filters keep stories age-appropriate for ages 3\u20138. You can also set audience mode to \u201CKid\u201D for simpler vocabulary.",
+      'Content filters keep stories age-appropriate for ages 3\u20138. Set audience mode to "Kid" for simpler vocabulary.',
     color: "var(--sj-coral)",
   },
   {
-    icon: "📖",
+    image: "/images/feature-length.png",
     title: "Choose Your Length",
     description:
       "3 pages for a quick bedtime story, 20 for a full adventure. You set the page count.",
     color: "var(--sj-lavender)",
   },
   {
-    icon: "🔄",
+    image: "/images/feature-redo.png",
     title: "Redo Any Page",
     description:
-      "Don't like a page? Regenerate just that page's text or illustration without restarting the whole book.",
+      "Regenerate just that page\u2019s text or illustration without restarting the whole book.",
     color: "var(--sj-sky)",
   },
   {
-    icon: "📚",
+    image: "/images/feature-library.png",
     title: "Save Your Library",
     description:
       "Books save automatically. Re-read, export, or share them whenever you want.",
@@ -72,34 +77,80 @@ export function Features() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          className="flex flex-col gap-5"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {features.map((feature) => (
-            <motion.div key={feature.title} variants={scaleInVariants}>
-              <GlassCard className="flex h-full flex-col p-6" hover>
+          {/* Hero features — two large cards with prominent images */}
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {heroFeatures.map((feature) => (
+              <motion.div key={feature.title} variants={fadeUpVariants}>
                 <div
-                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-full text-2xl"
-                  style={{
-                    backgroundColor: `color-mix(in srgb, ${feature.color} 12%, transparent)`,
-                  }}
+                  className={`bento-hero flex flex-col items-center gap-5 bg-gradient-to-br sm:flex-row sm:items-start ${feature.gradient}`}
                 >
-                  {feature.icon}
+                  {/* Image — large rounded showcase */}
+                  <div
+                    className="shrink-0 overflow-hidden rounded-2xl"
+                    style={{
+                      boxShadow: `0 6px 20px color-mix(in srgb, ${feature.accentColor} 15%, transparent)`,
+                    }}
+                  >
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      width={140}
+                      height={140}
+                      className="h-[120px] w-[120px] object-cover sm:h-[140px] sm:w-[140px]"
+                    />
+                  </div>
+
+                  {/* Text */}
+                  <div className="text-center sm:text-left">
+                    <h3 className="mb-2 font-serif text-2xl font-semibold text-sj-text">
+                      {feature.title}
+                    </h3>
+                    <p className="max-w-sm text-base leading-relaxed text-sj-secondary">
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
+              </motion.div>
+            ))}
+          </div>
 
-                <h3 className="mb-2 font-serif text-lg font-semibold text-sj-text">
-                  {feature.title}
-                </h3>
-
-                <p className="text-sm leading-relaxed text-sj-secondary">
-                  {feature.description}
-                </p>
-              </GlassCard>
-            </motion.div>
-          ))}
+          {/* Compact features — image + text rows */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {compactFeatures.map((feature) => (
+              <motion.div key={feature.title} variants={fadeUpVariants}>
+                <div className="bento-compact">
+                  <div
+                    className="shrink-0 overflow-hidden rounded-xl"
+                    style={{
+                      boxShadow: `0 4px 12px color-mix(in srgb, ${feature.color} 10%, transparent)`,
+                    }}
+                  >
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="mb-1 font-serif text-base font-semibold text-sj-text">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-sj-secondary">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>

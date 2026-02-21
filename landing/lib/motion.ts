@@ -32,3 +32,18 @@ export const staggerFast: Variants = {
     transition: { staggerChildren: 0.06, delayChildren: 0.04 },
   },
 };
+
+export const slideInLeftVariants: Variants = {
+  hidden: { opacity: 0, x: -40 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+export const slideInRightVariants: Variants = {
+  hidden: { opacity: 0, x: 40 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+export const fanVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.85, y: 30 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};

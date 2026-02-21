@@ -1,26 +1,26 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { fadeUpVariants, staggerContainer } from "@/lib/motion";
-import { GlassCard } from "./GlassCard";
 
 const requirements = [
   {
-    icon: "🖥",
+    image: "/images/req-macos.png",
     title: "macOS 26",
     subtitle: "Tahoe",
     description: "Requires the latest macOS with Apple Intelligence.",
     color: "var(--sj-coral)",
   },
   {
-    icon: "⚡",
+    image: "/images/req-silicon.png",
     title: "Apple Silicon",
     subtitle: "M1 or later",
     description: "Needs the Neural Engine in M1 or newer chips.",
     color: "var(--sj-gold)",
   },
   {
-    icon: "✨",
+    image: "/images/req-apple-intelligence.png",
     title: "Apple Intelligence",
     subtitle: "Enabled",
     description: "The on-device text and image generation runs through Apple Intelligence.",
@@ -30,19 +30,19 @@ const requirements = [
 
 export function Requirements() {
   return (
-    <section id="requirements" className="relative py-20 sm:py-28">
+    <section id="requirements" className="relative py-14 sm:py-20">
       {/* Ambient glow */}
       <div className="glow-amber pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2" />
 
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="mb-14 text-center"
+          className="mb-10 text-center"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeUpVariants}
         >
-          <h2 className="section-title mb-4 font-serif font-bold text-sj-text">
+          <h2 className="section-title mb-3 font-serif font-bold text-sj-text">
             What You Need
           </h2>
           <p className="mx-auto max-w-md text-lg text-sj-secondary">
@@ -51,45 +51,52 @@ export function Requirements() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-3"
-          variants={staggerContainer}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-3"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainer}
         >
           {requirements.map((req) => (
-            <motion.div key={req.title} variants={fadeUpVariants}>
-              <GlassCard className="flex h-full flex-col items-center p-7 text-center" hover>
-                {/* Colored icon ring */}
-                <div
-                  className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
-                  style={{
-                    backgroundColor: `color-mix(in srgb, ${req.color} 14%, transparent)`,
-                    boxShadow: `0 0 0 1px color-mix(in srgb, ${req.color} 20%, transparent)`,
-                  }}
-                >
-                  {req.icon}
-                </div>
+            <motion.div
+              key={req.title}
+              variants={fadeUpVariants}
+              className="flex flex-col items-center rounded-2xl border p-5 text-center"
+              style={{
+                borderColor: `color-mix(in srgb, ${req.color} 20%, transparent)`,
+                background: `color-mix(in srgb, var(--sj-card) 30%, transparent)`,
+              }}
+            >
+              <div
+                className="mb-3 overflow-hidden rounded-xl"
+                style={{
+                  boxShadow: `0 4px 16px color-mix(in srgb, ${req.color} 15%, transparent)`,
+                }}
+              >
+                <Image
+                  src={req.image}
+                  alt={req.title}
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 object-cover"
+                />
+              </div>
 
-                {/* Title + subtitle */}
-                <h3 className="font-serif text-lg font-bold text-sj-text">
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-serif text-base font-bold text-sj-text">
                   {req.title}
-                </h3>
-                <span
-                  className="mb-3 mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide"
-                  style={{
-                    backgroundColor: `color-mix(in srgb, ${req.color} 10%, transparent)`,
-                    color: req.color,
-                  }}
-                >
-                  {req.subtitle}
                 </span>
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: req.color }}
+                >
+                  ({req.subtitle})
+                </span>
+              </div>
 
-                {/* Description */}
-                <p className="text-sm leading-relaxed text-sj-secondary">
-                  {req.description}
-                </p>
-              </GlassCard>
+              <p className="mt-1 text-xs leading-relaxed text-sj-secondary">
+                {req.description}
+              </p>
             </motion.div>
           ))}
         </motion.div>

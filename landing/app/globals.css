@@ -171,6 +171,119 @@ body {
   mix-blend-mode: soft-light;
 }
 
+/* ─── Timeline (How It Works) ─── */
+
+.timeline-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-family: var(--font-playfair), serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Bento Grid (Features) ─── */
+
+.bento-hero {
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--sj-border) 30%, transparent);
+  padding: 2rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bento-hero:hover {
+  border-color: color-mix(in srgb, var(--sj-border) 50%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.bento-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--sj-border),
+    var(--sj-border) 1px,
+    transparent 1px,
+    transparent 12px
+  );
+  pointer-events: none;
+}
+
+.bento-compact {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--sj-border) 20%, transparent);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.bento-compact:hover {
+  border-color: color-mix(in srgb, var(--sj-border) 40%, transparent);
+  background-color: color-mix(in srgb, var(--sj-card) 40%, transparent);
+}
+
+/* ─── Bookshelf (Formats) ─── */
+
+.bookshelf-line {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--sj-border) 40%, transparent),
+    var(--sj-border),
+    color-mix(in srgb, var(--sj-gold) 50%, var(--sj-border)),
+    var(--sj-border),
+    color-mix(in srgb, var(--sj-border) 40%, transparent)
+  );
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.bookshelf-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+}
+
+/* ─── Checklist Bar (Requirements) ─── */
+
+.checklist-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.25rem 2.5rem;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--sj-border) 35%, transparent);
+  background: color-mix(in srgb, var(--sj-card) 30%, transparent);
+}
+
+@media (max-width: 640px) {
+  .checklist-bar {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+  }
+}
+
 /* Scroll progress bar */
 .scroll-progress {
   transform-origin: left;

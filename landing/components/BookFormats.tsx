@@ -2,39 +2,42 @@
 
 import { motion } from "framer-motion";
 import { fadeUpVariants, staggerContainer } from "@/lib/motion";
-import { GlassCard } from "./GlassCard";
 
 const formats = [
   {
     name: "Standard Square",
     dimensions: '8.5" × 8.5"',
-    aspect: "aspect-square",
-    width: "w-28",
-  },
-  {
-    name: "Landscape",
-    dimensions: '11" × 8.5"',
-    aspect: "aspect-[11/8.5]",
-    width: "w-36",
+    width: 100,
+    height: 100,
+    delay: 0,
   },
   {
     name: "Portrait",
     dimensions: '8.5" × 11"',
-    aspect: "aspect-[8.5/11]",
-    width: "w-24",
+    width: 80,
+    height: 110,
+    delay: 0.4,
+  },
+  {
+    name: "Landscape",
+    dimensions: '11" × 8.5"',
+    width: 130,
+    height: 90,
+    delay: 0.8,
   },
   {
     name: "Small Square",
     dimensions: '6" × 6"',
-    aspect: "aspect-square",
-    width: "w-20",
+    width: 72,
+    height: 72,
+    delay: 1.2,
   },
 ];
 
 export function BookFormats() {
   return (
     <section id="formats" className="relative py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <motion.div
           className="mb-16 text-center"
           initial="hidden"
@@ -51,31 +54,79 @@ export function BookFormats() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-2 gap-6 md:grid-cols-4"
+          className="flex flex-col items-center"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
         >
-          {formats.map((format) => (
-            <motion.div key={format.name} variants={fadeUpVariants}>
-              <GlassCard className="flex flex-col items-center p-6" hover>
-                {/* Format preview rectangle */}
-                <div className="mb-5 flex items-center justify-center" style={{ minHeight: 120 }}>
+          {/* Book shapes on shelf */}
+          <div className="flex items-end justify-center gap-8 sm:gap-12 md:gap-16 pb-4">
+            {formats.map((format) => (
+              <motion.div
+                key={format.name}
+                variants={fadeUpVariants}
+                className="flex flex-col items-center"
+              >
+                {/* Floating book shape */}
+                <motion.div
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: format.delay,
+                  }}
+                  className="rounded-lg"
+                  style={{
+                    width: format.width,
+                    height: format.height,
+                    background: `linear-gradient(145deg, var(--sj-card), color-mix(in srgb, var(--sj-highlight) 12%, var(--sj-card)))`,
+                    boxShadow: `
+                      inset -3px 0 6px rgba(0,0,0,0.04),
+                      inset 0 1px 0 rgba(255,255,255,0.4),
+                      0 4px 16px rgba(0,0,0,0.08),
+                      0 1px 3px rgba(0,0,0,0.06)
+                    `,
+                    border: `1px solid color-mix(in srgb, var(--sj-border) 40%, transparent)`,
+                  }}
+                >
+                  {/* Page lines */}
                   <div
-                    className={`${format.aspect} ${format.width} rounded-lg bg-gradient-to-br from-sj-coral/20 to-sj-highlight/20 ring-1 ring-sj-border/40`}
+                    className="h-full w-full rounded-lg opacity-[0.03]"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 7px, var(--sj-text) 7px, var(--sj-text) 8px)`,
+                      backgroundPosition: "8px 10px",
+                      backgroundSize: `calc(100% - 16px) calc(100% - 20px)`,
+                      backgroundRepeat: "no-repeat",
+                    }}
                   />
-                </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
 
-                <h3 className="mb-1 text-center font-serif text-base font-semibold text-sj-text">
+          {/* Bookshelf */}
+          <div className="bookshelf-line w-full max-w-lg" />
+
+          {/* Labels below shelf */}
+          <div className="mt-6 flex items-start justify-center gap-8 sm:gap-12 md:gap-16">
+            {formats.map((format) => (
+              <motion.div
+                key={format.name}
+                variants={fadeUpVariants}
+                className="flex flex-col items-center text-center"
+                style={{ width: format.width }}
+              >
+                <h3 className="font-serif text-sm font-semibold text-sj-text sm:text-base">
                   {format.name}
                 </h3>
-                <p className="text-center font-sans text-sm text-sj-muted">
+                <p className="mt-0.5 font-sans text-xs text-sj-muted">
                   {format.dimensions}
                 </p>
-              </GlassCard>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
