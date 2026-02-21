@@ -15,7 +15,7 @@
   </a>
 </p>
 <p align="center">
-  <sub>Signed &amp; notarized &bull; Requires macOS 26 on Apple Silicon &bull; <a href="https://storyfox.app">storyfox.app</a> &bull; <a href="https://storyfox.app/changelog">Changelog</a></sub>
+  <sub>Requires macOS 26 on Apple Silicon &bull; <a href="https://storyfox.app">storyfox.app</a> &bull; <a href="https://storyfox.app/changelog">Changelog</a></sub>
 </p>
 
 ---
