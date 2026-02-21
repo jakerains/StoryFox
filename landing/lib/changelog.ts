@@ -12,6 +12,18 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.7.3",
+    date: "2026-02-21",
+    title: "Export Page as Image",
+    changes: [
+      {
+        type: "added",
+        description:
+          "Export any storybook page as a high-resolution PNG image — cover, story pages, or the ending — perfect for sharing on social media or printing a favorite illustration",
+      },
+    ],
+  },
+  {
     version: "1.7.2",
     date: "2026-02-21",
     title: "3D Page Turn Animation",
