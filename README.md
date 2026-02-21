@@ -1,11 +1,5 @@
 <p align="center">
-  <img src=".github/app-icon.png" width="128" height="128" alt="StoryFox app icon" />
-</p>
-
-<h1 align="center">StoryFox</h1>
-
-<p align="center">
-  <strong>AI-powered illustrated children's storybooks — on your device.</strong>
+  <img src=".github/storyfox-hero.png" width="520" alt="StoryFox — AI-powered illustrated children's storybooks" />
 </p>
 
 <p align="center">
