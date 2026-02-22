@@ -32,6 +32,23 @@ final class CreationViewModel {
     var selectedStyle: IllustrationStyle = .illustration
     var isEnrichedConcept: Bool = false
 
+    // MARK: - Prompt Suggestions (typewriter cycle)
+    private var promptSuggestions: [String] = []
+    private var suggestionsGenerated = false
+    private var suggestionsTask: Task<Void, Never>?
+    private var suggestionCycleTask: Task<Void, Never>?
+    private var suggestionRestartTask: Task<Void, Never>?
+    private var currentSuggestionIndex: Int = 0
+
+    /// The portion of the suggestion typed out so far (for display as placeholder).
+    private(set) var suggestionDisplayText: String = ""
+    /// The full text of the currently active suggestion (nil when idle).
+    private(set) var activeSuggestion: String? = nil
+    /// Opacity for fade-in/out of the typewriter text.
+    private(set) var suggestionOpacity: Double = 0
+    /// Whether the suggestion cycle is actively running (stable across inter-suggestion gaps).
+    private(set) var isSuggestionCycleActive = false
+
     // MARK: - Author Mode Inputs
     var authorTitle: String = ""
     var authorCharacterDescriptions: String = ""
@@ -54,8 +71,9 @@ final class CreationViewModel {
     private var generationTask: Task<Void, Never>?
 
     var canGenerate: Bool {
-        !storyConcept.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && !phase.isWorking
+        let hasConcept = !storyConcept.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || activeSuggestion != nil
+        return hasConcept && !phase.isWorking
     }
 
     /// Whether Author Mode has enough content to generate illustrations.
@@ -106,7 +124,15 @@ final class CreationViewModel {
     // MARK: - Generation
 
     func squeezeStory() {
+        // If concept is empty but a suggestion is active, use the full suggestion
+        if storyConcept.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           let suggestion = activeSuggestion {
+            storyConcept = suggestion
+            stopSuggestionCycle()
+        }
+
         guard canGenerate else { return }
+        stopSuggestionCycle()
 
         // Enriched concepts from Q&A are longer — use a higher sanitization limit
         let maxLength = isEnrichedConcept ? 1500 : 220
@@ -118,6 +144,9 @@ final class CreationViewModel {
             return
         }
 
+        let settings = ModelSelectionStore.load()
+        let useCloudTextPath = settings.textProvider.isCloud
+
         generationTask = Task {
             do {
                 // Phase 1: Generate text
@@ -128,37 +157,55 @@ final class CreationViewModel {
                     pageCount: pageCount
                 )
 
-                // Phase 1.2: Validate/repair character descriptions with Foundation Model
-                let repairedDescriptions = await CharacterDescriptionValidator.validateAsync(
-                    descriptions: rawBook.characterDescriptions,
-                    pages: rawBook.pages,
-                    title: rawBook.title
-                )
-                let descriptionRepairedBook = StoryBook(
-                    title: rawBook.title,
-                    authorLine: rawBook.authorLine,
-                    moral: rawBook.moral,
-                    characterDescriptions: repairedDescriptions,
-                    pages: rawBook.pages
-                )
+                let book: StoryBook
+                let analyses: [Int: PromptAnalysis]
+                let parsedCharacters: [ImagePromptEnricher.CharacterEntry]
 
-                // Phase 1.3: Parse character descriptions with Foundation Model
-                self.parsedCharacters = await ImagePromptEnricher.parseCharacterDescriptionsAsync(
-                    descriptionRepairedBook.characterDescriptions
-                )
-                let parsedCharacters = self.parsedCharacters
+                if useCloudTextPath {
+                    // Cloud LLMs produce good text and image prompts — skip all
+                    // Foundation Model post-processing (repair, parse, analyze).
+                    book = rawBook
+                    analyses = [:]
+                    parsedCharacters = ImagePromptEnricher.parseCharacterDescriptions(
+                        rawBook.characterDescriptions
+                    )
+                    self.parsedCharacters = parsedCharacters
+                } else {
+                    // On-device / MLX path: run Foundation Model enrichment pipeline.
 
-                // Phase 1.5: Analyze image prompts with Foundation Model
-                let promptsToAnalyze = [(index: 0, prompt: ContentSafetyPolicy.safeCoverPrompt(
-                    title: descriptionRepairedBook.title, concept: safeConcept
-                ))] + descriptionRepairedBook.pages.map { (index: $0.pageNumber, prompt: $0.imagePrompt) }
-                let analyses = await PromptAnalysisEngine.analyzePrompts(promptsToAnalyze)
+                    // Phase 1.2: Validate/repair character descriptions with Foundation Model
+                    let repairedDescriptions = await CharacterDescriptionValidator.validateAsync(
+                        descriptions: rawBook.characterDescriptions,
+                        pages: rawBook.pages,
+                        title: rawBook.title
+                    )
+                    let descriptionRepairedBook = StoryBook(
+                        title: rawBook.title,
+                        authorLine: rawBook.authorLine,
+                        moral: rawBook.moral,
+                        characterDescriptions: repairedDescriptions,
+                        pages: rawBook.pages
+                    )
 
-                let book = ImagePromptEnricher.enrichImagePrompts(
-                    in: descriptionRepairedBook,
-                    analyses: analyses,
-                    parsedCharacters: parsedCharacters
-                )
+                    // Phase 1.3: Parse character descriptions with Foundation Model
+                    self.parsedCharacters = await ImagePromptEnricher.parseCharacterDescriptionsAsync(
+                        descriptionRepairedBook.characterDescriptions
+                    )
+                    parsedCharacters = self.parsedCharacters
+
+                    // Phase 1.5: Analyze image prompts with Foundation Model
+                    let promptsToAnalyze = [(index: 0, prompt: ContentSafetyPolicy.safeCoverPrompt(
+                        title: descriptionRepairedBook.title, concept: safeConcept
+                    ))] + descriptionRepairedBook.pages.map { (index: $0.pageNumber, prompt: $0.imagePrompt) }
+                    analyses = await PromptAnalysisEngine.analyzePrompts(promptsToAnalyze)
+
+                    book = ImagePromptEnricher.enrichImagePrompts(
+                        in: descriptionRepairedBook,
+                        analyses: analyses,
+                        parsedCharacters: parsedCharacters
+                    )
+                }
+
                 storyBook = book
 
                 // Phase 2: Generate illustrations
@@ -341,9 +388,87 @@ final class CreationViewModel {
         }
     }
 
+    // MARK: - Prompt Suggestions
+
+    func generateSuggestions() {
+        guard !suggestionsGenerated else { return }
+        suggestionsGenerated = true
+
+        suggestionsTask = Task {
+            let concepts = await SuggestionGenerator.generate()
+            promptSuggestions = concepts ?? SuggestionGenerator.randomFallback()
+            startSuggestionCycle()
+        }
+    }
+
+    func stopSuggestionCycle() {
+        suggestionRestartTask?.cancel()
+        suggestionRestartTask = nil
+        suggestionCycleTask?.cancel()
+        suggestionCycleTask = nil
+        suggestionDisplayText = ""
+        activeSuggestion = nil
+        suggestionOpacity = 0
+        isSuggestionCycleActive = false
+    }
+
+    /// Restart the suggestion cycle after a brief delay (e.g. when the user clears the text).
+    func restartSuggestionCycleAfterDelay() {
+        suggestionRestartTask?.cancel()
+        suggestionRestartTask = Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            guard !Task.isCancelled else { return }
+            guard storyConcept.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+            startSuggestionCycle()
+        }
+    }
+
+    private func startSuggestionCycle() {
+        guard !promptSuggestions.isEmpty else { return }
+        stopSuggestionCycle()
+        isSuggestionCycleActive = true
+
+        suggestionCycleTask = Task {
+            while !Task.isCancelled {
+                let suggestion = promptSuggestions[currentSuggestionIndex % promptSuggestions.count]
+                activeSuggestion = suggestion
+
+                // Type out character by character
+                suggestionOpacity = 1.0
+                for i in 1...suggestion.count {
+                    guard !Task.isCancelled else { return }
+                    suggestionDisplayText = String(suggestion.prefix(i))
+                    try? await Task.sleep(for: .milliseconds(30))
+                }
+
+                // Hold for a few seconds so the user can read it
+                guard !Task.isCancelled else { return }
+                try? await Task.sleep(for: .seconds(3))
+
+                // Fade out
+                guard !Task.isCancelled else { return }
+                suggestionOpacity = 0
+                try? await Task.sleep(for: .milliseconds(600))
+
+                // Clear and advance to the next suggestion
+                guard !Task.isCancelled else { return }
+                suggestionDisplayText = ""
+                activeSuggestion = nil
+                currentSuggestionIndex += 1
+
+                // Brief pause before next
+                try? await Task.sleep(for: .milliseconds(400))
+            }
+        }
+    }
+
+    // MARK: - Cancellation & Reset
+
     func cancel() {
         generationTask?.cancel()
         generationTask = nil
+        suggestionsTask?.cancel()
+        stopSuggestionCycle()
         storyGenerator.cancel()
         phase = .idle
     }
@@ -356,6 +481,8 @@ final class CreationViewModel {
         authorTitle = ""
         authorCharacterDescriptions = ""
         authorPages = ["", "", "", ""]
+        suggestionsGenerated = false
+        currentSuggestionIndex = 0
         phase = .idle
     }
 
@@ -419,26 +546,14 @@ final class CreationViewModel {
     ) async throws -> StoryBook {
         let generator = CloudTextGenerator(cloudProvider: provider)
         phase = .generatingText(partialText: "Using \(provider.displayName) for story drafting...")
-        do {
-            return try await generator.generateStory(
-                concept: concept,
-                pageCount: pageCount,
-                onProgress: { [weak self] partialText in
-                    guard let self else { return }
-                    self.phase = .generatingText(partialText: partialText)
-                }
-            )
-        } catch {
-            if enableFallback {
-                phase = .generatingText(partialText: "\(provider.displayName) unavailable, switching to Apple Foundation path...")
-                return try await generateFoundationRoutedStory(
-                    concept: concept,
-                    pageCount: pageCount
-                )
-            } else {
-                throw error
+        return try await generator.generateStory(
+            concept: concept,
+            pageCount: pageCount,
+            onProgress: { [weak self] partialText in
+                guard let self else { return }
+                self.phase = .generatingText(partialText: partialText)
             }
-        }
+        )
     }
 
     private func generateFoundationRoutedStory(

@@ -105,7 +105,8 @@ struct MacBookReaderView: View {
                     textProviderName: viewModel.textProviderName,
                     imageProviderName: viewModel.imageProviderName,
                     textModelName: viewModel.textModelName,
-                    imageModelName: viewModel.imageModelName
+                    imageModelName: viewModel.imageModelName,
+                    conceptDecompositions: viewModel.conceptDecompositionsForPage
                 ) {
                     activeSheet = nil
                 }

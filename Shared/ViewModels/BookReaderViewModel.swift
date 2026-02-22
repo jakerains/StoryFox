@@ -46,6 +46,11 @@ final class BookReaderViewModel {
     var textModelName: String = ""
     var imageModelName: String = ""
 
+    /// Concept decompositions from the illustration generator, keyed by page index (0 = cover).
+    var conceptDecompositionsForPage: [Int: ImageConceptDecomposition] {
+        illustrationGenerator.conceptDecompositions
+    }
+
     /// The UUID of the corresponding StoredStorybook, if persisted.
     var storedBookID: UUID?
 

@@ -68,7 +68,16 @@ struct CloudTextGenerator: StoryTextGenerating {
             )
         }
 
-        let textDTO = try StoryDecoding.decodeTextOnlyStoryDTO(from: pass1Text)
+        Self.logger.debug("Pass 1 raw response (\(pass1Text.count) chars): \(String(pass1Text.prefix(500)), privacy: .public)")
+
+        let textDTO: TextOnlyStoryDTO
+        do {
+            textDTO = try StoryDecoding.decodeTextOnlyStoryDTO(from: pass1Text)
+        } catch {
+            Self.logger.error("Pass 1 decode failed: \(error.localizedDescription, privacy: .public)")
+            Self.logger.error("Pass 1 full text: \(pass1Text, privacy: .public)")
+            throw CloudProviderError.custom("Story text could not be parsed. The \(cloudProvider.displayName) model may need a different prompt format. Raw start: \(String(pass1Text.prefix(200)))")
+        }
 
         // ── Pass 2: Generate image prompts with full story context ──
         await onProgress("Generating illustration prompts...")
@@ -82,13 +91,16 @@ struct CloudTextGenerator: StoryTextGenerating {
 
         let pass2Text: String
 
+        // Each page prompt is ~50-80 tokens; budget generously to avoid truncation.
+        let pass2MaxTokens = max(800, pageCount * 100)
+
         if cloudProvider == .huggingFace {
             pass2Text = try await chatWithHFSDK(
                 apiKey: apiKey,
                 model: modelID,
                 systemPrompt: pass2System,
                 userPrompt: pass2UserPrompt,
-                maxTokens: 600
+                maxTokens: pass2MaxTokens
             )
         } else {
             pass2Text = try await chatWithOpenAIClient(
@@ -96,11 +108,20 @@ struct CloudTextGenerator: StoryTextGenerating {
                 model: modelID,
                 systemPrompt: pass2System,
                 userPrompt: pass2UserPrompt,
-                maxTokens: 600
+                maxTokens: pass2MaxTokens
             )
         }
 
-        let promptSheet = try StoryDecoding.decodeImagePromptSheetDTO(from: pass2Text)
+        Self.logger.debug("Pass 2 raw response (\(pass2Text.count) chars): \(String(pass2Text.prefix(500)), privacy: .public)")
+
+        let promptSheet: ImagePromptSheetDTO
+        do {
+            promptSheet = try StoryDecoding.decodeImagePromptSheetDTO(from: pass2Text)
+        } catch {
+            Self.logger.error("Pass 2 decode failed: \(error.localizedDescription, privacy: .public)")
+            Self.logger.error("Pass 2 full text: \(pass2Text, privacy: .public)")
+            throw CloudProviderError.custom("Image prompts could not be parsed. The model's response may have been truncated or malformed. Raw start: \(String(pass2Text.prefix(200)))")
+        }
 
         // ── Merge text + prompts into a StoryBook ──
         await onProgress("Parsing story response...")

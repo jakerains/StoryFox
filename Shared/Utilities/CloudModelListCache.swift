@@ -209,10 +209,10 @@ final class CloudModelListCache {
 
     /// Curated text models for HuggingFace — always shown at the top of the picker.
     static let curatedHFTextModels: [CloudModelInfo] = [
-        CloudModelInfo(id: "openai/gpt-oss-120b", displayName: "GPT-OSS 120B", provider: .huggingFace, modality: .text),
+        CloudModelInfo(id: "openai/gpt-oss-120b", displayName: "GPT-OSS 120B", provider: .huggingFace, modality: .text, isRecommended: true),
+        CloudModelInfo(id: "deepseek-ai/DeepSeek-V3", displayName: "DeepSeek V3", provider: .huggingFace, modality: .text, isRecommended: true),
         CloudModelInfo(id: "openai/gpt-oss-20b", displayName: "GPT-OSS 20B", provider: .huggingFace, modality: .text),
         CloudModelInfo(id: "Qwen/Qwen3-32B", displayName: "Qwen3 32B", provider: .huggingFace, modality: .text),
-        CloudModelInfo(id: "deepseek-ai/DeepSeek-V3", displayName: "DeepSeek V3", provider: .huggingFace, modality: .text),
         CloudModelInfo(id: "meta-llama/Llama-3.1-8B-Instruct", displayName: "Llama 3.1 8B Instruct", provider: .huggingFace, modality: .text),
         CloudModelInfo(id: "mistralai/Mistral-7B-Instruct-v0.2", displayName: "Mistral 7B Instruct", provider: .huggingFace, modality: .text),
     ]

@@ -5,6 +5,8 @@ struct ErrorBanner: View {
     let onRetry: () -> Void
     let onDismiss: () -> Void
 
+    @State private var copied = false
+
     var body: some View {
         HStack(alignment: .top, spacing: StoryJuicerGlassTokens.Spacing.medium) {
             Image(systemName: "exclamationmark.triangle.fill")
@@ -20,26 +22,48 @@ struct ErrorBanner: View {
                 Text(message)
                     .font(StoryJuicerTypography.uiBody)
                     .foregroundStyle(Color.sjSecondaryText)
-                    .lineLimit(4)
+                    .textSelection(.enabled)
             }
 
             Spacer(minLength: StoryJuicerGlassTokens.Spacing.small)
 
-            HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
-                Button("Retry") {
-                    onRetry()
+            VStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                HStack(spacing: StoryJuicerGlassTokens.Spacing.small) {
+                    Button("Retry") {
+                        onRetry()
+                    }
+                    .sjGlassToolbarItem(prominent: true)
+                    .tint(Color.sjCoral)
+
+                    Button {
+                        onDismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(StoryJuicerTypography.uiFootnoteStrong)
+                            .frame(width: 24, height: 24)
+                    }
+                    .sjGlassToolbarItem(prominent: false)
                 }
-                .sjGlassToolbarItem(prominent: true)
-                .tint(Color.sjCoral)
 
                 Button {
-                    onDismiss()
+                    #if os(macOS)
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(message, forType: .string)
+                    #else
+                    UIPasteboard.general.string = message
+                    #endif
+                    copied = true
+                    Task {
+                        try? await Task.sleep(for: .seconds(2))
+                        copied = false
+                    }
                 } label: {
-                    Image(systemName: "xmark")
-                        .font(StoryJuicerTypography.uiFootnoteStrong)
-                        .frame(width: 24, height: 24)
+                    Label(copied ? "Copied" : "Copy Error", systemImage: copied ? "checkmark" : "doc.on.doc")
+                        .font(.system(size: 11, weight: .medium))
+                        .contentTransition(.symbolEffect(.replace))
                 }
-                .sjGlassToolbarItem(prominent: false)
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.sjSecondaryText)
             }
         }
         .padding(StoryJuicerGlassTokens.Spacing.medium)

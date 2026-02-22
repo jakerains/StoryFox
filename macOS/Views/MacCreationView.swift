@@ -11,6 +11,7 @@ struct MacCreationView: View {
     @State private var creationMode: CreationMode = .quick
     @State private var qaViewModel = StoryQAViewModel()
     @State private var showBookSetupPopover = false
+    @FocusState private var editorFocused: Bool
 
     var body: some View {
         ZStack {
@@ -107,14 +108,26 @@ struct MacCreationView: View {
                 UnavailableOverlay(reason: reason)
             }
         }
+        .task {
+            viewModel.generateSuggestions()
+        }
         .onAppear {
             withAnimation(StoryJuicerMotion.emphasis) {
                 animateTitle = true
             }
         }
+        .onChange(of: viewModel.storyConcept) { _, newValue in
+            if newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                viewModel.restartSuggestionCycleAfterDelay()
+            } else {
+                viewModel.stopSuggestionCycle()
+            }
+        }
         .onChange(of: creationMode) { _, newMode in
+            if newMode != .quick {
+                viewModel.stopSuggestionCycle()
+            }
             if newMode == .author && viewModel.authorPages.allSatisfy(\.isEmpty) {
-                // Seed 4 empty pages when first entering author mode
                 viewModel.authorPages = ["", "", "", ""]
             }
         }
@@ -274,29 +287,58 @@ struct MacCreationView: View {
         .animation(StoryJuicerMotion.emphasis, value: isQAActive)
     }
 
+    /// Whether the suggestion typewriter should replace the TextEditor entirely.
+    private var showSuggestionFacade: Bool {
+        viewModel.storyConcept.isEmpty && viewModel.isSuggestionCycleActive
+    }
+
     /// Full TextEditor for typing or editing the story concept.
+    @ViewBuilder
     private var conceptEditor: some View {
-        TextEditor(text: $viewModel.storyConcept)
-            .font(StoryJuicerTypography.uiBody)
-            .foregroundStyle(Color.sjText)
-            .frame(minHeight: 120, maxHeight: 190)
-            .padding(StoryJuicerGlassTokens.Spacing.small)
-            .scrollContentBackground(.hidden)
-            .background(Color.sjReadableCard.opacity(0.9))
-            .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
-            .overlay {
-                RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
-                    .strokeBorder(Color.sjBorder.opacity(0.75), lineWidth: 1)
+        Group {
+            if showSuggestionFacade {
+                // Cursor-free facade — just a Text view, no NSTextView underneath.
+                Text(viewModel.suggestionDisplayText)
+                    .font(StoryJuicerTypography.uiBody)
+                    .foregroundStyle(Color.sjCoral.opacity(0.65))
+                    .opacity(viewModel.suggestionOpacity)
+                    .animation(.easeOut(duration: 0.5), value: viewModel.suggestionOpacity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(.top, 7)
+                    .padding(.leading, 5)
+                    .frame(minHeight: 120, maxHeight: 190)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        viewModel.stopSuggestionCycle()
+                        editorFocused = true
+                    }
+            } else {
+                // Real TextEditor — only rendered once suggestions stop.
+                TextEditor(text: $viewModel.storyConcept)
+                    .focused($editorFocused)
+                    .font(StoryJuicerTypography.uiBody)
+                    .foregroundStyle(Color.sjText)
+                    .frame(minHeight: 120, maxHeight: 190)
+                    .overlay(alignment: .topLeading) {
+                        if viewModel.storyConcept.isEmpty {
+                            Text("Describe your story idea...")
+                                .font(StoryJuicerTypography.uiBody)
+                                .foregroundStyle(Color.sjSecondaryText)
+                                .padding(.top, 7)
+                                .padding(.leading, 5)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
             }
-            .overlay(alignment: .topLeading) {
-                if viewModel.storyConcept.isEmpty {
-                    Text("Describe your story idea... e.g. a curious fox building a moonlight library in the forest")
-                        .font(StoryJuicerTypography.uiBody)
-                        .foregroundStyle(Color.sjSecondaryText)
-                        .padding(StoryJuicerGlassTokens.Spacing.medium)
-                        .allowsHitTesting(false)
-                }
-            }
+        }
+        .padding(StoryJuicerGlassTokens.Spacing.small)
+        .background(Color.sjReadableCard.opacity(0.9))
+        .clipShape(.rect(cornerRadius: StoryJuicerGlassTokens.Radius.input))
+        .overlay {
+            RoundedRectangle(cornerRadius: StoryJuicerGlassTokens.Radius.input)
+                .strokeBorder(Color.sjBorder.opacity(0.75), lineWidth: 1)
+        }
     }
 
     /// Compact read-only line showing the concept while Q&A is active.

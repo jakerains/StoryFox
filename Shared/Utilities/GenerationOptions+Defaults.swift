@@ -8,7 +8,7 @@ struct GenerationConfig: Sendable {
     static let maxConcurrentImages = 1
     #endif
 
-    static let defaultTemperature: Float = 1.2
+    static let defaultTemperature: Float = 0.9
 
     /// Estimate token budget based on page count.
     /// Each page needs ~100-150 tokens for text + imagePrompt, plus overhead for title/moral/structure.

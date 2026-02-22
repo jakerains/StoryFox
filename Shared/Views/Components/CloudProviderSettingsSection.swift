@@ -210,9 +210,27 @@ struct CloudProviderSettingsSection: View {
         ) {
             Picker("Text Model", selection: textModelBinding) {
                 let models = modelCache.textModels[provider] ?? []
-                ForEach(models) { model in
-                    Text(model.displayName).tag(model.id)
+                let recommended = models.filter(\.isRecommended)
+                let others = models.filter { !$0.isRecommended }
+
+                if !recommended.isEmpty {
+                    Section("Recommended") {
+                        ForEach(recommended) { model in
+                            Text(model.displayName)
+                                .bold()
+                                .tag(model.id)
+                        }
+                    }
                 }
+
+                if !others.isEmpty {
+                    Section("All Models") {
+                        ForEach(others) { model in
+                            Text(model.displayName).tag(model.id)
+                        }
+                    }
+                }
+
                 if !models.contains(where: { $0.id == textModelBinding.wrappedValue }) {
                     Text(textModelBinding.wrappedValue).tag(textModelBinding.wrappedValue)
                 }

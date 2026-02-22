@@ -108,6 +108,7 @@ struct CloudModelInfo: Identifiable, Sendable, Hashable {
     let displayName: String
     let provider: CloudProvider
     let modality: CloudModelModality
+    var isRecommended: Bool = false
 }
 
 enum CloudModelModality: String, Sendable, Hashable {
@@ -176,6 +177,7 @@ enum CloudProviderError: LocalizedError {
     case httpError(statusCode: Int, message: String)
     case rateLimited(retryAfterSeconds: Int?)
     case unparsableResponse
+    case custom(String)
     case imageDecodingFailed
     case timeout
 
@@ -192,6 +194,8 @@ enum CloudProviderError: LocalizedError {
             return "Rate limited. Please wait and try again."
         case .unparsableResponse:
             return "Cloud model response could not be parsed."
+        case .custom(let message):
+            return message
         case .imageDecodingFailed:
             return "Could not decode image from cloud response."
         case .timeout:

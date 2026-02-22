@@ -10,6 +10,7 @@ struct StoryInfoSheet: View {
     let imageProviderName: String
     let textModelName: String
     let imageModelName: String
+    let conceptDecompositions: [Int: ImageConceptDecomposition]
     var dismiss: () -> Void
 
     /// The story page for the current position, if it's a content page (not title or end).
@@ -38,6 +39,12 @@ struct StoryInfoSheet: View {
                             icon: "paintbrush",
                             body: page.imagePrompt
                         )
+
+                        // Multi-concept decomposition (if available for this page)
+                        if let decomposition = conceptDecompositions[page.pageNumber],
+                           !decomposition.concepts.isEmpty {
+                            conceptDecompositionSection(decomposition.concepts)
+                        }
                     }
 
                     infoSection(
@@ -166,6 +173,49 @@ struct StoryInfoSheet: View {
                     .textSelection(.enabled)
             }
         }
+    }
+
+    // MARK: - Concept Decomposition
+
+    private func conceptDecompositionSection(_ concepts: [RankedImageConcept]) -> some View {
+        VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
+            Label("Image Concepts Sent to Image Playground", systemImage: "rectangle.3.group")
+                .font(StoryJuicerTypography.uiBodyStrong)
+                .foregroundStyle(Color.sjGlassInk)
+
+            Text("The prompt was split into these ranked concepts, each sent as a separate input (most important first):")
+                .font(StoryJuicerTypography.settingsMeta)
+                .foregroundStyle(Color.sjSecondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: StoryJuicerGlassTokens.Spacing.xSmall) {
+                ForEach(Array(concepts.enumerated()), id: \.offset) { index, concept in
+                    HStack(spacing: 4) {
+                        Text("\(index + 1).")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Color.sjCoral)
+                            .frame(width: 18, alignment: .trailing)
+
+                        Text(concept.label)
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color.sjCoral)
+
+                        Text(concept.value)
+                            .font(StoryJuicerTypography.settingsMeta)
+                            .foregroundStyle(Color.sjGlassInk)
+                    }
+                    .padding(.horizontal, StoryJuicerGlassTokens.Spacing.small)
+                    .padding(.vertical, StoryJuicerGlassTokens.Spacing.xSmall)
+                    .sjGlassChip(selected: index == 0, interactive: false)
+                }
+            }
+        }
+        .padding(StoryJuicerGlassTokens.Spacing.medium)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .sjGlassCard(
+            tint: .sjGlassSoft.opacity(StoryJuicerGlassTokens.Tint.subtle),
+            cornerRadius: StoryJuicerGlassTokens.Radius.chip
+        )
     }
 
     // MARK: - Helpers

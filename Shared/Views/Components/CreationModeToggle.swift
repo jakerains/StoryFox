@@ -11,13 +11,6 @@ struct CreationModeToggle: View {
                 modeChip(mode)
             }
         }
-        .overlay(alignment: .bottom) {
-            if let mode = hoveredMode {
-                hoverTooltip(for: mode)
-                    .offset(y: 36)
-                    .transition(.opacity.combined(with: .scale(scale: 0.92, anchor: .top)))
-            }
-        }
         .animation(.snappy(duration: 0.18), value: hoveredMode)
     }
 
@@ -46,6 +39,14 @@ struct CreationModeToggle: View {
             .sjGlassChip(selected: isSelected, interactive: true)
         }
         .buttonStyle(.plain)
+        .overlay(alignment: .top) {
+            if hoveredMode == mode {
+                hoverTooltip(for: mode)
+                    .offset(y: -36)
+                    .transition(.opacity.combined(with: .scale(scale: 0.92, anchor: .bottom)))
+                    .zIndex(10)
+            }
+        }
         .onHover { hovering in
             hoveredMode = hovering ? mode : nil
         }
@@ -59,6 +60,7 @@ struct CreationModeToggle: View {
         Text(mode.subtitle)
             .font(.system(size: 11, weight: .medium, design: .rounded))
             .foregroundStyle(Color.sjGlassInk)
+            .fixedSize()
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background {
