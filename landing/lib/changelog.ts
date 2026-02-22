@@ -12,6 +12,38 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.8.0",
+    date: "2026-02-21",
+    title: "Prompt Suggestions & Smarter Cloud Generation",
+    changes: [
+      {
+        type: "added",
+        description:
+          "AI-generated story prompt suggestions with typewriter animation on the creation screen — tap a suggestion to start generating instantly",
+      },
+      {
+        type: "added",
+        description:
+          "Recommended models section in HuggingFace text model picker highlights top-performing models like GPT-OSS 120B and DeepSeek V3",
+      },
+      {
+        type: "added",
+        description:
+          "Copy Error button on error banners lets you copy full error details for easier troubleshooting",
+      },
+      {
+        type: "changed",
+        description:
+          "Cloud text generation runs independently of on-device Foundation Models — no more deserialization errors when using HuggingFace or other cloud providers",
+      },
+      {
+        type: "fixed",
+        description:
+          "Creation mode tooltips (Quick, Guided, Author) now appear directly above the hovered button instead of overlapping other UI",
+      },
+    ],
+  },
+  {
     version: "1.7.6",
     date: "2026-02-21",
     title: "Smarter Illustrations",
